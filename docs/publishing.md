@@ -1,12 +1,12 @@
-# GitHub 发布步骤 · 1.0
+# GitHub 发布步骤 · 1.1
 
-公开仓库：[jindx1020-crypto/qingzhu-sword-array](https://github.com/jindx1020-crypto/qingzhu-sword-array)。1.0 标签为 `v1.0`，[Release 入口](https://github.com/jindx1020-crypto/qingzhu-sword-array/releases/tag/v1.0)，标题为 **1.0正式发布**。
+公开仓库：[jindx1020-crypto/qingzhu-sword-array](https://github.com/jindx1020-crypto/qingzhu-sword-array)。1.1 标签为 `v1.1`，[Release 入口](https://github.com/jindx1020-crypto/qingzhu-sword-array/releases/tag/v1.1)，标题为 **1.1 修复更新**。1.0 的 `v1.0` 标签与 Release 保留不改。
 
 本页保留构建、验证和上传步骤供后续维护。
 
 ## 发布前核对
 
-- 阅读 [验收报告](release-1.0.md)，保留尚未验证的真机与原著细节说明。
+- 阅读 [1.1 验收报告](release-1.1.md)，保留尚未验证的真机与原著细节说明。
 - 核对 [素材来源](assets.md)：原始人物／飞剑参考图的再分发权利需要作者确认；GPL 代码许可不代替素材或小说 IP 授权。
 - 从源码包在干净目录执行 [开发文档](development.md) 中的检查与构建。
 - 发布对应源码与两份 HTML，保留 GPLv3、第三方声明和制作署名。
@@ -19,16 +19,16 @@
 
 ## 创建 Release
 
-检查 GitHub Actions 完成后，为同一提交创建 `v1.0` 标签与正式 Release。标题和正文均可用 **1.0正式发布**。
+检查 GitHub Actions 完成后，为同一提交创建 `v1.1` 标签与正式 Release。标题用 **1.1 修复更新**，正文可取更新日志首段。
 
 在 game 目录执行 `npm run build:release`、`npm run check:release` 后，再执行 `npm run prepare:github`。
 
-GitHub 会规范化附件中的非英文字符，因此上传 `release/1.0/github/` 内的六个文件：
+GitHub 会规范化附件中的非英文字符，因此上传 `release/1.1/github/` 内的六个文件：
 
-- qingzhu-1.0.html
-- qingzhu-1.0-png.html
-- qingzhu-1.0-source.zip
-- qingzhu-1.0-player.zip
+- qingzhu-1.1.html
+- qingzhu-1.1-png.html
+- qingzhu-1.1-source.zip
+- qingzhu-1.1-player.zip
 - SHA256SUMS.txt
 - release-manifest.json
 

@@ -132,7 +132,7 @@ export const LEGACY_META=PATHS.flatMap((p,i)=>Array.from({length:6},(_,j)=>({id:
 export const DIFFICULTIES=[{name:'初入仙途',desc:'敌人生命 −15%、伤害 −30%；基础雷源150',hp:.85,damage:.7,xp:1.12,reserve:150},{name:'标准历练',desc:'敌人生命和伤害基准；基础雷源120',hp:1,damage:1,xp:1,reserve:120},{name:'险境求生',desc:'敌人生命 +20%、伤害 +25%；基础雷源110',hp:1.2,damage:1.25,xp:1.08,reserve:110}];
 export function xpCost(l){return Math.round(8+2.4*l+.035*l*l);}
 export function hashSeed(s){let h=2166136261;for(const c of String(s))h=Math.imul(h^c.charCodeAt(0),16777619);return h>>>0;}
-export function seeded(seed){let a=seed>>>0;const f=()=>{a+=0x6D2B79F5;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return ((t^t>>>14)>>>0)/4294967296;};f.state=()=>a>>>0;f.set=n=>a=n>>>0;return f;}
+export function seeded(seed){let a=seed>>>0;const f=()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return ((t^t>>>14)>>>0)/4294967296;};f.state=()=>a>>>0;f.set=n=>a=n>>>0;return f;}
 export function initialSave(){return {version:VERSION,metaRulesVersion:3,unlocked:0,insight:0,meta:[],seen:[],relicSeen:[],wins:0,runs:0,kills:0,best:0,achievements:[],history:[],records:{schema:1,entries:[],receipts:[]},checkpoint:null,settings:{music:.15,sfx:.4,shake:true,flash:false,numbers:false,quality:1,joystickSide:'left',joystickSize:'standard',skillSide:'right',touchLock:false,skipSeenCinematics:false,endlessSkipSeen:true,skipSeenAfterWin:false}};}
 
 export function relicDescription(item){return modText(RELICS.find(r=>r.id===item?.id)?.mods||item?.mods||{});}

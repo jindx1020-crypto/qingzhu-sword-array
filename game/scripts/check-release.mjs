@@ -11,7 +11,7 @@ import {artifactPath} from './delivery-paths.mjs';
 const read=file=>fs.readFileSync(path.join(root,file)),readArtifact=file=>fs.readFileSync(artifactPath(file));
 const files=releaseFiles(),sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 const guide=read('青竹剑阵_游玩说明.md').toString();validateGuide(guide);
-assert.equal(GAME_VERSION,'1.0');assert.equal(JSON.parse(read('game/package.json')).version,'1.0.0');assert.equal(JSON.parse(read('game/package.json')).license,'GPL-3.0-only');assert.equal(read('青竹剑阵_更新日志.md').toString().trim(),'1.0正式发布');
+assert.equal(GAME_VERSION,'1.1');assert.equal(JSON.parse(read('game/package.json')).version,'1.1.0');assert.equal(JSON.parse(read('game/package-lock.json')).version,'1.1.0');assert.equal(JSON.parse(read('game/package.json')).license,'GPL-3.0-only');const changelog=read('青竹剑阵_更新日志.md').toString();assert.ok(changelog.startsWith(GAME_VERSION+' 修复更新\n')&&changelog.trimEnd().endsWith('1.0正式发布'),'Changelog must lead with the current release and keep 1.0');
 const manifest=JSON.parse(readArtifact('release-manifest.json')),archive=unzipSync(readArtifact('青竹剑阵_源码.zip'));
 const playerFolder='青竹剑阵_'+GAME_VERSION+'_免安装版',player=unzipSync(readArtifact(playerFolder+'.zip'));
 assert.equal(Object.keys(player).length,5);
@@ -19,8 +19,9 @@ for(const [name,original]of Object.entries({'开始游戏.html':'凡人修仙传
 assert.match(Buffer.from(player[playerFolder+'/先读我.txt']).toString(),/双击同一文件夹内的「开始游戏.html」/);
 assert.deepEqual(Object.keys(archive).sort((a,b)=>a<b?-1:a>b?1:0),files);assert.deepEqual(Object.keys(manifest.source).sort((a,b)=>a<b?-1:a>b?1:0),files);
 for(const file of files){const bytes=read(file);assert.ok(Buffer.from(archive[file]).equals(bytes),'ZIP differs: '+file);assert.equal(sha(bytes),manifest.source[file],'Manifest differs: '+file);assert.ok(bytes.length<50*1024*1024,'Oversized source: '+file);
- if(/\.(md|m?js|jsx|tsx?|json|css|yml)$/.test(file)){
-  const text=bytes.toString();assert.doesNotMatch(text,/\/(?:Users|home)\/[^\s/'"`]+\//,'Personal path: '+file);
+ // Every non-binary file is scanned, including Python, text, SVG and HTML; paths also cover encoded tool folders and Windows profiles.
+ if(!/\.(png|jpe?g|webp|gif|ico|zip)$/i.test(file)){
+  const text=bytes.toString();assert.doesNotMatch(text,/\/(?:Users|home)\/[^\s/'"`]+\/|-Users-[A-Za-z0-9._]+-|\/private\/tmp\/|\/var\/folders\/|[A-Za-z]:\\{1,2}Users\\{1,2}/,'Personal path: '+file);
   assert.doesNotMatch(text,/(?:gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{50,}|sk-proj-[A-Za-z0-9_-]{30,})/,'Potential credential: '+file);
   if(file.endsWith('.md'))for(const m of text.matchAll(/\]\(([^)]+)\)/g)){const url=m[1].split('#')[0];if(!url||/^(?:https?:|mailto:)/.test(url))continue;const target=path.resolve(path.dirname(path.join(root,file)),decodeURIComponent(url));assert.ok(target.startsWith(root)&&fs.existsSync(target),'Broken local link: '+file+' -> '+url);}
  }

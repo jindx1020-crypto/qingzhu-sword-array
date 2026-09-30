@@ -7,6 +7,7 @@ import {createHash} from 'node:crypto';
 import {zipSync,unzipSync} from 'fflate';
 import {root} from './release-files.mjs';
 import {GAME_VERSION} from '../gameplay/version.js';
+import {OFFLINE_ENTRY,OFFLINE_PNG_ENTRY,PLAYER_ENTRY,PLAYER_PNG_ENTRY} from '../gameplay/delivery-names.js';
 import {releaseDir,artifactPath} from './delivery-paths.mjs';
 const folder='青竹剑阵_'+GAME_VERSION+'_免安装版';
 const readme=`青竹剑阵 · 虚天殿篇 ${GAME_VERSION}
@@ -42,9 +43,9 @@ WASD／方向键：移动；空格：闪避；E：神雷；Q：切换剑式；1�
 现有图片和原始参考图的来源／授权边界见源码包 docs/assets.md。
 `;
 const files={
- '开始游戏.html':fs.readFileSync(path.join(root,'凡人修仙传_青竹剑阵.html')),
+ [PLAYER_ENTRY]:fs.readFileSync(path.join(root,OFFLINE_ENTRY)),
  '先读我.txt':Buffer.from(readme.replaceAll('\n','\r\n')),
- '兼容版/开始游戏_PNG.html':fs.readFileSync(path.join(root,'凡人修仙传_青竹剑阵_兼容PNG.html')),
+ [PLAYER_PNG_ENTRY]:fs.readFileSync(path.join(root,OFFLINE_PNG_ENTRY)),
  '开源资料/LICENSE.txt':fs.readFileSync(path.join(root,'LICENSE')),
  '开源资料/青竹剑阵_源码.zip':fs.readFileSync(artifactPath('青竹剑阵_源码.zip'))
 };

@@ -2,7 +2,7 @@
 
 ## 代码授权
 
-青竹剑阵 · 虚天殿篇 1.0
+青竹剑阵 · 虚天殿篇 1.1
 
 Copyright (C) 2026 bilibili@卡布奇诺ultra
 
@@ -14,11 +14,11 @@ Copyright (C) 2026 bilibili@卡布奇诺ultra
 
 免安装玩家包已经附带「开源资料／青竹剑阵_源码.zip」及 GPLv3 原文，解压即可取得对应源码；游玩入口为包内「开始游戏.html」。
 
-请在取得本游戏的同一发行页面下载源码附件「qingzhu-1.0-source.zip」（本地文件名为「青竹剑阵_源码.zip」），包含本版可修改源码、构建脚本、依赖锁文件、素材与文档。仓库代码和同版本源码包均是源码入口。重新分发游戏时，应提供该成品对应的完整源码及许可证；修改版须注明修改。安装依赖后可按源码中的开发文档重建两份离线 HTML。
+请在取得本游戏的同一发行页面下载源码附件「qingzhu-1.1-source.zip」（本地文件名为「青竹剑阵_源码.zip」），包含本版可修改源码、构建脚本、依赖锁文件、素材与文档。仓库代码和同版本源码包均是源码入口。重新分发游戏时，应提供该成品对应的完整源码及许可证；修改版须注明修改。安装依赖后可按源码中的开发文档重建两份离线 HTML。
 
 源码仓库：https://github.com/jindx1020-crypto/qingzhu-sword-array
 
-1.0 发布页：https://github.com/jindx1020-crypto/qingzhu-sword-array/releases/tag/v1.0
+1.1 发布页：https://github.com/jindx1020-crypto/qingzhu-sword-array/releases/tag/v1.1
 
 游戏与对应源码在同一个 Release 中提供；免安装玩家包内也包含对应源码。
 

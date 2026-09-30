@@ -1,0 +1,160 @@
+{
+  "version": "1.1",
+  "date": "2026-09-30",
+  "environment": {
+    "os": "macOS arm64",
+    "node": "24.15.0",
+    "npm": "11.12.1"
+  },
+  "automated": {
+    "tests": 547,
+    "passed": 547,
+    "failed": 0,
+    "skipped": 0,
+    "newRegressionTests": 8
+  },
+  "lint": {
+    "newDiagnostics": 0,
+    "unchangedBaseline": 19
+  },
+  "typescript": true,
+  "audit": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0,
+    "total": 0
+  },
+  "dependencyInventory": {
+    "lockEntries": 699,
+    "regeneratedWith": "npm run docs:deps"
+  },
+  "browser": [
+    {
+      "profile": "webp",
+      "suite": "batch1",
+      "checks": 13,
+      "viewRecords": 10,
+      "pageErrors": 0,
+      "externalRequests": 0
+    },
+    {
+      "profile": "webp",
+      "suite": "batch2",
+      "checks": 4,
+      "viewRecords": 8,
+      "pageErrors": 0,
+      "externalRequests": 0
+    },
+    {
+      "profile": "webp",
+      "suite": "batch3",
+      "checks": 11,
+      "viewRecords": 0,
+      "pageErrors": 0,
+      "externalRequests": 0
+    },
+    {
+      "profile": "webp",
+      "suite": "experience",
+      "checks": 24,
+      "viewRecords": 0,
+      "pageErrors": 0,
+      "externalRequests": null
+    },
+    {
+      "profile": "webp",
+      "suite": "release",
+      "checks": 7,
+      "viewRecords": 0,
+      "pageErrors": 0,
+      "externalRequests": 0
+    },
+    {
+      "profile": "png",
+      "suite": "batch1",
+      "checks": 13,
+      "viewRecords": 10,
+      "pageErrors": 0,
+      "externalRequests": 0
+    },
+    {
+      "profile": "png",
+      "suite": "batch2",
+      "checks": 4,
+      "viewRecords": 8,
+      "pageErrors": 0,
+      "externalRequests": 0
+    },
+    {
+      "profile": "png",
+      "suite": "batch3",
+      "checks": 11,
+      "viewRecords": 0,
+      "pageErrors": 0,
+      "externalRequests": 0
+    },
+    {
+      "profile": "png",
+      "suite": "experience",
+      "checks": 24,
+      "viewRecords": 0,
+      "pageErrors": 0,
+      "externalRequests": null
+    },
+    {
+      "profile": "png",
+      "suite": "release",
+      "checks": 7,
+      "viewRecords": 0,
+      "pageErrors": 0,
+      "externalRequests": 0
+    }
+  ],
+  "browserChecks": 118,
+  "viewRecords": 36,
+  "playerPackage": {
+    "entries": [
+      {
+        "entry": "开始游戏.html",
+        "viewport": "1440x900"
+      },
+      {
+        "entry": "兼容版/开始游戏_PNG.html",
+        "viewport": "390x844"
+      }
+    ],
+    "offline": true,
+    "normalLaunch": true,
+    "movementAndDash": true,
+    "pause": true,
+    "saveSurvivesReload": true,
+    "errors": 0,
+    "externalRequests": 0
+  },
+  "introduction": true,
+  "simulations": {
+    "seed": "release-v1.0",
+    "runs": 18,
+    "wins": 16,
+    "losses": 2,
+    "snapshotChecks": 2811,
+    "identicalTo1_0": 18
+  },
+  "cleanVerification": {
+    "npmCi": true,
+    "check": true,
+    "webBuild": true,
+    "offlineBuilds": true,
+    "identicalHTML": true,
+    "identicalSourceArchive": true,
+    "identicalPlayerPackage": true
+  },
+  "boundaries": [
+    "No physical phone validation",
+    "No human win-rate claim",
+    "Reference image rights pending author confirmation",
+    "Nine source-wording groups pending verification"
+  ]
+}

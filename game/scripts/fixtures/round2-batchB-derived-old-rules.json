@@ -1,5 +1,5 @@
 {
- "source": "batch-A accepted snapshot (baseline/source-after-stepA.tar.gz), GAME_ROOT=/private/tmp/claude-501/-Users-capu-6-0fanren/e0e6f431-03c9-48a8-91f0-543ec4761025/scratchpad/afterA/game/",
+ "source": "batch-A accepted snapshot (baseline/source-after-stepA.tar.gz), GAME_ROOT=<afterA>/game/",
  "generated": "2026-09-14",
  "command": "GAME_ROOT=<afterA>/game/ node scripts/round2-batchB-derived.mjs > scripts/fixtures/round2-batchB-derived-old-rules.json",
  "combos": [

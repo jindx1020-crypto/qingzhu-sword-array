@@ -35,5 +35,5 @@ jobs:
           path: game/qa/release/
       - uses: actions/upload-artifact@v4
         with:
-          name: qingzhu-1.0
-          path: release/1.0/
+          name: qingzhu-1.1
+          path: release/1.1/

@@ -13,14 +13,14 @@
 ├── docs/                            精选公开文档
 │   └── presentation/                视频介绍源模板、截图和口播稿
 ├── release/                         本地生成，不提交 Git
-│   ├── 1.0/                         发给玩家／上传 Release 的附件
+│   ├── 1.1/                         发给玩家／上传 Release 的附件
 │   └── video/                       录视频用的 HTML、口播稿、录制说明
 └── local-archive/                   完整历史资料，不提交 Git
 ```
 
 ### 发给玩家
 
-进入 `release/1.0/`，按需要发送单个游戏 HTML 或免安装 ZIP。对应源码 ZIP、校验清单与交付 manifest 在同一目录。不要把整个工作目录发送给玩家。
+进入 `release/1.1/`，按需要发送单个游戏 HTML 或免安装 ZIP。对应源码 ZIP、校验清单与交付 manifest 在同一目录。不要把整个工作目录发送给玩家。
 
 ### 录制视频
 

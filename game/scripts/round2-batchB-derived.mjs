@@ -60,5 +60,5 @@ export function captureRows(mods,combos){const rows=[];for(const combo of combos
 if(process.argv[1]&&fileURLToPath(import.meta.url)===process.argv[1]){
  const G=process.env.GAME_ROOT;if(!G)throw Error('GAME_ROOT required (the batch-A accepted tree)');
  const mods=await loadTree(G);
- process.stdout.write(JSON.stringify({source:'batch-A accepted snapshot (baseline/source-after-stepA.tar.gz), GAME_ROOT='+G,generated:new Date().toISOString().slice(0,10),command:'GAME_ROOT=<afterA>/game/ node scripts/round2-batchB-derived.mjs > scripts/fixtures/round2-batchB-derived-old-rules.json',combos:OLD_COMBOS,rows:captureRows(mods,OLD_COMBOS)},null,1));
+ process.stdout.write(JSON.stringify({source:'batch-A accepted snapshot (baseline/source-after-stepA.tar.gz), GAME_ROOT=<afterA>/game/',generated:new Date().toISOString().slice(0,10),command:'GAME_ROOT=<afterA>/game/ node scripts/round2-batchB-derived.mjs > scripts/fixtures/round2-batchB-derived-old-rules.json',combos:OLD_COMBOS,rows:captureRows(mods,OLD_COMBOS)},null,1));
 }

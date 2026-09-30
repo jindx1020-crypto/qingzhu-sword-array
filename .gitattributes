@@ -1,4 +1,5 @@
-* text=auto
+# LF everywhere keeps LICENSE, HTML and other embedded texts byte-identical across checkout platforms.
+* text=auto eol=lf
 *.js text eol=lf
 *.jsx text eol=lf
 *.mjs text eol=lf
@@ -9,5 +10,6 @@
 *.json text eol=lf
 *.yml text eol=lf
 *.png binary
+*.jpg binary
 *.webp binary
 *.zip binary

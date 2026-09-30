@@ -7,6 +7,6 @@ const url=new URL('../../青竹剑阵_游玩说明.md',import.meta.url);let guid
 for(const [key,table]of Object.entries(guideTables())){
  const pattern=new RegExp('<!-- table:'+key+':start -->[\\s\\S]*?<!-- table:'+key+':end -->');
  if(!pattern.test(guide))throw Error('Missing documentation table: '+key);
- guide=guide.replace(pattern,'<!-- table:'+key+':start -->\n'+table+'\n<!-- table:'+key+':end -->');
+ guide=guide.replace(pattern,()=>'<!-- table:'+key+':start -->\n'+table+'\n<!-- table:'+key+':end -->');
 }
 fs.writeFileSync(url,guide);console.log('Updated rule tables; review the guide before building.');

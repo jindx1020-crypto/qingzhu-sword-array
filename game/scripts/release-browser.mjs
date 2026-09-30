@@ -26,7 +26,7 @@ try{
   const before=await snapshot(page);await page.getByRole('button',{name:/开源许可与源码/}).click();const body=page.getByLabel('开源许可正文');assert.match(await body.innerText(),/GPL-3.0-only/);assert.match(await body.innerText(),/GNU GENERAL PUBLIC LICENSE/);assert.match(await body.innerText(),/青竹剑阵_源码.zip/);
   await page.getByRole('button',{name:'关闭说明',exact:true}).click();assert.deepEqual(await snapshot(page),before);
   await page.getByRole('button',{name:/游玩说明/}).click();await page.getByLabel('搜索说明关键词').fill('隔离原文');assert.match(await page.getByLabel('游玩说明正文').innerText(),/满额时停止本次覆盖/);await page.getByRole('button',{name:'下一个匹配段落',exact:true}).click();await page.screenshot({path:new URL('help-'+width+'x'+height+'.png',out).pathname});
-  await page.getByRole('button',{name:'关闭说明',exact:true}).click();await page.getByRole('button',{name:/更新日志/}).click();assert.equal((await page.getByLabel('更新日志正文').innerText()).trim(),'1.0正式发布');
+  await page.getByRole('button',{name:'关闭说明',exact:true}).click();await page.getByRole('button',{name:/更新日志/}).click();const changes=(await page.getByLabel('更新日志正文').innerText()).trim();assert.ok(changes.startsWith('1.1 修复更新')&&changes.endsWith('1.0正式发布'),changes);
   if(width===1440){
    await page.getByRole('button',{name:'关闭说明',exact:true}).click();await page.getByRole('button',{name:/藏经图鉴/}).click();
    const thunder=page.locator('.codex-card').filter({has:page.getByRole('heading',{name:'雷威',exact:true})});assert.match(await thunder.innerText(),/40%/);

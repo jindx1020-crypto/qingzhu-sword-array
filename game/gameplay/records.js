@@ -9,6 +9,9 @@ export const emptyRecords=()=>({schema:1,entries:[],receipts:[]});
 const integer=(n,min=0,max=1e12)=>Number.isSafeInteger(n)&&n>=min&&n<=max;
 const text=(s,max=256)=>typeof s==='string'&&s.length>0&&s.length<=max&&Array.from(s).every(c=>c.charCodeAt(0)>=32);
 export const recordReceipt=(runId,kind,loop=0)=>JSON.stringify([runId,kind,loop]);
+// Seeds are free text; control characters (pasted tabs, line breaks) are dropped so a finished run can always be recorded.
+export const printableText=value=>Array.from(String(value??'')).filter(c=>c.charCodeAt(0)>=32).join('');
+export const printableSeed=seed=>printableText(seed).slice(0,256)||'（空）';
 export const recordGroup=r=>JSON.stringify([r.mode,r.difficulty,r.path,...RULE_KEYS.map(k=>r.rules[k]),r.touchLockUsed,...(r.segmentVersion===1||[1,2].includes(r.challengeVersion)?[r.segmentVersion||0,r.challengeVersion||0,(r.challengeChoices||[]).flatMap((v,i)=>v==='none'?[]:[[i,v]])]:[])]);
 export function normalizeRecords(value){if(value===undefined)return emptyRecords();const fail=()=>{throw Error('本地成绩记录无效，原记录未被修改');};
  if(!value||value.schema!==1||!Array.isArray(value.entries)||!Array.isArray(value.receipts))fail();
@@ -34,7 +37,7 @@ function enter(book,summary,kind){const d=summary.recordDetails,loop=kind==='loo
  const out=copy(book);out.receipts.push(token);
  const can=d?.version===1&&d.eligibleStart&&(kind==='loop'?summary.mode==='endless'&&loop>0:summary.won&&['story','seed'].includes(summary.mode)&&summary.nodes===22);
  if(!can)return out;
- const entry={...experienceRecordFields(d,loop),mode:summary.mode,path:summary.path,difficulty:summary.difficulty??0,seed:summary.seed,runId:id,gameVersion:d.gameVersion,timeMs:kind==='loop'?d.lastLoopMs:d.battleMs,loops:loop,rules:copy(d.rules),touchLockUsed:kind==='loop'?d.lastLoopLockUsed:d.touchLockUsed,metaCount:d.metaCount,supply:d.supply};
+ const entry={...experienceRecordFields(d,loop),mode:summary.mode,path:summary.path,difficulty:summary.difficulty??0,seed:printableSeed(summary.seed),runId:id,gameVersion:d.gameVersion,timeMs:kind==='loop'?d.lastLoopMs:d.battleMs,loops:loop,rules:copy(d.rules),touchLockUsed:kind==='loop'?d.lastLoopLockUsed:d.touchLockUsed,metaCount:d.metaCount,supply:d.supply};
  const at=out.entries.findIndex(r=>recordGroup(r)===recordGroup(entry)),prior=out.entries[at];const better=!prior||(kind==='loop'?entry.loops>prior.loops||entry.loops===prior.loops&&entry.timeMs<prior.timeMs:entry.timeMs<prior.timeMs);
  if(better){if(at<0)out.entries.push(entry);else out.entries[at]=entry;}return out;
 }

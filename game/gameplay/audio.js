@@ -5,10 +5,11 @@ const EFFECTS={level:[[523,.3],[659,.4],[784,.5]],choose:[[440,.12],[660,.18]],d
 const MECHANISMS=new Set(['focus','sigil','echo','line','counter','critical']);
 export const SOUND_GAPS={hurt:.08,dash:.12,thunder:.15,level:.2,item:.2,choose:.12,boss:.4,kill:.1,denied:.4};
 export class Sound {
- constructor(){this.ctx=null;this.settings={music:.15,sfx:.4};this.step=0;this.last=0;this.paused=false;this.voices=new Set();this.voiceMeta=new Map();this.buses={};this.soundAt={};this.lastMechanism=-Infinity;}
+ constructor(){this.ctx=null;this.settings={music:.15,sfx:.4};this.step=0;this.last=0;this.paused=false;this.voices=new Set();this.voiceMeta=new Map();this.buses={};this.levels={};this.soundAt={};this.lastMechanism=-Infinity;}
  start(){if(!this.ctx){const C=window.AudioContext||window.webkitAudioContext;if(C)this.ctx=new C();}this.ctx?.resume().catch(()=>{});}
  stopVoice(o){const meta=this.voiceMeta.get(o);this.voices.delete(o);this.voiceMeta.delete(o);try{o.stop();}catch{}try{o.disconnect();meta?.gain.disconnect();}catch{}}
- configure(settings){this.settings=settings;const c=this.ctx;if(!c||c.state==='closed')return;for(const channel of ['music','sfx']){if(!(settings[channel]>0))for(const voice of this.voices)if(this.voiceMeta.get(voice)?.channel===channel)this.stopVoice(voice);if(!this.buses[channel]){this.buses[channel]=c.createGain();this.buses[channel].connect(c.destination);}this.buses[channel].gain.setValueAtTime(this.paused?0:settings[channel],c.currentTime);}}
+ // Called every frame; bus gains are only rescheduled when the level actually changes.
+ configure(settings){this.settings=settings;const c=this.ctx;if(!c||c.state==='closed')return;for(const channel of ['music','sfx']){if(!(settings[channel]>0))for(const voice of this.voices)if(this.voiceMeta.get(voice)?.channel===channel)this.stopVoice(voice);if(!this.buses[channel]){this.buses[channel]=c.createGain();this.buses[channel].connect(c.destination);}const level=this.paused?0:settings[channel];if(this.levels[channel]!==level){this.levels[channel]=level;this.buses[channel].gain.setValueAtTime(level,c.currentTime);}}}
  setPaused(paused){if(paused)for(const voice of this.voices)this.stopVoice(voice);this.paused=paused;this.configure(this.settings);}
  tone(freq,duration,type='sine',volume=.1,channel='sfx',delay=0,priority=0,name=channel){
   const c=this.ctx;if(this.paused||!c||c.state!=='running'||volume<=0||!(this.settings[channel]>0))return false;

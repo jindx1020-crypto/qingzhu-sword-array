@@ -1,4 +1,4 @@
-# 开发与构建 · 1.0
+# 开发与构建 · 1.1
 
 ## 环境
 
@@ -22,7 +22,7 @@ React 与 Canvas 通过 Game 组件桥接；战斗引擎维护可变状态，Rea
 | game/scripts | 构建、文档表格、验收、模拟与测试夹具 |
 | game/tests | 当前与历史规则的回归测试 |
 | docs | 当前开发、许可、验收、改编与发布说明 |
-| release/1.0、release/video | 游戏发布附件、介绍视频成品；构建生成，不提交 Git |
+| release/1.1、release/video | 游戏发布附件、介绍视频成品；构建生成，不提交 Git |
 | local-archive | 本地旧源码、测试原文、方案、参考素材和旧交付；不公开 |
 | game/qa | 当前验证输出目录，按需创建；旧输出已归档 |
 
@@ -35,6 +35,8 @@ React 与 Canvas 通过 Game 组件桥接；战斗引擎维护可变状态，Rea
 ```sh
 npm run docs:tables
 ```
+
+依赖变化后，先 `npm ci` 与 `npm run build:offline`，再运行 `npm run docs:deps` 重新生成 `docs/dependency-inventory.json` 与 `docs/licenses/`：每个锁定条目一行，许可原文按 LF 规范化后以 SHA-256 前 16 位命名，未被引用的旧原文会删除。`npm run check:release` 仍逐项核对锁文件与清单。
 
 这条命令显式更新文档表格。请复核正文后再构建。构建中的 `embed-docs` 只校验和生成 `docs.generated.js`；表格不同会失败，不会偷偷改说明。`assets.generated.js`、`docs.generated.js` 和构建目录不提交。
 
@@ -64,7 +66,7 @@ npm run check:release
 
 ## 发布产物
 
-产物位置统一定义在 `scripts/delivery-paths.mjs`。游戏发布附件进入 `release/<游戏版本>/`，当前为 `release/1.0/`；根目录两个同名 HTML 保留直接游玩入口，与发布副本逐字节相同。`npm run build:intro` 将视频介绍 HTML、口播稿副本和录制说明写入 `release/video/`。
+产物位置统一定义在 `scripts/delivery-paths.mjs`。游戏发布附件进入 `release/<游戏版本>/`，当前为 `release/1.1/`；根目录两个同名 HTML 保留直接游玩入口，与发布副本逐字节相同。`npm run build:intro` 将视频介绍 HTML、口播稿副本和录制说明写入 `release/video/`。
 
 `build:release` 校验原图／编码哈希、嵌入文档、构建两份离线 HTML，恢复默认 WebP 配置，生成白名单源码 ZIP、免安装玩家 ZIP、SHA256SUMS.txt 与 release-manifest.json。玩家包包含直接运行的 HTML、PNG 兼容入口、先读我和对应源码；构建脚本不放在玩家入口目录。源码包固定 ZIP 时间戳并解压回读比对，不靠 Python 或系统 zip。
 
@@ -76,4 +78,4 @@ WebP 与 PNG 的离线画面应在浏览器中核对；半透明预乘通道可�
 
 旧规则快照现在与 `scripts/fixtures/pre-balance4/` 中经哈希封存的独立旧引擎，在同一个 Node 运行时进行完整快照哈希对比。原 54 行归档与派生数值夹具保持；不靠跨 CPU／运行时的序列化哈希替代兼容性验证，不放宽数字容差或跳过用例。
 
-发布 GitHub 前运行 `npm run prepare:github`，在 release/1.0/github/ 生成逐字节相同的英文附件及对应校验清单，避免平台把中文文件名改成下划线。
+发布 GitHub 前运行 `npm run prepare:github`，在 release/1.1/github/ 生成逐字节相同的英文附件及对应校验清单，避免平台把中文文件名改成下划线。
