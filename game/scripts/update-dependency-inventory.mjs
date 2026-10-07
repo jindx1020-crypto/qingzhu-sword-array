@@ -2,7 +2,7 @@
  * Copyright (C) 2026 bilibili@卡布奇诺ultra
  */
 // Regenerates docs/dependency-inventory.json and docs/licenses/ from package-lock.json and the installed node_modules.
-// Run after `npm ci` and `npm run build:offline` (bundled-packages.json marks the offline runtime dependencies).
+// Run after `npm ci` and `npm run build:offline` (bundled-packages.json marks every package whose code, stylesheet or vendored source is in the offline HTML).
 // Only packages installed on this platform contribute local license texts; others keep registry URL and integrity.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -12,7 +12,9 @@ const game=path.join(root,'game'),docs=path.join(root,'docs'),licenseDir=path.jo
 const lock=JSON.parse(fs.readFileSync(path.join(game,'package-lock.json'),'utf8'));
 const bundledFile=path.join(game,'offline-build','bundled-packages.json');
 if(!fs.existsSync(bundledFile))throw Error('Run npm run build:offline first: '+path.relative(root,bundledFile)+' is missing');
-const bundled=new Set(JSON.parse(fs.readFileSync(bundledFile,'utf8')).map(p=>p.name+'@'+p.version));
+// Bundled copies are matched by their installed lock path, and each must be a locked package of the same name and version.
+const bundledList=JSON.parse(fs.readFileSync(bundledFile,'utf8')),bundled=new Set(bundledList.map(p=>p.path));
+for(const p of bundledList){const entry=lock.packages[p.path];if(!p.path||!entry||p.path.split('node_modules/').at(-1)!==p.name||entry.version!==p.version)throw Error('Bundled package is not a locked dependency: '+p.name+'@'+p.version+' at '+p.path+'; rerun npm ci and npm run build:offline');}
 const check=process.argv.includes('--check'),texts=new Map(),rows=[];
 for(const [key,p]of Object.entries(lock.packages)){
  if(!key)continue;const name=key.split('node_modules/').at(-1),folder=path.join(game,key),licenseTexts=[];
@@ -21,7 +23,7 @@ for(const [key,p]of Object.entries(lock.packages)){
   // Line endings are normalized so the stored text and its id do not depend on the package tarball or checkout platform.
   const text=Buffer.from(fs.readFileSync(full,'latin1').replaceAll('\r\n','\n'),'latin1'),id=createHash('sha256').update(text).digest('hex').slice(0,16);texts.set(id,text);licenseTexts.push('licenses/'+id+'.txt');
  }
- const row={package:name,version:p.version,license:p.license,resolved:p.resolved,integrity:p.integrity,bundledInOffline:bundled.has(name+'@'+p.version),licenseTexts:[...new Set(licenseTexts)]};
+ const row={package:name,version:p.version,license:p.license,resolved:p.resolved,integrity:p.integrity,bundledInOffline:bundled.has(key),licenseTexts:[...new Set(licenseTexts)]};
  rows.push({key,row});
 }
 // One row per lock entry (nested copies stay listed), ordered by lock path.

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (C) 2026 bilibili@卡布奇诺ultra
 name: Verify release
 on:
   push:
@@ -8,19 +10,26 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
+    # The checkout folder contains a space and CJK characters so path-encoding regressions fail here first.
     defaults:
       run:
-        working-directory: game
+        working-directory: 'qingzhu 青竹/game'
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: 'qingzhu 青竹'
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
-          cache-dependency-path: game/package-lock.json
+          cache-dependency-path: 'qingzhu 青竹/game/package-lock.json'
       - run: npm ci
-      - run: npm audit --audit-level=high
+      - name: Read game version
+        id: version
+        run: node --input-type=module -e "import {GAME_VERSION} from './gameplay/version.js';console.log('version='+GAME_VERSION);" >> "$GITHUB_OUTPUT"
+      # High and critical advisories fail unless registered in scripts/audit-gate.mjs as still unfixed upstream.
+      - run: npm run audit:gate
       - run: npm run check
       - run: npm run build
       - run: npm run build:release
@@ -28,12 +37,16 @@ jobs:
       - run: npm run test:browser
       - run: npm run test:player
       - run: npm run check:release
+      - run: npm run build:intro
+      - run: npm run test:intro
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: verification
-          path: game/qa/release/
+          path: 'qingzhu 青竹/game/qa/'
+          if-no-files-found: error
       - uses: actions/upload-artifact@v4
         with:
-          name: qingzhu-1.1
-          path: release/1.1/
+          name: qingzhu-${{ steps.version.outputs.version }}
+          path: 'qingzhu 青竹/release/${{ steps.version.outputs.version }}/'
+          if-no-files-found: error

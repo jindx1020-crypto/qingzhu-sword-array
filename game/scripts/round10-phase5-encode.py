@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (C) 2026 bilibili@卡布奇诺ultra
 """Compare encoding copies; never alter original PNGs. Run from the game directory."""
 from pathlib import Path
 from PIL import Image,ImageChops,ImageStat

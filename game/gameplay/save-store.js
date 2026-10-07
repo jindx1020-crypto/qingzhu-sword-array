@@ -105,7 +105,9 @@ export class SaveVault{
   // Every write (including commit rollback) checks all four slots before and after.
   const attempt=this.recoveryAttempt?.signature===signature?this.recoveryAttempt:{signature,snapshot:{...before},protected:false};
   const storage=this.storage,read=()=>({primary:storage.getItem(SAVE_KEY),backup:storage.getItem(BACKUP_KEY),journal:storage.getItem(JOURNAL_KEY),unreadable:storage.getItem(RAW_BACKUP_KEY)});
-  if(before.primary!==this.expectedRaw)throw new SaveError('conflict','主记录已变化，请重新载入');
+  // A preview taken before a later write by this same page is stale, not a cross-window conflict: disk primary is still exactly what this page wrote.
+  // Only that case is reclassified; any other change (including another window touching backup, journal or quarantine) stays a hard conflict.
+  if(before.primary!==this.expectedRaw)throw read().primary===this.expectedRaw?new SaveError('stale-preview','预览之后本页已保存过新的记录，请重新查看并确认'):new SaveError('conflict','主记录已变化，请重新载入');
   const check=()=>{if(JSON.stringify(read())!==JSON.stringify(attempt.snapshot))throw new SaveError('conflict','恢复资料已被另一窗口更改，请重新载入');};
   check();this.recoveryAttempt=attempt;
   const keys={[SAVE_KEY]:'primary',[BACKUP_KEY]:'backup',[JOURNAL_KEY]:'journal',[RAW_BACKUP_KEY]:'unreadable'};
@@ -166,7 +168,7 @@ export class SaveVault{
   if(this.corrupt&&!allowCorrupt)throw new SaveError('invalid','旧存档尚未处理，操作已停止');
   const next=normalizeSave(input);let raw;try{this.recoverBackup();raw=this.storage.getItem(SAVE_KEY);}catch(e){if(e instanceof SaveError)throw e;throw new SaveError('storage','备份尚未恢复，未覆盖存档',{cause:e});}
   if(raw!==this.expectedRaw)throw new SaveError('conflict','其他窗口已更新存档，本页暂时停止写入');
-  const stamp=Date.now();next.savedAt=stamp;next.revision=(Number(next.revision)||0)+1;const encoded=JSON.stringify(next);let journalText=null;
+  const stamp=Date.now();next.savedAt=stamp;next.revision=(Number(next.revision)||0)%1e15+1;/* wraps inside the 1e15 bound normalizeSave enforces, so an imported edge value never yields an unloadable save */const encoded=JSON.stringify(next);let journalText=null;
   try{
    if(raw&&(backup||this.corrupt)){
     const key=this.corrupt?RAW_BACKUP_KEY:BACKUP_KEY,before=this.storage.getItem(key);let entry={raw,savedAt:stamp};

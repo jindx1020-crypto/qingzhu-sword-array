@@ -4,11 +4,12 @@
 // Independent late-rest transactions. Never change a pending event/core selection or thunder reserve.
 export const SUPPLY_NODES=['4:0','4:1','4:2','4:3','5:0','5:1'];
 export const SUPPLY_PRICES=[80,80,80];
+// Less than one point to restore counts as full: the HUD rounds HP up, so the player already sees a full bar and must not pay 80 for it.
 export function supplyState(b,type='hp'){
  const records=b.economy?.supplyPurchases||[],count=records.length,price=SUPPLY_PRICES[count]??null,p=b.player;
  const gain=type==='hp'?Math.max(0,Math.min(p.maxHp*.25,p.maxHp-p.hp)):type==='shield'?Math.max(0,Math.min(12,p.maxShield+12-p.shield)):0;
  const visible=b.options.economyVersion===4&&!!b.rest&&SUPPLY_NODES.includes(b.rest.node),duplicate=records.some(r=>r.loop===(b.endlessLoop||0)&&r.node===b.rest?.node);
- const reason=!visible?'unavailable':b.scene!=='intermission'?'wrong-scene':duplicate?'node-used':count>=3?'global-limit':!['hp','shield'].includes(type)?'invalid-type':gain<=0?'full':b.gold<price?'unaffordable':'';
+ const reason=!visible?'unavailable':b.scene!=='intermission'?'wrong-scene':duplicate?'node-used':count>=3?'global-limit':!['hp','shield'].includes(type)?'invalid-type':gain<1?'full':b.gold<price?'unaffordable':'';
  return {visible,ready:!reason,reason,count,type,gain,price};
 }
 export function buySupply(b,type,quotedPrice=supplyState(b,type).price){

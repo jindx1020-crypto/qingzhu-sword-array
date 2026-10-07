@@ -1,0 +1,250 @@
+{
+ "version": "1.2",
+ "date": "2026-10-08",
+ "environment": {
+  "os": "macOS arm64",
+  "node": "24.15.0",
+  "npm": "11.12.1"
+ },
+ "automated": {
+  "tests": 557,
+  "passed": 557,
+  "failed": 0,
+  "skipped": 0,
+  "newRegressionTests": 10,
+  "newRegressionTestsFailOn1_1": 10
+ },
+ "lint": {
+  "newDiagnostics": 0,
+  "unchangedBaseline": 19
+ },
+ "typescript": true,
+ "audit": {
+  "gate": "npm run audit:gate",
+  "passed": true,
+  "highOrCritical": 1,
+  "registeredUnfixedUpstream": [
+   "GHSA-vfj7-8cjw-p6xm"
+  ],
+  "resolvedThisRelease": [
+   "GHSA-5gmw-xhrv-c9v3",
+   "GHSA-85c8-ppgw-ccpr",
+   "GHSA-jqcg-44mw-7w3h",
+   "GHSA-wq5f-xc86-pv6w",
+   "GHSA-68fv-2mgg-jv7q",
+   "GHSA-6qxp-vccf-f47h"
+  ],
+  "bundledPackagesChanged": 0
+ },
+ "dependencyInventory": {
+  "lockEntries": 699,
+  "licenseTexts": 272,
+  "bundledInOffline": 15,
+  "regeneratedWith": "npm run docs:deps"
+ },
+ "browser": [
+  {
+   "profile": "webp",
+   "suite": "batch1",
+   "checks": 13,
+   "viewRecords": 10,
+   "pageErrors": 0,
+   "externalRequests": 0
+  },
+  {
+   "profile": "webp",
+   "suite": "batch2",
+   "checks": 4,
+   "viewRecords": 8,
+   "pageErrors": 0,
+   "externalRequests": 0
+  },
+  {
+   "profile": "webp",
+   "suite": "batch3",
+   "checks": 11,
+   "viewRecords": 0,
+   "pageErrors": 0,
+   "externalRequests": 0
+  },
+  {
+   "profile": "webp",
+   "suite": "experience",
+   "checks": 24,
+   "viewRecords": 0,
+   "pageErrors": 0,
+   "externalRequests": null
+  },
+  {
+   "profile": "webp",
+   "suite": "release",
+   "checks": 7,
+   "viewRecords": 0,
+   "pageErrors": 0,
+   "externalRequests": 0
+  },
+  {
+   "profile": "webp",
+   "suite": "release-1.2",
+   "checks": 23,
+   "viewRecords": 0,
+   "pageErrors": 0,
+   "externalRequests": 0
+  },
+  {
+   "profile": "png",
+   "suite": "batch1",
+   "checks": 13,
+   "viewRecords": 10,
+   "pageErrors": 0,
+   "externalRequests": 0
+  },
+  {
+   "profile": "png",
+   "suite": "batch2",
+   "checks": 4,
+   "viewRecords": 8,
+   "pageErrors": 0,
+   "externalRequests": 0
+  },
+  {
+   "profile": "png",
+   "suite": "batch3",
+   "checks": 11,
+   "viewRecords": 0,
+   "pageErrors": 0,
+   "externalRequests": 0
+  },
+  {
+   "profile": "png",
+   "suite": "experience",
+   "checks": 24,
+   "viewRecords": 0,
+   "pageErrors": 0,
+   "externalRequests": null
+  },
+  {
+   "profile": "png",
+   "suite": "release",
+   "checks": 7,
+   "viewRecords": 0,
+   "pageErrors": 0,
+   "externalRequests": 0
+  },
+  {
+   "profile": "png",
+   "suite": "release-1.2",
+   "checks": 23,
+   "viewRecords": 0,
+   "pageErrors": 0,
+   "externalRequests": 0
+  }
+ ],
+ "browserChecks": 164,
+ "viewRecords": 36,
+ "realInputSuite": {
+  "script": "game/scripts/qa-release-1.2-browser.mjs",
+  "checksPerProfile": 23,
+  "failsOn1_1At": "choice card body selects with real mouse 1440x900"
+ },
+ "playerPackage": {
+  "entries": [
+   {
+    "entry": "开始游戏.html",
+    "viewport": "1440x900"
+   },
+   {
+    "entry": "兼容版/开始游戏_PNG.html",
+    "viewport": "390x844"
+   }
+  ],
+  "offline": true,
+  "normalLaunch": true,
+  "movementAndDash": true,
+  "pause": true,
+  "saveSurvivesReload": true,
+  "errors": 0,
+  "externalRequests": 0
+ },
+ "introduction": {
+  "built": true,
+  "tested": true,
+  "versionLabelsMatch": "1.2"
+ },
+ "simulations": {
+  "seed": "release-v1.0",
+  "runs": 18,
+  "wins": 16,
+  "losses": 2,
+  "snapshotChecks": 2811,
+  "fullyIdenticalRecordsTo1_1": 18
+ },
+ "layout": {
+  "method": "same Playwright measurement on 1.1 and 1.2 offline HTML",
+  "journeyBodyPx": {
+   "320x568": [
+    9,
+    185
+   ],
+   "360x640": [
+    81,
+    264
+   ],
+   "375x667": [
+    160,
+    291
+   ],
+   "667x375": [
+    73,
+    146
+   ],
+   "744x430": [
+    16,
+    160
+   ],
+   "820x560": [
+    89,
+    233
+   ],
+   "568x320": [
+    18,
+    77
+   ]
+  },
+  "restBodyPx": {
+   "320x568": [
+    54,
+    178
+   ],
+   "360x640": [
+    126,
+    250
+   ],
+   "568x320": [
+    113,
+    113
+   ]
+  },
+  "launchDockVisibleWithoutScroll": "all batch1 sizes 1440x1000 to 320x280"
+ },
+ "cleanVerification": {
+  "pathWithSpaceAndCJK": true,
+  "npmCi": true,
+  "check": true,
+  "auditGate": true,
+  "webBuild": true,
+  "offlineBuilds": true,
+  "identicalHTML": true,
+  "identicalSourceArchive": true,
+  "identicalPlayerPackage": true,
+  "identicalChecksums": true
+ },
+ "boundaries": [
+  "No physical phone validation",
+  "No human win-rate claim",
+  "Reference image rights pending author confirmation",
+  "Nine source-wording groups pending verification",
+  "Rule-changing findings (fire spirit, replay insight, reserve buy/sell, live-array sweeps) deferred to a gated rules update"
+ ],
+ "sourceArchiveFiles": 614
+}

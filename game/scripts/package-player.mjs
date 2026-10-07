@@ -8,8 +8,8 @@ import {zipSync,unzipSync} from 'fflate';
 import {root} from './release-files.mjs';
 import {GAME_VERSION} from '../gameplay/version.js';
 import {OFFLINE_ENTRY,OFFLINE_PNG_ENTRY,PLAYER_ENTRY,PLAYER_PNG_ENTRY} from '../gameplay/delivery-names.js';
-import {releaseDir,artifactPath} from './delivery-paths.mjs';
-const folder='青竹剑阵_'+GAME_VERSION+'_免安装版';
+import {releaseDir,artifactPath,SOURCE_ARCHIVE,PLAYER_FOLDER,PLAYER_ARCHIVE} from './delivery-paths.mjs';
+const folder=PLAYER_FOLDER;
 const readme=`青竹剑阵 · 虚天殿篇 ${GAME_VERSION}
 制作人：bilibili@卡布奇诺ultra
 
@@ -47,11 +47,11 @@ const files={
  '先读我.txt':Buffer.from(readme.replaceAll('\n','\r\n')),
  [PLAYER_PNG_ENTRY]:fs.readFileSync(path.join(root,OFFLINE_PNG_ENTRY)),
  '开源资料/LICENSE.txt':fs.readFileSync(path.join(root,'LICENSE')),
- '开源资料/青竹剑阵_源码.zip':fs.readFileSync(artifactPath('青竹剑阵_源码.zip'))
+ '开源资料/青竹剑阵_源码.zip':fs.readFileSync(artifactPath(SOURCE_ARCHIVE))
 };
 const entries={};for(const [name,bytes]of Object.entries(files))entries[folder+'/'+name]=[new Uint8Array(bytes),{mtime:new Date(2026,0,1)}];
 const bytes=zipSync(entries,{level:7}),decoded=unzipSync(bytes);
 for(const [name,original]of Object.entries(files))if(!Buffer.from(decoded[folder+'/'+name]).equals(original))throw Error('Player archive differs: '+name);
 fs.mkdirSync(releaseDir,{recursive:true});
-const target=artifactPath(folder+'.zip'),pending=target+'.pending';fs.writeFileSync(pending,bytes);fs.renameSync(pending,target);
+const target=artifactPath(PLAYER_ARCHIVE),pending=target+'.pending';fs.writeFileSync(pending,bytes);fs.renameSync(pending,target);
 console.log(JSON.stringify({playerPackage:path.basename(target),files:Object.keys(files),bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex')}));

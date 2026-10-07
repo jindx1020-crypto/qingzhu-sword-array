@@ -21,7 +21,8 @@ export function beginPracticeStep(b,step=0){
  b.objective=step===4?{kind:'defend',x:640,y:410,hp:360,maxHp:360,invuln:0,done:0}:null;
  if(step===0)b.practice.goal={x:530,y:470,r:55};
  if(step===5){b.lastSigil=b.time-6;const target=b.spawn(4,{x:640,y:380,hp:100000,speed:50,practiceTarget:true,noDrop:true,name:'留符追兵练习靶'});if(target){target.x=640;target.y=410;}}
- if(step===2){for(const [label,x,y] of [['A',560,450],['B',810,420]]){const e=b.spawn(4,{x,y,hp:10000000,speed:0,noDrop:true,name:label+' · 集火练习靶',practiceAnchor:true});e.x=x;e.y=y;e.practiceAnchor=true;}b.practice.focusLaunch=false;}
+ // B sits left of Han Li: the instruction panel docks on the right and covered the old right-hand B at 844×390 and 1024×768.
+ if(step===2){for(const [label,x,y] of [['A',560,450],['B',430,560]]){const e=b.spawn(4,{x,y,hp:10000000,speed:0,noDrop:true,name:label+' · 集火练习靶',practiceAnchor:true});e.x=x;e.y=y;e.practiceAnchor=true;}b.practice.focusLaunch=false;}
  if(step===6){b.player.shield=0;b.player.invuln=0;b.practice.attackAt=b.time+3;b.practice.counterBefore=b.lastCounter;b.practice.guardResult='来袭预警 · 3.0 秒';b.practice.warnSounded=false;b.fx.push({kind:'practice-warning',x:b.player.x,y:b.player.y,fromX:PRACTICE_ATTACK_ORIGIN.x,fromY:PRACTICE_ATTACK_ORIGIN.y,ttl:3,max:3});}
  b.emit({type:'update'});
 }

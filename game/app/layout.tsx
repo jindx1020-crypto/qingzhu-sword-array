@@ -1,3 +1,6 @@
+/* SPDX-License-Identifier: GPL-3.0-only
+ * Copyright (C) 2026 bilibili@卡布奇诺ultra
+ */
 import type { Metadata,Viewport } from 'next';
 import './globals.css';
 import {GAME_VERSION,GAME_ARC,GAME_TITLE} from '../gameplay/version';

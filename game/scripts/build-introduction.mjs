@@ -9,7 +9,9 @@ import {CHAPTER_NAMES} from '../gameplay/chapter-names.js';
 import {CHAPTERS} from '../gameplay/data.js';
 import {videoDir,introductionPath} from './delivery-paths.mjs';
 const source=path.join(root,'docs/presentation');
-const data={...JSON.parse(fs.readFileSync(path.join(source,'content.json'),'utf8')),version:GAME_VERSION,chapters:CHAPTER_NAMES,chapterMaps:CHAPTERS.map(c=>c.map)};
+// Narration and captions write `{version}` for the current release, so a version bump never leaves stale spoken text.
+const content=JSON.parse(fs.readFileSync(path.join(source,'content.json'),'utf8'),(_key,value)=>typeof value==='string'?value.replaceAll('{version}',GAME_VERSION):value);
+const data={...content,version:GAME_VERSION,chapters:CHAPTER_NAMES,chapterMaps:CHAPTERS.map(c=>c.map)};
 const assets={};
 for(const [key,file,mime]of [
  ['cover','game/public/assets/encoded/menu-backdrop.webp','image/webp'],
@@ -18,7 +20,10 @@ for(const [key,file,mime]of [
  ['choices','docs/presentation/assets/choices.jpg','image/jpeg']
 ])assets[key]='data:'+mime+';base64,'+fs.readFileSync(path.join(root,file)).toString('base64');
 const literal=value=>JSON.stringify(value).replaceAll('<','\\u003c');
-const html=fs.readFileSync(path.join(source,'intro.template.html'),'utf8').replace('__PRESENTATION_DATA__',literal(data)).replace('__ASSET_DATA__',literal(assets));
+// One callback pass: `$&`-style sequences and placeholder names inside the inserted JSON stay literal.
+const template=fs.readFileSync(path.join(source,'intro.template.html'),'utf8'),slots={__PRESENTATION_DATA__:data,__ASSET_DATA__:assets};
+for(const slot of Object.keys(slots))if(template.split(slot).length!==2)throw Error('Introduction template needs exactly one '+slot);
+const html=template.replace(/__PRESENTATION_DATA__|__ASSET_DATA__/g,slot=>literal(slots[slot]));
 fs.mkdirSync(videoDir,{recursive:true});
 const output=introductionPath;fs.writeFileSync(output,html);
 const script='# 青竹剑阵 · 视频口播稿\n\n'+data.author+'\n\n适用游戏版本：'+GAME_VERSION+'。参考总时长：'+data.slides.reduce((n,s)=>n+s.duration,0)+' 秒，可按语速调整。\n\n'+data.slides.map((s,i)=>'## '+String(i+1).padStart(2,'0')+' '+s.label+'（约 '+s.duration+' 秒）\n\n'+s.speech+'\n\n画面字幕：'+s.cue+'\n').join('\n');

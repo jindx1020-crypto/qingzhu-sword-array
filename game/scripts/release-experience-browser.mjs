@@ -5,16 +5,16 @@
 // C-1 战斗 toast 半透明/短时且技能确认走 cue；C-2 390×844 战场占比、摇杆距底、生命数值不裁切、紧凑状态行与首领血条不重叠、
 // ≤420 隐藏保存图标／≤360 省头像仍在、悟道卡整卡可点；C-3 卡面「当前→修持后」与阶级；C-4 试剑台入场标题与按钮不重叠；
 // C-5 结算页固定计时下限；C-8 过场居中与账号级跳过开关。三视口截图：390×844、844×390、1440×900。
-// 用法：node browser-batchC.mjs <html 路径> <变体名 webp|png>
+// 用法：node scripts/release-experience-browser.mjs；QINGZHU_ASSET_PROFILE=png 选择 PNG 变体，QINGZHU_HTML 可指定待测文件。
 import {launchBrowser,qaOutput,htmlPath,variant} from './browser-runtime.mjs';
 import {GAME_VERSION} from '../gameplay/version.js';
-import fs from 'node:fs';import {pathToFileURL} from 'node:url';
+import fs from 'node:fs';import path from 'node:path';import {pathToFileURL} from 'node:url';
 const html=htmlPath;
-const OUT=qaOutput('experience').pathname;fs.mkdirSync(OUT,{recursive:true});
+const OUT=qaOutput('experience');
 const report={variant,html,checks:[],errors:[],measurements:{}};
 const ok=(name,pass,detail)=>{report.checks.push({name,pass:!!pass,detail});console.log((pass?'PASS ':'FAIL ')+name+(detail?' · '+JSON.stringify(detail).slice(0,420):''));};
 const browser=await launchBrowser();
-const shot=(page,name)=>page.screenshot({path:OUT+'batchC-'+name+'-'+variant+'.png'});
+const shot=(page,name)=>page.screenshot({path:path.join(OUT,'batchC-'+name+'-'+variant+'.png')});
 const PHONE={width:390,height:844},LANDSCAPE={width:844,height:390},DESKTOP={width:1440,height:900};
 const NEW_RUN={mode:'seed',path:5,seed:'batchC-web',difficulty:1,skipPractice:true};
 try{
@@ -186,6 +186,6 @@ try{
 await browser.close();
 report.summary={passed:report.checks.filter(c=>c.pass).length,total:report.checks.length,pageErrors:report.errors.length};
 console.log('summary',JSON.stringify(report.summary));
-fs.writeFileSync(new URL('browser.json',qaOutput('experience')),JSON.stringify(report,null,1));
+fs.writeFileSync(path.join(OUT,'browser.json'),JSON.stringify(report,null,1));
 
 if(report.errors.length||report.checks.some(c=>!c.pass))process.exitCode=1;

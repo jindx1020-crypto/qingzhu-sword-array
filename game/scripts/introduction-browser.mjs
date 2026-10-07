@@ -8,14 +8,19 @@ import {pathToFileURL} from 'node:url';
 import {launchBrowser} from './browser-runtime.mjs';
 import {root} from './release-files.mjs';
 import {introductionPath} from './delivery-paths.mjs';
+import {GAME_VERSION} from '../gameplay/version.js';
 const out=path.join(root,'game/qa/introduction');fs.mkdirSync(out,{recursive:true});
+const versions=text=>[...new Set([...text.matchAll(/(?<![\d.])\d+\.\d+(?:\.\d+)*(?![\d.])/g)].map(m=>m[0]))];
 const browser=await launchBrowser(),context=await browser.newContext({offline:true,viewport:{width:1366,height:900}}),page=await context.newPage();
 const report={checks:[],errors:[],externalRequests:[],slides:[]};page.on('pageerror',e=>report.errors.push(e.message));page.on('request',r=>{if(/^https?:/.test(r.url()))report.externalRequests.push(r.url());});
 try{
  await page.goto(pathToFileURL(introductionPath).href);await page.waitForFunction(()=>[...document.querySelectorAll('[data-asset]')].every(i=>i.complete&&i.naturalWidth));
  assert.equal(await page.locator('.slide').count(),8);assert.equal(await page.locator('#framePage').innerText(),'01');
+ // Every version number on the page (labels in all slides, title, captions and narration data) is the current game version.
+ const shown=await page.evaluate(()=>{const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{acceptNode:n=>n.parentElement?.closest('script,style')?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT}),texts=[document.title];while(walker.nextNode())texts.push(walker.currentNode.nodeValue);return {text:texts.join('\n'),data:JSON.stringify(DATA),marked:[...document.querySelectorAll('[data-version]')].map(e=>e.textContent),outro:document.querySelector('.outro .eyebrow').textContent};});
+ assert.ok(shown.marked.length>=3&&shown.marked.every(v=>v===GAME_VERSION),'Version labels: '+shown.marked.join(', '));assert.equal(shown.outro,'青竹剑阵 · '+GAME_VERSION);assert.deepEqual(versions(shown.text+'\n'+shown.data),[GAME_VERSION]);report.checks.push('every version label, caption and narration shows '+GAME_VERSION);
  await page.locator('#notesBtn').click();assert.ok(await page.locator('#liveNotes').isVisible());assert.match(await page.locator('#notesSpeech').innerText(),/大家好/);
- const downloading=page.waitForEvent('download');await page.locator('#exportBtn').click();const download=await downloading,scriptFile=path.join(out,'口播稿.txt');await download.saveAs(scriptFile);assert.match(fs.readFileSync(scriptFile,'utf8'),/08 开始游玩/);report.checks.push('inline narration and complete script download');
+ const downloading=page.waitForEvent('download');await page.locator('#exportBtn').click();const download=await downloading,scriptFile=path.join(out,'口播稿.txt');await download.saveAs(scriptFile);assert.match(fs.readFileSync(scriptFile,'utf8'),/08 开始游玩/);assert.deepEqual(versions(fs.readFileSync(scriptFile,'utf8')),[GAME_VERSION]);report.checks.push('inline narration and complete script download');
  const opening=page.waitForEvent('popup');await page.locator('#speakerBtn').click();const speaker=await opening;await speaker.waitForLoadState();speaker.on('pageerror',e=>report.errors.push(e.message));
  await page.locator('#nextBtn').click();await speaker.waitForFunction(()=>document.getElementById('speakerTitle').textContent==='核心玩法');
  await speaker.locator('[data-speaker-command=next]').click();await page.waitForFunction(()=>document.getElementById('framePage').textContent==='03');

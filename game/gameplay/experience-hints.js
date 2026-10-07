@@ -3,6 +3,7 @@
  */
 import {TRAITS,COMBOS,PATHS} from './data.js';
 import {traitDescription,modText} from './descriptions.js';
+import {traitMods} from './balance.js';
 // Read-only: uses targets chosen by the real update, never calls the targeting engine.
 export function insectOrderHint(b){
  if(!b.insects.length)return '';
@@ -14,7 +15,8 @@ export function insectOrderHint(b){
 export function choiceChain(b){
  const t=TRAITS.find(t=>t.id===b.lastChoice?.id),remaining=b.queuedChoices||0;
  const links=COMBOS.map(c=>({...c,paths:[c.a,c.b].map(id=>PATHS.findIndex(p=>p.id===id))})).filter(c=>c.paths.includes(b.path)).map(c=>{const gaps=c.paths.map(p=>Math.max(0,3-(b.pathCounts[p]||0))),prior=c.paths.map((p,i)=>gaps[i]+(t?.path===p&&b.lastChoice.rank===1&&(b.pathCounts[p]||0)<=3?1:0));return c.name+'：'+c.paths.map((p,i)=>PATHS[p].name+'还差 '+gaps[i]+' 种'+(prior[i]!==gaps[i]?'（上次 '+prior[i]+'）':'')).join(' / ');});
- const gain=t?Object.entries(t.mods).filter(([key])=>['damage','haste','range','puppetDamage','insectDamage','thunderDamage','burnDamage','speed','crit','pierce','puppetPierce','thunderSave'].includes(key)).map(([key,value])=>modText({[key]:(b.stats[key]||0)-value})+' → '+modText({[key]:b.stats[key]||0})).join('；'):'';
- return {gain,remaining,last:t?t.name+' · '+traitDescription(t,b):'本页之前的选择未记录',links};
+ // Same balance-gated mods the engine sums in recalc, so balance-4 values (e.g. 雷威 +40%) start from the real prior total.
+ const gain=t?Object.entries(traitMods(b,t)).filter(([key])=>['damage','haste','range','puppetDamage','insectDamage','thunderDamage','burnDamage','speed','crit','pierce','puppetPierce','thunderSave'].includes(key)).map(([key,value])=>modText({[key]:(b.stats[key]||0)-value})+' → '+modText({[key]:b.stats[key]||0})).join('；'):'';
+ return {gain,remaining,last:t?t.name+' · '+traitDescription(t,b):Object.keys(b.traits||{}).length?'旧存档未记录上次选择':'本局首次悟道',links};
 }
 export function validateLastChoice(ex,b){const q=ex.lastChoice;if(q===undefined)return;if(!q||!TRAITS.some(t=>t.id===q.id)||!Number.isInteger(q.rank)||q.rank<1||q.rank!==(b.traits[q.id]||0))throw Error('上次悟道记录无效，原记录未被修改');}

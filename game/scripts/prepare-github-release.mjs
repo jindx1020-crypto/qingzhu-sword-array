@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
-import {releaseDir,artifactPath} from './delivery-paths.mjs';
+import {releaseDir,artifactPath,SOURCE_ARCHIVE,PLAYER_ARCHIVE} from './delivery-paths.mjs';
 import {GAME_VERSION} from '../gameplay/version.js';
 import {OFFLINE_ENTRY,OFFLINE_PNG_ENTRY,githubEntry} from '../gameplay/delivery-names.js';
 // GitHub normalizes non-ASCII asset names. Keep local names and create byte-identical upload aliases.
@@ -15,8 +15,8 @@ const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 const mapping=[
  [OFFLINE_ENTRY,githubEntry(GAME_VERSION),'单文件游戏 · 浏览器直接打开'],
  [OFFLINE_PNG_ENTRY,githubEntry(GAME_VERSION,true),'PNG 兼容版 · 浏览器直接打开'],
- ['青竹剑阵_源码.zip','qingzhu-'+GAME_VERSION+'-source.zip','完整源码与开发说明 · GPLv3'],
- ['青竹剑阵_'+GAME_VERSION+'_免安装版.zip','qingzhu-'+GAME_VERSION+'-player.zip','免安装完整包 · 含对应源码']
+ [SOURCE_ARCHIVE,'qingzhu-'+GAME_VERSION+'-source.zip','完整源码与开发说明 · GPLv3'],
+ [PLAYER_ARCHIVE,'qingzhu-'+GAME_VERSION+'-player.zip','免安装完整包 · 含对应源码']
 ];
 const files=mapping.map(([localFile,file,label])=>{const bytes=fs.readFileSync(artifactPath(localFile)),hash=sha(bytes),entry=manifest.files.find(f=>f.file===localFile);assert.ok(entry&&entry.sha256===hash&&entry.bytes===bytes.length,'Stale artifact: '+localFile);fs.writeFileSync(path.join(folder,file),bytes);return {file,localFile,label,bytes:bytes.length,sha256:hash};});
 fs.writeFileSync(path.join(folder,'SHA256SUMS.txt'),files.map(f=>f.sha256+'  '+f.file).join('\n')+'\n');

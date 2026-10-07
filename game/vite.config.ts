@@ -1,3 +1,6 @@
+/* SPDX-License-Identifier: GPL-3.0-only
+ * Copyright (C) 2026 bilibili@卡布奇诺ultra
+ */
 import { sites } from '@openai/sites-vite-plugin';
 import tailwindcss from '@tailwindcss/postcss';
 import vinext from 'vinext';

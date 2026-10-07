@@ -11,12 +11,12 @@ import {root} from './release-files.mjs';
 import {launchBrowser} from './browser-runtime.mjs';
 import {waitForText} from './browser-assertions.mjs';
 import {GAME_VERSION} from '../gameplay/version.js';
-import {artifactPath} from './delivery-paths.mjs';
-const folder='青竹剑阵_'+GAME_VERSION+'_免安装版',temp=fs.mkdtempSync(path.join(os.tmpdir(),'qingzhu-player-'));
-const files=unzipSync(fs.readFileSync(artifactPath(folder+'.zip')));
+import {artifactPath,PLAYER_FOLDER,PLAYER_ARCHIVE} from './delivery-paths.mjs';
+const folder=PLAYER_FOLDER,temp=fs.mkdtempSync(path.join(os.tmpdir(),'qingzhu-player-'));
+const files=unzipSync(fs.readFileSync(artifactPath(PLAYER_ARCHIVE)));
 for(const [name,bytes]of Object.entries(files)){const target=path.resolve(temp,name);assert.ok(target.startsWith(temp+path.sep));fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,bytes);}
 const out=path.join(root,'game/qa/release/player-package');fs.mkdirSync(out,{recursive:true});
-const report={version:GAME_VERSION,archive:folder+'.zip',method:'Extract actual player ZIP; launch file URLs in offline Chromium with fresh browser contexts, normal UI and no debug API.',checks:[],errors:[],externalRequests:[]},browser=await launchBrowser();
+const report={version:GAME_VERSION,archive:PLAYER_ARCHIVE,method:'Extract actual player ZIP; launch file URLs in offline Chromium with fresh browser contexts, normal UI and no debug API.',checks:[],errors:[],externalRequests:[]},browser=await launchBrowser();
 try{
  for(const [entry,width,height]of [['开始游戏.html',1440,900],['兼容版/开始游戏_PNG.html',390,844]]){
   const context=await browser.newContext({offline:true,viewport:{width,height},hasTouch:true}),page=await context.newPage();
