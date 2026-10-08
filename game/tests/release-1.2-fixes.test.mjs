@@ -5,7 +5,7 @@
 // The UI flows are also exercised with real pointer, touch and keyboard input in scripts/qa-release-1.2-browser.mjs.
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';
 import {Expedition} from '../gameplay/expedition.js';import {restoreRun} from '../gameplay/run-factory.js';import {beginPracticeStep} from '../gameplay/practice.js';
-import {choiceChain} from '../gameplay/experience-hints.js';import {TRAITS} from '../gameplay/data.js';import {supplyState} from '../gameplay/late-supply.js';
+import {choiceChain} from '../gameplay/experience-hints.js';import {TRAITS,RELICS} from '../gameplay/data.js';import {STORY_ITEMS} from '../gameplay/journal.js';import {supplyState} from '../gameplay/late-supply.js';
 import {SaveVault,SAVE_KEY} from '../gameplay/save-store.js';
 const src=name=>fs.readFileSync(new URL('../gameplay/'+name,import.meta.url),'utf8');
 const memory=()=>{const map=new Map();return {map,getItem:k=>map.get(k)??null,setItem:(k,v)=>map.set(k,String(v)),removeItem:k=>map.delete(k)};};
@@ -109,4 +109,23 @@ void test('UI-only 1.2 flows keep their source markers',()=>{
  assert.match(css,/\.rest-action-dock \.rest-missing\{display:flex;flex-wrap:nowrap;/);assert.doesNotMatch(css,/\.page-journey \.launch-selection\{display:none\}/,'the pinned dock keeps its difficulty select');
  assert.match(help,/else target\.scrollIntoView\(\{block:'start'\}\)/);
  assert.match(panel,/进入第 '\+\(\(b\.endlessLoop\|\|0\)\+2\)\+' 圈/);assert.match(panel,/onClick=\{\(\)=>\{setReplace\(null\);b\.refreshShop\(\);\}\}/);
+});
+
+// 2026-10-08 thirty-player playtest, first batch (G01 / G02 / G31). Geometry is measured with real input in scripts/qa-release-1.2-browser.mjs.
+void test('story relics marked non-canon in their source are flagged canon:false, so codex and shop labels cannot contradict them',()=>{
+ const nonCanon=RELICS.filter(r=>r.story&&/非原著/.test(r.source));assert.deepEqual(nonCanon.map(r=>r.id),['lingxi']);
+ for(const r of RELICS.filter(r=>r.story))assert.equal(STORY_ITEMS.find(i=>i.id===r.id)?.canon===false,/非原著/.test(r.source),r.id);
+ const game=src('Game.jsx');assert.match(game,/const NON_CANON_ITEMS=new Set\(STORY_ITEMS\.filter\(i=>i\.canon===false\)\.map\(i=>i\.id\)\);/);
+ assert.match(game,/r\.story\?\(NON_CANON_ITEMS\.has\(r\.id\)\?'游戏化器物':'原著器物 \/ 协战'\):'携行战术'/);assert.match(game,/r\.story\?\(NON_CANON_ITEMS\.has\(r\.id\)\?'游戏化器物':'原著器物'\):'携行配置'/);
+ assert.doesNotMatch(game,/r\.story\?'原著器物/,'no label reads the story flag alone');
+});
+
+void test('result dialogs keep one shrinkable column and the compact HUD keeps the rest hint in the 战况 summary',()=>{
+ const css=src('game.css'),game=src('Game.jsx');
+ assert.match(css,/\.game-dialog\.scene-result\{grid-template-columns:minmax\(0,1fr\)\}\.game-dialog\.scene-result>\*\{min-width:0;max-width:100%\}/);
+ assert.match(css,/@media\(max-width:600px\)\{\.sigil-report \.reader-table th,\.sigil-report \.reader-table td\{min-width:0;/);
+ assert.match(css,/\.hud-compact \.skill-controls \.reserve-label>\.reserve-rest-hint:last-child\{display:none\}/);
+ assert.ok(css.lastIndexOf('.hud-compact .skill-controls .reserve-label>.reserve-rest-hint:last-child{display:none}')>css.lastIndexOf('.skill-controls .reserve-label>.reserve-rest-hint:last-child{display:inline'),'the compact rule comes after the rule that shows the hint again');
+ assert.match(game,/每次神雷耗用 \{thunder\.cost\} 雷源\{b\.isExpedition&&hasReserveRest\(b\)&&<> · \{reserveRestText\(b\)\}<\/>\}/);
+ assert.equal(game.split('reserveRestText(b)').length-1,2,'HUD and summary share one hint text');
 });

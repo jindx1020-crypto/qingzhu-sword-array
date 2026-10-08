@@ -104,5 +104,30 @@ try{
   await page.bringToFront();await page.waitForSelector('.risk-dialog');await page.keyboard.press('Escape');await page.waitForSelector('.risk-dialog',{state:'detached'});
   report.checks.push({name:'Esc closes the visible confirmation first'});await context.close();}
 
+ // 2026-10-08 playtest G01: a 符阵 defeat at narrow widths keeps every result number and the sigil table inside the dialog (1.2 left
+ // the 541px table widening the whole result, so 净战斗时间 and 心得 sat past the right edge at 320×568).
+ for(const [w,h] of [[320,568],[360,640],[568,320]]){const {page,context}=await open(w,h);await enterBattle(page,{mode:'story',path:4});await page.evaluate(()=>window.__FANREN__.step(600));
+  await page.evaluate(()=>{const b=window.__FANREN__.battle;b.sigilStats.sigil.casts=21;b.sigilStats.sigil.empty=20;b.finish(false,'生命耗尽');});await page.waitForSelector('.scene-result .sigil-report');await settled(page);
+  const r=await page.evaluate(()=>{const d=document.querySelector('.scene-result'),dr=d.getBoundingClientRect(),t=d.querySelector('.sigil-report .reader-table');const inside=e=>{const r=e.getBoundingClientRect();return r.left>=dr.left-.5&&r.right<=dr.right+.5;};
+   return {scroll:d.scrollWidth,client:d.clientWidth,numbers:[...d.querySelectorAll('.result-stats strong')].every(inside),cells:[...t.querySelectorAll('th,td')].every(inside),table:t.scrollWidth-t.clientWidth};});
+  assert.ok(r.scroll<=r.client,'result dialog does not overflow at '+w+'x'+h+': '+r.scroll+'>'+r.client);assert.ok(r.numbers,'result numbers inside the dialog');assert.ok(r.cells&&r.table<=0,'sigil table fits without its own scroll');
+  const back=page.getByRole('button',{name:'回到山门'});await back.scrollIntoViewIfNeeded();const box=await back.boundingBox();assert.ok(await hit(page,box.x+box.width/2,box.y+box.height/2,'button'),'return button reachable');
+  await shot(page,'result-sigil-'+w+'x'+h);report.checks.push({name:'narrow 符阵 result fits its dialog',w,h,...r});await context.close();}
+
+ // G02: in the compact 568×320 HUD the 雷法 rest hint no longer spills onto 闪避 and 神雷; a real tap on 战况 shows it in the summary.
+ {const {page,context}=await open(568,320);await enterBattle(page,{mode:'story',path:1});await page.evaluate(()=>window.__FANREN__.step(60));await page.waitForTimeout(300);
+  const r=await page.evaluate(()=>{const label=document.querySelector('.skill-controls .reserve-label'),buttons=['.dash-button','.thunder-button'].map(s=>document.querySelector(s).getBoundingClientRect());const boxes=[];
+   for(const walker=document.createTreeWalker(label,NodeFilter.SHOW_TEXT);walker.nextNode();){const n=walker.currentNode;if(!n.textContent.trim())continue;const range=document.createRange();range.selectNodeContents(n);for(const b of range.getClientRects())if(b.width>0)boxes.push(b);}
+   return {compact:document.querySelector('main.fanren').classList.contains('hud-compact'),hint:getComputedStyle(document.querySelector('.reserve-rest-hint')).display,reserve:label.textContent.match(/雷源 \d+ \/ \d+/)?.[0]||null,overlaps:boxes.filter(a=>buttons.some(r=>a.left<r.right&&a.right>r.left&&a.top<r.bottom&&a.bottom>r.top)).length,horizontal:label.scrollWidth-label.clientWidth};});
+  assert.ok(r.compact,'568×320 uses the compact HUD');assert.equal(r.hint,'none');assert.ok(r.reserve,'reserve value stays in the row');assert.equal(r.overlaps,0,'no reserve text over the skill buttons');assert.ok(r.horizontal<=0);
+  await shot(page,'reserve-568x320');const box=await page.locator('.hud-summary-button').boundingBox();await page.touchscreen.tap(box.x+box.width/2,box.y+box.height/2);await page.waitForSelector('.hud-summary-dialog');
+  const summary=await page.locator('.hud-summary-dialog').innerText();assert.match(summary,/合格休整：基础\d+（上限内）/);report.checks.push({name:'compact 568×320 reserve row clear of skills; rest hint in 战况 summary',...r});await context.close();}
+
+ // G31: the codex labels 灵犀佩 as a game invention, matching its source line; no card pairs a 原著 chip with a 非原著 source.
+ {const {page,context}=await open(1440,900);await page.getByRole('button',{name:/藏经图鉴/}).click();await page.getByRole('tab',{name:/器物与配置/}).click();await page.waitForSelector('.codex-card');
+  const cards=await page.locator('.codex-card').evaluateAll(cs=>cs.map(c=>({chip:c.firstElementChild.textContent,name:c.querySelector('h3').textContent,source:c.querySelector('small')?.textContent||''})));
+  assert.equal(cards.find(c=>c.name==='灵犀佩').chip,'游戏化器物');assert.deepEqual(cards.filter(c=>c.chip.includes('原著器物')&&/非原著/.test(c.source)),[]);
+  report.checks.push({name:'codex relic labels agree with their source lines',lingxi:cards.find(c=>c.name==='灵犀佩')});await context.close();}
+
  assert.deepEqual(report.errors,[]);assert.deepEqual(report.external,[]);
 }finally{fs.writeFileSync(path.join(out,'browser.json'),JSON.stringify(report,null,2));await browser.close();}

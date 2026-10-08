@@ -7,12 +7,13 @@
   "npm": "11.12.1"
  },
  "automated": {
-  "tests": 557,
-  "passed": 557,
+  "tests": 559,
+  "passed": 559,
   "failed": 0,
   "skipped": 0,
-  "newRegressionTests": 10,
-  "newRegressionTestsFailOn1_1": 10
+  "newRegressionTests": 12,
+  "newRegressionTestsFailOn1_1": 10,
+  "playtestBatch1RegressionTestsFailOnPrior1_2": 2
  },
  "lint": {
   "newDiagnostics": 0,
@@ -86,7 +87,7 @@
   {
    "profile": "webp",
    "suite": "release-1.2",
-   "checks": 23,
+   "checks": 28,
    "viewRecords": 0,
    "pageErrors": 0,
    "externalRequests": 0
@@ -134,17 +135,17 @@
   {
    "profile": "png",
    "suite": "release-1.2",
-   "checks": 23,
+   "checks": 28,
    "viewRecords": 0,
    "pageErrors": 0,
    "externalRequests": 0
   }
  ],
- "browserChecks": 164,
+ "browserChecks": 174,
  "viewRecords": 36,
  "realInputSuite": {
   "script": "game/scripts/qa-release-1.2-browser.mjs",
-  "checksPerProfile": 23,
+  "checksPerProfile": 28,
   "failsOn1_1At": "choice card body selects with real mouse 1440x900"
  },
  "playerPackage": {
@@ -246,5 +247,43 @@
   "Nine source-wording groups pending verification",
   "Rule-changing findings (fire spirit, replay insight, reserve buy/sell, live-array sweeps) deferred to a gated rules update"
  ],
- "sourceArchiveFiles": 614
+ "sourceArchiveFiles": 614,
+ "playtestBatch1": {
+  "date": "2026-10-08",
+  "source": "local-archive/playtests/2026-10-08-thirty-players (30 automated agents; not human or device testing)",
+  "implemented": [
+   "G01",
+   "G02",
+   "G31"
+  ],
+  "deferred": 28,
+  "rulesChanged": false,
+  "measurements": {
+   "G01_resultDialogScrollOverClientWidth": {
+    "320x568": [
+     "585/278",
+     "278/278"
+    ],
+    "360x640": [
+     "585/318",
+     "318/318"
+    ],
+    "568x320": [
+     "581/526",
+     "526/526"
+    ]
+   },
+   "G01_sigilTableFitsAt320": true,
+   "G02_restHintOverlapsSkills568x320": [
+    true,
+    false
+   ],
+   "G02_restHintInSummary": true,
+   "G31_lingxiLabel": [
+    "原著器物 / 协战",
+    "游戏化器物"
+   ]
+  },
+  "browserChecksAdded": 5
+ }
 }

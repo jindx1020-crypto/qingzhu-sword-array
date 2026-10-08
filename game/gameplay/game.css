@@ -386,3 +386,11 @@ h3{font-size:17px;letter-spacing:1px;font-weight:500;margin:20px 0 14px}.muted{c
 @media(max-width:480px){.result-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(86px,1fr));gap:12px 10px}.result-stats strong{font-size:20px;overflow-wrap:anywhere}}
 /* 1.2: the transparent file input still takes keyboard focus; show it on its visible label. */
 .import-label:has(input:focus-visible){outline:2px solid #e6d79a;outline-offset:2px}
+/* 1.2 playtest G01: every result dialog keeps one shrinkable column. The 符阵战果 table (six 90px cells) used to widen the whole
+   result to 541px, clipping 净战斗时间 and 心得 at 320 width; on narrow screens the table now fits and only scrolls itself if it must, and the closing line wraps below the portrait
+   instead of shrinking to a 70px column. */
+.game-dialog.scene-result{grid-template-columns:minmax(0,1fr)}.game-dialog.scene-result>*{min-width:0;max-width:100%}.game-dialog.scene-result .reader-table{max-width:100%;overflow-x:auto}
+@media(max-width:600px){.sigil-report .reader-table th,.sigil-report .reader-table td{min-width:0;padding:6px 2px;font-size:12px}.scene-result .result-hero{flex-wrap:wrap;gap:8px 16px}.scene-result .result-hero p{flex:1 1 150px}}
+/* 1.2 playtest G02: the compact HUD's reserve column is 80px wide; the rest hint (shown again above for the absolute reserve row)
+   overflowed onto 闪避 and 神雷 at 568×320. As on other compact screens it stays in the 战况 summary instead. */
+.hud-compact .skill-controls .reserve-label>.reserve-rest-hint:last-child{display:none}
