@@ -86,7 +86,7 @@ try{
   assert.ok(match.top>=0&&match.top<match.vh,'the current match is scrolled into view');await shot(page,'help-search-568x320');report.checks.push({name:'small landscape help search jumps',match});await context.close();}
 
  // A defeat opens the result with its heading in view on short landscape screens.
- {const {page,context}=await open(844,390);await enterBattle(page);await page.evaluate(()=>{const b=window.__FANREN__.battle;b.kills=2345;b.time=1834.4;b.finish(false,'被追兵围困');});await page.waitForSelector('.scene-result');await page.waitForTimeout(600);
+ {const {page,context}=await open(844,390);await enterBattle(page);await page.evaluate(()=>{const b=window.__FANREN__.battle;/* Layout-only clock jump has no observed chapter history. */delete b.chapterStats;b.kills=2345;b.time=1834.4;b.finish(false,'被追兵围困');});await page.waitForSelector('.scene-result');await page.waitForTimeout(600);
   const r=await page.evaluate(()=>{const d=document.querySelector('[data-slot=dialog-content]'),t=d.querySelector('[data-slot=dialog-title]').getBoundingClientRect(),dr=d.getBoundingClientRect();return {scrollTop:d.scrollTop,titleVisible:t.top>=dr.top-1&&t.bottom<=dr.bottom+1};});
   assert.ok(r.titleVisible&&r.scrollTop<40,'result opens at its heading');await shot(page,'result-844x390');report.checks.push({name:'result opens at its heading on short landscape',...r});await context.close();}
 
@@ -146,7 +146,7 @@ try{
  // Normal-speed playtest follow-up: declared failure fixtures, not extra natural-play sessions.
  // The actual hit/finish path supplies the fatal record; check its rendered distinction from recent melee losses.
  for(const [w,h] of [[320,568],[568,320],[1024,768]]){const {page,context}=await open(w,h);await enterBattle(page);
-  await page.evaluate(()=>{const b=window.__FANREN__.battle;b.clearField();b.player.shield=0;b.player.hp=100;b.recentHits=[];for(let i=0;i<4;i++){b.time=60+i;b.player.invuln=0;b.hitPlayer(20,true,{name:'追兵',kind:'近身'});}b.time=64;b.waveTime=64;b.player.invuln=0;b.hitPlayer(1000,true,{name:'毒雾',kind:'险地'});});
+  await page.evaluate(()=>{const b=window.__FANREN__.battle;/* Historical fatal-hit fixture assigns times directly, not a chapter playthrough. */delete b.chapterStats;b.clearField();b.player.shield=0;b.player.hp=100;b.recentHits=[];for(let i=0;i<4;i++){b.time=60+i;b.player.invuln=0;b.hitPlayer(20,true,{name:'追兵',kind:'近身'});}b.time=64;b.waveTime=64;b.player.invuln=0;b.hitPlayer(1000,true,{name:'毒雾',kind:'险地'});});
   await page.waitForSelector('.defeat-review');await settled(page);await page.waitForFunction(()=>!document.querySelector('.toast-layer .game-toast'));const review=page.locator('.defeat-review');
   assert.match(await review.locator('.defeat-objective').innerText(),/64 \/ 65 秒.*还差 1 秒/);
   assert.match(await review.locator('.defeat-fatal').innerText(),/毒雾 · 险地 → 韩立/);

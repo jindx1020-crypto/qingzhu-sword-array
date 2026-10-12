@@ -3,6 +3,7 @@
  */
 // 1.2 review fixes: engine, expedition and vault regressions on the real modules, plus source markers for UI-only flows.
 // The UI flows are also exercised with real pointer, touch and keyboard input in scripts/qa-release-1.2-browser.mjs.
+import {initChapterStats} from '../gameplay/chapter-telemetry.js';
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';
 import {Expedition} from '../gameplay/expedition.js';import {restoreRun} from '../gameplay/run-factory.js';import {beginPracticeStep} from '../gameplay/practice.js';
 import {choiceChain} from '../gameplay/experience-hints.js';import {TRAITS,RELICS} from '../gameplay/data.js';import {STORY_ITEMS} from '../gameplay/journal.js';import {supplyState} from '../gameplay/late-supply.js';
@@ -59,7 +60,8 @@ void test('a late supply that would restore less than one point counts as full a
 
 void test('a restored endless run multiplies loop difficulty exactly like continuous play',()=>{
  const b=new Expedition({mode:'endless',difficulty:2,seed:'h3b',runId:'h3b',recordVersion:0});
- for(let i=0;i<5;i++){b.chapter=5;b.wave=3;b.nextChapter();b.chooseChallenge('none');b.start();if(b.cinematic)b.advanceCinematic(true);b.clearField();b.showScene('intro','intro');b.growth.ledger=null;b.directorState=null;b.pursuitState=null;b.objective=null;b.mechanism=null;b.boss=null;b.waveTime=0;}
+ // Synthetic loop-end positions start new observation baselines; this test preserves the original difficulty assertions.
+ for(let i=0;i<5;i++){b.chapter=5;b.wave=3;initChapterStats(b);b.nextChapter();b.chooseChallenge('none');b.start();if(b.cinematic)b.advanceCinematic(true);b.clearField();b.showScene('intro','intro');b.growth.ledger=null;b.directorState=null;b.pursuitState=null;b.objective=null;b.mechanism=null;b.boss=null;b.waveTime=0;}
  const c=restoreRun(copy(b.serialize()));assert.equal(c.endlessLoop,5);assert.equal(c.difficulty.hp,b.difficulty.hp);assert.equal(c.difficulty.damage,b.difficulty.damage);
 });
 

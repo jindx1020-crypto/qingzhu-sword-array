@@ -17,8 +17,15 @@ import {additiveStats,traitPathCounts,statCombos,derivedStats,maxReserveForStats
 import {DAMAGE_SOURCES,WORLD} from './combat-values.js';
 import {clearDashInput,requestDash,tickDashInput} from './battle-input.js';
 import {feedbackSound} from './presentation-feedback.js';
+import {initChapterStats,restoreChapterStats,chapterStatsSnapshot,beginChapterNode,recordChapterTime,recordChapterHit,recordChapterConsumable,recordChapterThunder,recordChapterReserve,completeChapterNode,advanceChapterStats,closeChapterStats,recordChapterCombos} from './chapter-telemetry.js';
+import {emptyDefenseStats,recordDash,recordDeflection,recordCounter,recordShieldAbsorption,recordShieldRegen,withDefenseDamage,observeDefenseDamage,recordDefenseTime,recordPuppetTime,recordPuppetShot} from './defense-telemetry.js';
 export {WORLD} from './combat-values.js';
 const TAU=Math.PI*2,clamp=(n,a,b)=>Math.max(a,Math.min(b,n)),dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+// Observe the existing conditions without changing any damage or cooldown calculation.
+export function puppetDefenseConditions(b){
+ const mobileEligible=!!b.hasCore?.('K06'),setupEligible=b.rulesVersion>=2&&b.path===2&&!mobileEligible,stationaryEligible=(b.stats.stationary||0)>0;
+ return {setupEligible,setupActive:setupEligible&&puppetReady(b),stationaryEligible,stationaryActive:stationaryEligible&&stationaryActive(b),mobileEligible,mobileActive:mobileEligible&&!!b.player.moving};
+}
 export class Battle {
  constructor(options={},emit=()=>{}){
   this.emit=emit;this.seed=options.seed||String(Date.now());this.rng=seeded(hashSeed(this.seed));this.rulesVersion=options.rulesVersion??2;this.options={...options,rulesVersion:this.rulesVersion,metaRulesVersion:options.metaRulesVersion??1};this.stillTime=0;this.setupUntil=-1;this.lastSigil=-100;this.lastCounter=-100;this.notices=new Set();
@@ -40,7 +47,7 @@ export class Battle {
   this.rerolls+=meta.filter(x=>x.endsWith('-meta-3')).length;
   if(this.mode==='training'){this.chapter=0;this.level=meta.includes(PATHS[this.path].id+'-meta-5')?72:36;this.gold=500;if(!this.options.guidedPractice)for(let j=0;j<12;j++)this.traits[PATHS[this.path].id+'-'+j]=1;this.recalc();}
   if(this.chapter>0){this.level=1+this.chapter*11;this.time=this.chapter*185;this.waveTime=0;for(let j=0;j<this.chapter*3;j++){const t=TRAITS[(this.path*12+j)%TRAITS.length];this.traits[t.id]=Math.min(3,(this.traits[t.id]||0)+1);}this.gold+=this.chapter*40;this.grantStoryItems();this.recalc();this.player.hp=this.player.maxHp;}
-  this.syncSwords();this.uiTimer=0;
+  this.syncSwords();this.uiTimer=0;this.defenseStats=emptyDefenseStats(this.time,true);initChapterStats(this);
  }
  toastLimited(key,text){this.messageLimits??={};const old=this.messageLimits[key];if(old?.text===text&&old.until>this.time)return;this.messageLimits[key]={text,until:this.time+2.5};this.toast(text);}
  toast(text){this.toastText=text;this.toastUntil=this.time+3;this.emit({type:'toast',text});}
@@ -56,13 +63,13 @@ export class Battle {
    const levelHp=levelHpBonus(this);this.levelHpApplied=levelHp;p.maxHp=100+(s.hp||0)+bonus+levelHp;p.maxShield=s.shield||0;p.maxReserve=maxReserveForStats(this,s);
    p.hp=clamp(p.hp+Math.max(0,(s.hp||0)-(old.hp||0)),0,p.maxHp);
    p.shield=clamp(p.shield+Math.max(0,(s.shield||0)-(old.shield||0)),0,Math.max(p.maxShield,p.shield));
-   p.reserve=reserveAfterStats(p.reserve,old,s,p.maxReserve);
+   const reserveBefore=p.reserve;p.reserve=reserveAfterStats(p.reserve,old,s,p.maxReserve);recordChapterReserve(this,'stats',p.reserve-reserveBefore);
   }
  }
  // Level-derived state has one sync hook: the sword count and, under balance 4, the max-HP bonus (+4 per 8 levels). A level change
  // that has not been recalculated yet is reconciled here; the gained maximum is also added to current HP once.
  syncSwords(){if(this.player&&this.stats&&levelHpBonus(this)!==(this.levelHpApplied||0)){const before=this.player.maxHp;this.recalc();this.player.hp=Math.min(this.player.maxHp,this.player.hp+Math.max(0,this.player.maxHp-before));}const n=Math.min(72,this.level);while(this.swords.length<n)this.swords.push({x:this.player.x,y:this.player.y,px:this.player.x,py:this.player.y,a:0,cool:this.swords.length*.012,target:null,hits:[],life:0});}
- start(){this.scene=null;this.modeState='battle';this.waveTime=0;if(this.wave===3&&!this.boss)this.spawnBoss();this.emit({type:'scene',scene:null});if(this.time===0){this.spawn(4,{x:790,y:430});this.spawn(4,{x:440,y:400});this.spawn(5,{x:640,y:210});}this.toast(CHAPTERS[this.chapter].name+' · 第 '+(this.wave+1)+' 波');}
+ start(){this.scene=null;this.modeState='battle';this.waveTime=0;beginChapterNode(this);if(this.wave===3&&!this.boss)this.spawnBoss();this.emit({type:'scene',scene:null});if(this.time===0){this.spawn(4,{x:790,y:430});this.spawn(4,{x:440,y:400});this.spawn(5,{x:640,y:210});}this.toast(CHAPTERS[this.chapter].name+' · 第 '+(this.wave+1)+' 波');}
  pause(reason='pause'){clearDashInput(this);clearTouchLock(this,true,reason);if(this.modeState==='battle'){this.modeState='pause';this.scene='pause';this.emit({type:'scene',scene:'pause'});}}
  requestDash(){return requestDash(this);}
  clearDashInput(reason='input-cleared'){clearDashInput(this);clearTouchLock(this,true,reason);}
@@ -76,7 +83,7 @@ export class Battle {
  }
  chooseTrait(id){
   const t=TRAITS.find(x=>x.id===id);if(!t||this.modeState!=='choice'||!this.choices?.some(x=>x.id===id)||(this.traits[id]||0)>=t.max)return;
-  this.traits[id]=(this.traits[id]||0)+1;this.recalc();this.queuedChoices=Math.max(0,this.queuedChoices-1);
+  const beforeCombos=new Set(this.comboSet);this.traits[id]=(this.traits[id]||0)+1;this.recalc();recordChapterCombos(this,beforeCombos,id);this.queuedChoices=Math.max(0,this.queuedChoices-1);
   this.emit({type:'sound',name:'choose'});
   if(this.queuedChoices)this.openChoices();else{this.scene=null;this.modeState='battle';this.emit({type:'scene',scene:null});}
  }
@@ -96,7 +103,7 @@ export class Battle {
    if(modern){zone.armedTargets=this.sigilLiveTargets(zone).length;zone.killsAtArming=this.kills;}this.zones.push(zone);}
   if(s.dashFire&&!(this.rulesVersion>=2&&this.path===4))this.zones.push({x:p.x,y:p.y,r:75,ttl:2.5,warn:.35,kind:'fire',friendly:true,damage:25*(1+(s.burnDamage||0))});
   if(phase3Balance(this)&&this.path===5){delete this.cueTimers['guard-window'];this.cue('guard-window','化解窗口 · 待挡招','#9bddfa',.24+(s.iframes||0));}
-  this.emit({type:'sound',name:'dash'});return true;
+  recordDash(this);this.emit({type:'sound',name:'dash'});return true;
  }
  thunderReadiness(){const cost=thunderCost(this),p=this.player;return {cost,ready:p.mana>=99.9&&p.reserve>=cost,label:p.reserve<cost?'雷源不足':p.mana>=99.9?'可以施放':'灵力 '+Math.floor(p.mana)+' / 100'};}
  thunder(){
@@ -104,7 +111,7 @@ export class Battle {
   if(this.modeState!=='battle')return false;
   if(p.mana<99.9){this.toastLimited('mana-short','灵力尚未蓄满');return false;}
   if(p.reserve<cost){this.toastLimited('reserve-short','雷源不足 · 回灵无法补充雷源');return false;}
-  p.mana=0;p.reserve-=cost;this.thunders++;this.thunderTime=this.time;this.cue('thunder-cast','辟邪神雷 · 已施放，耗用 '+cost+' 雷源','#fff0aa',1.5);
+  p.mana=0;p.reserve-=cost;this.thunders++;this.thunderTime=this.time;recordChapterThunder(this,cost);this.cue('thunder-cast','辟邪神雷 · 已施放，耗用 '+cost+' 雷源','#fff0aa',1.5);
   this.shots=this.shots.filter(b=>b.friendly);p.shield=Math.max(p.shield,Math.min(p.maxShield+25,p.shield+(s.thunderShield||0)));
   if(this.comboSet.has('thunderInsect'))p.hp=Math.min(p.maxHp,p.hp+this.insects.length*.8);
   if(s.metaThunderVeil){p.invuln=Math.max(p.invuln,1);this.cue('veil','金雷护窍 · 已触发','#fff0aa',1);}
@@ -125,7 +132,7 @@ export class Battle {
  sigilReadiness(){const left=Math.max(0,sigilCooldown(this)-(this.time-this.lastSigil));const pending=this.zones.find(z=>z.twin&&!z.pair&&!z.fired);return {left,label:pending?(left>0?'次符 '+left.toFixed(1)+'s':'可放第二符'):left>0?'留符 '+left.toFixed(1)+'s':'起点留符已就绪'};}
  consume(index){
   if(this.modeState!=='battle')return false;const slot=this.consumables[index],p=this.player;if(!slot||slot.count<=0)return false;
-  const state=this.itemReadiness(index),c=state.item;if(state.blocked){this.toast(state.reason);return false;}slot.count--;const aim=this.input.aim||p;
+  const state=this.itemReadiness(index),c=state.item;if(state.blocked){this.toast(state.reason);return false;}slot.count--;recordChapterConsumable(this);const aim=this.input.aim||p;
   switch(c.effect){
    case'heal':p.hp=Math.min(p.maxHp,p.hp+p.maxHp*c.value);break;
    case'mana':p.mana=Math.min(100,p.mana+c.value);break;
@@ -143,21 +150,21 @@ export class Battle {
  }
  addConsumable(id){const same=this.consumables.find(x=>x.id===id);if(same)same.count++;else if(this.consumables.length<2)this.consumables.push({id,count:1});else{const empty=this.consumables.findIndex(x=>x.count<=0);if(empty>=0)this.consumables[empty]={id,count:1};else return false;}return true;}
  hitPlayer(amount,hazard=false,origin=null){
-  const p=this.player,s=this.stats;if(this.finished||this.isExpedition&&this.modeState!=='battle')return;if(!phase3Balance(this)&&this.rulesVersion>=2&&this.path===5&&p.invuln>0&&this.time-p.lastDash<.24+(s.iframes||0)&&this.time-this.lastCounter<4&&this.lastCounter<p.lastDash&&this.guardNoticeDash!==p.lastDash){this.guardNoticeDash=p.lastDash;this.cue('counter-wait','已化解 · 反击还需 '+(4-this.time+this.lastCounter).toFixed(1)+' 秒','#b6c0ba',.8);}if(this.rulesVersion>=2&&this.path===5&&p.invuln>0&&this.time-p.lastDash<.24+(s.iframes||0)&&(phase3Balance(this)?this.lastCounter<p.lastDash:this.time-this.lastCounter>=4)){this.lastCounter=this.time;this.combatCues=this.combatCues.filter(c=>c.key!=='guard-window');delete this.cueTimers.counter;if(s.metaGuardCounter)p.buffs.metaGuardSwift=this.time+1.5;const gain=shieldReward(p,phase3Balance(this)?3:6,12);p.shield+=gain;this.explode(p.x,p.y,110,(32+this.level*.9)*guardCounterScale(this),'guard');this.cue('counter',(s.metaGuardCounter?'已化解 · 反击与疾行 +12%':'已化解 · 守元反击')+(gain>0?' · 回盾 +'+Number(gain.toFixed(1)):' · 额外护盾保留'),'#9bddfa',s.metaGuardCounter?1.5:1.2);}if(this.mode==='training'||p.invuln>0)return;
+  const p=this.player,s=this.stats;if(this.finished||this.isExpedition&&this.modeState!=='battle')return;if(this.rulesVersion>=2&&this.path===5&&p.invuln>0&&this.time-p.lastDash<.24+(s.iframes||0))recordDeflection(this);if(!phase3Balance(this)&&this.rulesVersion>=2&&this.path===5&&p.invuln>0&&this.time-p.lastDash<.24+(s.iframes||0)&&this.time-this.lastCounter<4&&this.lastCounter<p.lastDash&&this.guardNoticeDash!==p.lastDash){this.guardNoticeDash=p.lastDash;this.cue('counter-wait','已化解 · 反击还需 '+(4-this.time+this.lastCounter).toFixed(1)+' 秒','#b6c0ba',.8);}if(this.rulesVersion>=2&&this.path===5&&p.invuln>0&&this.time-p.lastDash<.24+(s.iframes||0)&&(phase3Balance(this)?this.lastCounter<p.lastDash:this.time-this.lastCounter>=4)){this.lastCounter=this.time;this.combatCues=this.combatCues.filter(c=>c.key!=='guard-window');delete this.cueTimers.counter;if(s.metaGuardCounter)p.buffs.metaGuardSwift=this.time+1.5;const gain=shieldReward(p,phase3Balance(this)?3:6,12);p.shield+=gain;recordCounter(this,gain);withDefenseDamage(this,'counter',()=>this.explode(p.x,p.y,110,(32+this.level*.9)*guardCounterScale(this),'guard'));this.cue('counter',(s.metaGuardCounter?'已化解 · 反击与疾行 +12%':'已化解 · 守元反击')+(gain>0?' · 回盾 +'+Number(gain.toFixed(1)):' · 额外护盾保留'),'#9bddfa',s.metaGuardCounter?1.5:1.2);}if(this.mode==='training'||p.invuln>0)return;
   const armor=(s.armor||0)+(p.buffs.armor>this.time?40:0);let d=amount*100/(100+armor*3);
   if(this.time-p.lastDash<2)d*=1-Math.min(.65,s.dashGuard||0);
   if(this.puppets.some(a=>dist(a,p)<110))d*=1-Math.min(.3,s.puppetGuard||0);
   if(hazard)d*=1-Math.min(.75,s.hazardGuard||0);
-  const hpBefore=p.hp;const absorbed=Math.min(p.shield,d);p.shield-=absorbed;d-=absorbed;p.hp=Math.max(0,p.hp-d);p.invuln=.55;p.lastHit=this.time;this.hitCount++;
-  const lost=hpBefore-p.hp,revived=p.hp<=0&&!!s.revive&&!p.revived;if(revived){p.revived=true;p.hp=p.maxHp*.25;p.invuln=3;}
+  const hpBefore=p.hp;const absorbed=Math.min(p.shield,d);p.shield-=absorbed;d-=absorbed;p.hp=Math.max(0,p.hp-d);p.invuln=.55;p.lastHit=this.time;this.hitCount++;recordShieldAbsorption(this,absorbed);
+  const lost=hpBefore-p.hp,revived=p.hp<=0&&!!s.revive&&!p.revived;recordChapterHit(this,{hp:p.hp,hpLost:lost,shieldLost:absorbed,maxHp:p.maxHp,revived});if(revived){p.revived=true;p.hp=p.maxHp*.25;p.invuln=3;}
   recordHit(this,{...(origin||this.attackOrigin||{name:hazard?'场地危险':'近身来袭'}),kind:origin?.kind||(hazard?'险地':'近身'),shield:absorbed,hp:lost,remaining:p.hp,outcome:revived?'revived':p.hp<=0?'defeated':'hurt',recovered:revived?p.hp:0});
   this.fx.push({kind:'number',x:p.x,y:p.y-36,text:'−'+Math.ceil(d+absorbed),color:'#ffac94',ttl:.8,max:.8});
   this.emit({type:'sound',name:'hurt'});this.emit({type:'shake',value:4});
   if(revived)this.toast('守心 · 化解致命伤，恢复 '+Number(p.hp.toFixed(1))+' 生命');else if(p.hp<=0){this.finish(false,'生命耗尽');return;}
   if(s.thorns)this.explode(p.x,p.y,95,25+this.level*1.4,'fire');
  }
- finish(won,reason='历练未完成'){if(this.finished)return;clearTouchLock(this,true,'finish');this.finished=true;this.modeState='result';this.scene='result';this.won=won;this.failureReason=won?null:reason;this.emit({type:'finish',won,summary:this.summary()});}
- summary(){return {studyVersion:this.options.studyVersion||0,won:!!this.won,failureReason:this.failureReason||null,chapter:this.chapter,level:this.level,kills:this.kills,time:this.time,thunders:this.thunders,gold:this.gold,path:this.path,seed:this.seed,mode:this.mode,damageSources:this.damageSources,fireBreakdown:this.fireBreakdown,sigilStats:this.sigilStats,recentHits:this.recentHits,traits:this.traits,combos:this.combos.map(c=>c.name),hitCount:this.hitCount,maxEnemies:this.maxEnemies,insight:this.options.studyVersion===1?0:Math.floor(this.kills/30)+this.chapter*8+(this.won?40:8)};}
+ finish(won,reason='历练未完成'){if(this.finished)return;clearTouchLock(this,true,'finish');this.finished=true;this.modeState='result';this.scene='result';this.won=won;this.failureReason=won?null:reason;closeChapterStats(this);this.emit({type:'finish',won,summary:this.summary()});}
+ summary(){return {...(this.chapterStats?{chapterStats:chapterStatsSnapshot(this)}:{}),...(this.defenseStats?{defenseStats:structuredClone(this.defenseStats)}:{}),studyVersion:this.options.studyVersion||0,won:!!this.won,failureReason:this.failureReason||null,chapter:this.chapter,level:this.level,kills:this.kills,time:this.time,thunders:this.thunders,gold:this.gold,path:this.path,seed:this.seed,mode:this.mode,damageSources:this.damageSources,fireBreakdown:this.fireBreakdown,sigilStats:this.sigilStats,recentHits:this.recentHits,traits:this.traits,combos:this.combos.map(c=>c.name),hitCount:this.hitCount,maxEnemies:this.maxEnemies,insight:this.options.studyVersion===1?0:Math.floor(this.kills/30)+this.chapter*8+(this.won?40:8)};}
  rebuildHash(){this.hash.clear();for(const e of this.enemies)if(e.hp>0&&!e.untargetable){const k=(e.x/96|0)+','+(e.y/96|0);if(!this.hash.has(k))this.hash.set(k,[]);this.hash.get(k).push(e);}}
  near(x,y,r){const result=[];for(let a=Math.floor((x-r)/96);a<=Math.floor((x+r)/96);a++)for(let b=Math.floor((y-r)/96);b<=Math.floor((y+r)/96);b++){const bucket=this.hash.get(a+','+b);if(bucket)for(const e of bucket)if(e.hp>0&&(e.x-x)**2+(e.y-y)**2<r*r)result.push(e);}return result;}
  nearest(x,y,r,exclude=[]){let best=null,score=Infinity;for(const e of this.near(x,y,r)){if(exclude.includes(e.id))continue;const d=(e.x-x)**2+(e.y-y)**2;if(d<score){score=d;best=e;}}return best;}
@@ -201,7 +208,7 @@ export class Battle {
    if(crit&&this.comboSet.has('swordThunder')&&this.rng()<.25){d+=25+this.level;this.fx.push({kind:'bolt',x:e.x,y:e.y,ttl:.2,max:.2,color:'#eed396',seed:this.rng()});}
   }
   if(e.bossType==='xuangu'&&this.bossEnding>0)d=0;
-  if(e.boss&&!this.bossEnding){const next=e.maxHp*(e.phase===0?.66:e.phase===1?.33:0);if(e.hp-d<=next&&e.phase<2){d=Math.max(0,e.hp-next);e.phase++;e.phaseShield=2.6;e.timer=.15;this.toast(e.name+' · 护势变化，准备避招');}}const effective=this.rulesVersion>=2?Math.min(Math.max(0,e.hp),Math.max(0,d)):d;e.hp-=d;e.flash=.1;this.damageSources[source]=(this.damageSources[source]||0)+effective;if(source==='fire')this.fireBreakdown[fireKind]+=effective;observeSigil(this,e,source,fireKind,Math.min(effective,hpBefore));
+  if(e.boss&&!this.bossEnding){const next=e.maxHp*(e.phase===0?.66:e.phase===1?.33:0);if(e.hp-d<=next&&e.phase<2){d=Math.max(0,e.hp-next);e.phase++;e.phaseShield=2.6;e.timer=.15;this.toast(e.name+' · 护势变化，准备避招');}}const effective=this.rulesVersion>=2?Math.min(Math.max(0,e.hp),Math.max(0,d)):d;e.hp-=d;e.flash=.1;this.damageSources[source]=(this.damageSources[source]||0)+effective;observeDefenseDamage(this,source,effective,hpBefore);if(source==='fire')this.fireBreakdown[fireKind]+=effective;observeSigil(this,e,source,fireKind,Math.min(effective,hpBefore));
   if(effective>0&&source==='insect'&&s.metaInsectAssist)e.lastInsectHit=this.time;
   if(effective>0&&empowered)this.cue('focus',s.metaSwordMomentum?'聚锋触发 · 飞剑攻速 +12%':'四击聚锋','#d8ffe9');
   const key=empowered?'聚锋':source==='fire'&&['sigil','echo','line'].includes(fireKind)?FIRE_LABELS[fireKind]:source==='guard'?'反击':null;
@@ -350,12 +357,12 @@ export class Battle {
  }
  sigilLiveTargets(z){return (phase3Balance(this)?sigilTargets(this,z):this.near(z.x,z.y,z.r)).filter(e=>!e.untargetable&&!e.phaseShield&&!(e.bossType==='xuangu'&&this.bossEnding>0));}
  allyTarget(x,y,r){if(this.rulesVersion>=2&&this.input.focus&&this.input.aim){let target=null,best=Infinity;for(const e of this.near(x,y,r)){const d=dist(e,this.input.aim);if(d<best){best=d;target=e;}}return target;}return this.nearest(x,y,r);}
- updateAllies(dt){
+ updateAllies(dt,defenseDt=dt){
   const p=this.player,s=this.stats,phase=this.modeState;const wanted=Math.min(12,(s.puppets||0)+(p.buffs.puppet>this.time?1:0));
   while(this.puppets.length<wanted)this.puppets.push({x:p.x,y:p.y,cool:this.rng()});
-  this.puppets.length=wanted;
+  this.puppets.length=wanted;const defenseConditions=wanted>0?puppetDefenseConditions(this):null;if(wanted>0)recordPuppetTime(this,defenseDt,defenseConditions);
   for(let i=0;i<wanted;i++){const a=this.puppets[i],ang=i*TAU/wanted+this.time*.15;a.x+=(p.x+Math.cos(ang)*90-a.x)*Math.min(1,dt*3*(1+(s.metaPuppetFollow||0)));a.y+=(p.y+Math.sin(ang)*70-a.y)*Math.min(1,dt*3*(1+(s.metaPuppetFollow||0)));a.cool-=dt;
-   if(a.cool<=0){const e=this.allyTarget(a.x,a.y,420*(1+(s.puppetRange||0)),{kind:'puppet',index:i});if(e){let dmg=(20+this.level*.4)*allyBaseScale(this,'puppet')*(1+(s.puppetDamage||0)+(stationaryActive(this)?(s.stationary||0):0));if(this.comboSet.has('swordPuppet'))dmg*=1+swordPuppetInherit(this,s.damage);if(e.mark)dmg*=1+(s.puppetMark||0);a.metaShots=(a.metaShots||0)+1;dmg*=this.puppetDamageMultiplier?.()??1;this.shoot(a.x,a.y,Math.atan2(e.y-a.y,e.x-a.x),dmg,520,true,{pierce:Math.floor(s.puppetPierce||0),color:s.metaPuppetPin&&a.metaShots%6===0?'#e7d398':'#a8c5fa',metaPin:!!s.metaPuppetPin&&a.metaShots%6===0});this.onPuppetShot?.(a,e,dmg,i);a.cool=.7/(1+(s.puppetHaste||0)+(this.puppetHasteBonus?.()??(this.rulesVersion>=2&&this.path===2&&puppetReady(this)?.25:0))+(this.comboSet.has('thunderPuppet')&&this.time-this.thunderTime<6?.65:0));}}
+   if(a.cool<=0){const e=this.allyTarget(a.x,a.y,420*(1+(s.puppetRange||0)),{kind:'puppet',index:i});if(e){let dmg=(20+this.level*.4)*allyBaseScale(this,'puppet')*(1+(s.puppetDamage||0)+(stationaryActive(this)?(s.stationary||0):0));if(this.comboSet.has('swordPuppet'))dmg*=1+swordPuppetInherit(this,s.damage);if(e.mark)dmg*=1+(s.puppetMark||0);a.metaShots=(a.metaShots||0)+1;dmg*=this.puppetDamageMultiplier?.()??1;const shotsBefore=this.shots.length;this.shoot(a.x,a.y,Math.atan2(e.y-a.y,e.x-a.x),dmg,520,true,{pierce:Math.floor(s.puppetPierce||0),color:s.metaPuppetPin&&a.metaShots%6===0?'#e7d398':'#a8c5fa',metaPin:!!s.metaPuppetPin&&a.metaShots%6===0});if(this.shots.length>shotsBefore)recordPuppetShot(this,this.shots.length-shotsBefore,defenseConditions);this.onPuppetShot?.(a,e,dmg,i);a.cool=.7/(1+(s.puppetHaste||0)+(this.puppetHasteBonus?.()??(this.rulesVersion>=2&&this.path===2&&puppetReady(this)?.25:0))+(this.comboSet.has('thunderPuppet')&&this.time-this.thunderTime<6?.65:0));}}
   }
   const bugs=Math.min(30,(s.insects||0)+(s.breed?Math.min(6,Math.floor(this.kills/25)):0)+(p.buffs.insect>this.time?4:0));
   while(this.insects.length<bugs)this.insects.push({x:p.x,y:p.y,cool:this.rng()});this.insects.length=bugs;
@@ -366,7 +373,7 @@ export class Battle {
   }
  }
  update(dt){
-  if(this.modeState!=='battle'||this.finished)return;dt=Math.min(dt,.05);this.time+=dt;this.waveTime+=dt;const p=this.player,s=this.stats;
+  if(this.modeState!=='battle'||this.finished)return;beginChapterNode(this);dt=Math.min(dt,.05);const beforeTime=this.time;this.time+=dt;this.waveTime+=dt;const defenseDt=this.time-beforeTime;recordDefenseTime(this,defenseDt);recordChapterTime(this,defenseDt);const p=this.player,s=this.stats;
   const previousTime=this.time-dt;for(const [key,name] of [['insect','灵虫诱饵结束 · 临时增员退场'],['puppet','备用傀儡结束 · 临时增员退场']])if(p.buffs[key]>previousTime&&p.buffs[key]<=this.time)this.cue('expire-'+key,name,key==='insect'?'#e2c57b':'#a9ddec');
   p.invuln=Math.max(0,p.invuln-dt);p.dashCD=Math.max(0,p.dashCD-dt);p.dash-=dt;
   tickDashInput(this);
@@ -378,7 +385,7 @@ export class Battle {
   p.x=clamp(p.x+ix*speed*dt,30,WORLD.w-30);p.y=clamp(p.y+iy*speed*dt,40,WORLD.h-30);
   p.mana=Math.min(100,p.mana+dt*(100/30)*(1+(s.manaRegen||0)+(this.time-p.lastHit>6?(s.safeMana||0):0)));
   p.hp=Math.min(p.maxHp,p.hp+dt*((s.regen||0)+(p.buffs.regen>this.time?3:0))*(this.comboSet.has('fireGuard')?1.3:1));
-  if(this.time-p.lastHit>(this.rulesVersion>=2&&this.path===5?4:5)&&p.shield<p.maxShield)p.shield=Math.min(p.maxShield,p.shield+dt*(s.shieldRegen||0));
+  if(this.time-p.lastHit>(this.rulesVersion>=2&&this.path===5?4:5)&&p.shield<p.maxShield){const shieldBefore=p.shield;p.shield=Math.min(p.maxShield,p.shield+dt*(s.shieldRegen||0));recordShieldRegen(this,p.shield-shieldBefore);}
   this.rebuildHash();
   if(this.updateDirector)this.updateDirector(dt);
   else if(this.wave<3||this.mode==='training'){
@@ -399,7 +406,7 @@ export class Battle {
   if(this.modeState!=='battle')return;
   for(const e of this.enemies)e.defended=false;for(const e of this.enemies){e.assigned=0;this.attackOrigin={name:e.name,x:e.x,y:e.y};try{this.updateEnemy(e,dt);}finally{this.attackOrigin=null;}if(this.modeState!=='battle')return;}
   if(this.modeState!=='battle')return;
-  this.rebuildHash();updateTouchLock(this);this.updateSwords(dt);if(this.isExpedition&&this.modeState!=='battle')return;this.updateAllies(dt);if(this.isExpedition&&this.modeState!=='battle')return;this.updateEnvironment(dt);
+  this.rebuildHash();updateTouchLock(this);this.updateSwords(dt);if(this.isExpedition&&this.modeState!=='battle')return;this.updateAllies(dt,defenseDt);if(this.isExpedition&&this.modeState!=='battle')return;this.updateEnvironment(dt);
   if(s.chain&&this.time-this.lastChain>3){this.lastChain=this.time;const e=this.nearest(p.x,p.y,400);if(e){let from=p;for(const target of this.near(e.x,e.y,160).slice(0,2+s.chain)){this.hit(target,(20+this.level*.5)*s.chain,'thunder');if(this.modeState!=='battle')return;this.fx.push({kind:'line',x:from.x,y:from.y,tx:target.x,ty:target.y,color:'#eddb91',ttl:.2,max:.2});from=target;}}}
   if(s.ward&&this.time-this.lastWard>7){this.lastWard=this.time;this.zones.push({x:p.x,y:p.y,r:80*(this.comboSet.has('fireGuard')?1.4:1),ttl:5,warn:0,kind:'ward',friendly:true,damage:2});}
   for(const b of this.shots){b.ttl-=dt;b.px=b.x;b.py=b.y;b.x+=b.vx*dt;b.y+=b.vy*dt;
@@ -440,28 +447,29 @@ export class Battle {
  mergeDrops(extra){const d=extra[0];d.value=extra.reduce((a,b)=>a+b.value,0);d.gold=extra.reduce((a,b)=>a+b.gold,0);return d;}
  collectAll(){let xp=0,gold=0;for(const d of this.drops){xp+=d.value;gold+=d.gold;if(d.heal)this.player.hp=Math.min(this.player.maxHp,this.player.hp+d.heal);}this.drops=[];this.addXP(xp);this.gold+=gold;}
  endWave(){
-  this.collectAll();this.enemies=[];this.shots=[];this.zones=[];this.wave++;this.waveTime=0;this.nextElite=35;this.nextHazard=12;this.midEncounter=null;
-  if(this.wave===3){this.spawnBoss();return;}
+  this.collectAll();completeChapterNode(this);this.enemies=[];this.shots=[];this.zones=[];this.wave++;this.waveTime=0;this.nextElite=35;this.nextHazard=12;this.midEncounter=null;
+  if(this.wave===3){beginChapterNode(this);this.spawnBoss();return;}
   this.modeState='rest';this.scene=this.wave===1?'event':'shop';this.risk=false;
   this.shopRolls=0;this.purchased=[];this.makeShop();this.eventIndex=Math.floor(this.rng()*24);
   this.emit({type:'checkpoint',checkpoint:this.serialize()});this.emit({type:'scene',scene:this.scene});
  }
  endChapter(){
   if(this.modeState!=='battle')return;this.collectAll();this.enemies=[];this.shots=[];this.zones=[];this.mechanism=null;
-  this.modeState='chapterEnd';this.scene='chapterEnd';this.gold+=80+this.chapter*25;
+  this.modeState='chapterEnd';this.scene='chapterEnd';this.gold+=80+this.chapter*25;completeChapterNode(this,true);
   this.emit({type:'chapter',chapter:this.chapter});this.emit({type:'scene',scene:'chapterEnd'});
  }
  nextChapter(){
   if(this.chapter>=5){if(this.mode==='endless'){this.chapter=0;this.endlessLoop=(this.endlessLoop||0)+1;this.difficulty={...this.difficulty,hp:this.difficulty.hp*1.4,damage:this.difficulty.damage*1.12};}else{this.finish(true);return;}}
   else this.chapter++;
-  this.wave=0;this.waveTime=0;this.nextElite=40;this.nextHazard=12;this.midEncounter=null;this.bossEnding=0;this.player.revived=false;this.player.hp=Math.min(this.player.maxHp,this.player.hp+this.player.maxHp*.3);this.player.reserve=this.player.maxReserve;
+  advanceChapterStats(this);
+  this.wave=0;this.waveTime=0;this.nextElite=40;this.nextHazard=12;this.midEncounter=null;this.bossEnding=0;this.player.revived=false;this.player.hp=Math.min(this.player.maxHp,this.player.hp+this.player.maxHp*.3);const reserveBefore=this.player.reserve;this.player.reserve=this.player.maxReserve;recordChapterReserve(this,'chapter',this.player.reserve-reserveBefore);
   this.grantStoryItems();this.modeState='intro';this.scene='intro';this.emit({type:'checkpoint',checkpoint:this.serialize()});this.emit({type:'scene',scene:'intro'});
  }
  grantStoryItems(){
   const ids=this.chapter>=4?['lingxi','icepearl','five-rings','cape','weeping']:this.chapter>=3?['lingxi','icepearl','weeping']:this.chapter>=2?['lingxi','icepearl']:[];
   this.storyInventory=[...(this.storyInventory||[]),...ids].filter((v,i,a)=>a.indexOf(v)===i);
  }
- continueRest(){this.scene=null;this.modeState='battle';this.emit({type:'checkpoint',checkpoint:this.serialize()});this.emit({type:'scene',scene:null});this.toast('第 '+(this.wave+1)+' 波 · 灵息渐急');}
+ continueRest(){this.scene=null;this.modeState='battle';beginChapterNode(this);this.emit({type:'checkpoint',checkpoint:this.serialize()});this.emit({type:'scene',scene:null});this.toast('第 '+(this.wave+1)+' 波 · 灵息渐急');}
  makeShop(){
   const held=new Set([...this.relics,...this.locked.map(x=>x.id)]);const pool=RELICS.filter(r=>!held.has(r.id)&&(!r.story||(this.storyInventory||[]).includes(r.id)));
   const picks=[...this.locked];if(picks.length<2){const match=pool.findIndex(r=>r.path===this.path);if(match>=0){const r=pool.splice(match,1)[0];picks.push({...r,kind:'relic',price:55+this.chapter*14});}}while(picks.length<3&&pool.length){const r=pool.splice(Math.floor(this.rng()*pool.length),1)[0];picks.push({...r,kind:'relic',price:55+this.chapter*14+(r.story?25:0)});}
@@ -490,7 +498,7 @@ export class Battle {
   if(effect==='riskRelic'){p.hp=Math.max(1,p.hp*.8);const candidates=RELICS.filter(r=>!r.story&&!this.relics.includes(r.id));if(this.relics.length<6&&candidates.length){this.relics.push(candidates[Math.floor(this.rng()*candidates.length)].id);this.recalc();}else this.gold+=70;}
   this.continueRest();
  }
- serialize(){return {notices:[...this.notices],lastSigil:this.lastSigil,lastCounter:this.lastCounter,risk:!!this.risk,layoutOffset:this.layoutOffset,formation:this.formation||0,locked:this.locked,version:1,options:this.options,seed:this.seed,rng:this.rng.state(),chapter:this.chapter,wave:this.wave,time:this.time,level:this.level,xp:this.xp,totalXP:this.totalXP,gold:this.gold,kills:this.kills,thunders:this.thunders,hitCount:this.hitCount,traits:{...this.traits},relics:[...this.relics],consumables:this.consumables.map(c=>({...c})),player:{...this.player,buffs:{...this.player.buffs}},rerolls:this.rerolls,queuedChoices:this.queuedChoices,scene:this.scene,modeState:this.modeState,damageSources:{...this.damageSources},fireBreakdown:{...this.fireBreakdown},sigilStats:structuredClone(this.sigilStats),recentHits:this.recentHits.map(h=>({...h})),storyInventory:[...(this.storyInventory||[])],endlessLoop:this.endlessLoop||0};}
+ serialize(){return {...(this.chapterStats?{chapterStats:chapterStatsSnapshot(this)}:{}),...(this.defenseStats?{defenseStats:structuredClone(this.defenseStats)}:{}),notices:[...this.notices],lastSigil:this.lastSigil,lastCounter:this.lastCounter,risk:!!this.risk,layoutOffset:this.layoutOffset,formation:this.formation||0,locked:this.locked,version:1,options:this.options,seed:this.seed,rng:this.rng.state(),chapter:this.chapter,wave:this.wave,time:this.time,level:this.level,xp:this.xp,totalXP:this.totalXP,gold:this.gold,kills:this.kills,thunders:this.thunders,hitCount:this.hitCount,traits:{...this.traits},relics:[...this.relics],consumables:this.consumables.map(c=>({...c})),player:{...this.player,buffs:{...this.player.buffs}},rerolls:this.rerolls,queuedChoices:this.queuedChoices,scene:this.scene,modeState:this.modeState,damageSources:{...this.damageSources},fireBreakdown:{...this.fireBreakdown},sigilStats:structuredClone(this.sigilStats),recentHits:this.recentHits.map(h=>({...h})),storyInventory:[...(this.storyInventory||[])],endlessLoop:this.endlessLoop||0};}
  static restore(data,emit){
   validateCommonSnapshot(data);
   if(data?.version!==1||!Number.isFinite(data.level)||data.level<1||data.level>160||!Number.isInteger(data.chapter)||data.chapter<0||data.chapter>5)throw Error('存档格式不兼容');
@@ -505,8 +513,8 @@ export class Battle {
   if(data.damageSources!==undefined&&(!data.damageSources||typeof data.damageSources!=='object'||Array.isArray(data.damageSources)||Object.values(data.damageSources).some(n=>!Number.isFinite(n)||n<0)))throw Error('存档统计无效');
   if(data.storyInventory!==undefined&&(!Array.isArray(data.storyInventory)||data.storyInventory.some(id=>!RELICS.some(r=>r.id===id))))throw Error('剧情物品记录无效');
   if(data.locked!==undefined&&(!Array.isArray(data.locked)||data.locked.length>2||data.locked.some(r=>!r||!RELICS.some(x=>x.id===r.id)||!Number.isFinite(r.price)||r.price<0)))throw Error('整备锁定记录无效');
-  const b=new Battle({...data.options,chapter:0,rulesVersion:data.options.rulesVersion??1},emit);restoreFeedback(b,data);for(const k of ['chapter','wave','time','level','xp','totalXP','gold','kills','thunders','hitCount','traits','relics','consumables','rerolls','queuedChoices','damageSources','storyInventory','endlessLoop','layoutOffset','formation','locked','risk','lastSigil','lastCounter'])if(data[k]!==undefined)b[k]=structuredClone(data[k]);
+  const b=new Battle({...data.options,chapter:0,rulesVersion:data.options.rulesVersion??1},emit);delete b.chapterStats;restoreFeedback(b,data);for(const k of ['chapter','wave','time','level','xp','totalXP','gold','kills','thunders','hitCount','traits','relics','consumables','rerolls','queuedChoices','damageSources','storyInventory','endlessLoop','layoutOffset','formation','locked','risk','lastSigil','lastCounter'])if(data[k]!==undefined)b[k]=structuredClone(data[k]);
   if(b.endlessLoop)b.difficulty={...b.difficulty,hp:b.difficulty.hp*1.4**b.endlessLoop,damage:b.difficulty.damage*1.12**b.endlessLoop};b.stats={};b.recalc();b.player={...b.player,...data.player,x:WORLD.w/2,y:WORLD.h/2,invuln:1,dash:0,dashCD:0,buffs:{}};b.recalc();b.rng.set(data.rng);b.syncSwords();
-  b.locked=(b.locked||[]).map(r=>({...RELICS.find(v=>v.id===r.id),kind:'relic',price:r.price}));b.notices=new Set(data.notices||[]);b.modeState='intro';b.scene='intro';b.resuming=true;return b;
+  b.locked=(b.locked||[]).map(r=>({...RELICS.find(v=>v.id===r.id),kind:'relic',price:r.price}));b.notices=new Set(data.notices||[]);b.modeState='intro';b.scene='intro';b.resuming=true;restoreChapterStats(b,data);return b;
  }
 }

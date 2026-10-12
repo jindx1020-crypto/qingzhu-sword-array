@@ -5,6 +5,7 @@
 // C-8 (illusion true-gate order) and C-9 (fixed-step sub-stepping) are the only two packages that can touch runtime
 // determinism, so both carry a "same seed + same input sequence ⇒ identical snapshot" case and an "old run restores
 // unchanged" case. No case here asserts a new number: every value is read from the same function the engine reads.
+import {initChapterStats} from '../gameplay/chapter-telemetry.js';
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';
 import {Expedition} from '../gameplay/expedition.js';
 import {initialSave,TRAITS,META,RELICS} from '../gameplay/data.js';
@@ -26,7 +27,7 @@ const SEEN=['bamboo','ghostFog','innerHall','treasure','cauldron'];
 function arena(options={}){const b=new Expedition({seed:'batchC',runId:'batchC',difficulty:1,...PHASE4,...options},()=>{});b.cinematicSeen=[...SEEN];return b;}
 function battle(options={}){const b=arena(options);b.node.selected=0;b.beginNode();b.clearField();b.updateDirector=()=>{};b.updateEnvironment=()=>{};b.player.invuln=0;return b;}
 // Walk the route to a given chapter/wave without playing it, so node-specific objectives can be opened directly.
-function at(chapter,wave,options={}){const b=arena(options);b.chapter=chapter;b.wave=wave;b.routes.forEach(ch=>ch.forEach(n=>{if(n.selected===null)n.selected=0;}));return b;}
+function at(chapter,wave,options={}){const b=arena(options);b.chapter=chapter;b.wave=wave;b.routes.forEach(ch=>ch.forEach(n=>{if(n.selected===null)n.selected=0;}));initChapterStats(b);return b;}
 function illusionRun(options={}){const b=at(3,1,options);assert.equal(b.encounter.kind,'illusion');b.beginNode();b.clearField();b.updateEnvironment=()=>{};return b;}
 // Stand on gate `index` and let the objective tick; returns the true gate the run is now looking for.
 function enterGate(b,index){const q=b.objective,g=q.gates[index];b.player.x=g.x;b.player.y=g.y;const target=Math.max(b.waveTime,q.next),delta=target-b.waveTime;b.waveTime=target;b.time+=delta;q.cool=0;b.updateDirector(0);return q;}

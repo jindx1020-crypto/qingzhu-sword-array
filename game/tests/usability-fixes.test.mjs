@@ -1,6 +1,8 @@
 /* SPDX-License-Identifier: GPL-3.0-only
  * Copyright (C) 2026 bilibili@卡布奇诺ultra
  */
+import {initChapterStats} from '../gameplay/chapter-telemetry.js';
+// These fixtures jump directly to historical scenes; start optional observation at that arranged state.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {battleCamera} from '../gameplay/camera.js';
@@ -16,7 +18,7 @@ function fixture(kind) {
   for(let c=0;c<6;c++)for(let w=0;w<b.routes[c].length;w++){
    const choice=b.routes[c][w].choices.findIndex(e=>e.kind===kind);
    if(choice<0)continue;
-   b.chapter=c;b.wave=w;b.routes[c][w].selected=choice;b.beginNode();return b;
+   b.chapter=c;b.wave=w;b.routes[c][w].selected=choice;initChapterStats(b,true);b.beginNode();return b;
   }
  }
  throw Error('Missing encounter '+kind);

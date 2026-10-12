@@ -520,5 +520,575 @@
       "generatedAssetsInitiallyAbsent": true
     },
     "initialCI": "https://github.com/jindx1020-crypto/qingzhu-sword-array/actions/runs/38190786790"
+  },
+  "priorityBatch7": {
+    "date": "2026-10-12",
+    "scope": "Post-publication local defense/stationary telemetry. This does not replace the published v1.3 tag or its historical acceptance.",
+    "implementedThemeScope": "T13 defense and stationary observations",
+    "implementedSuggestionIds": [
+      "R02-03",
+      "R03-01",
+      "R08-03",
+      "R14-04",
+      "R20-04",
+      "R21-02",
+      "R26-02"
+    ],
+    "deferredInOriginalT13": [
+      "R23-05",
+      "R25-02"
+    ],
+    "rulesChanged": false,
+    "saveFormatChanged": false,
+    "recordsSchemaChanged": false,
+    "telemetry": {
+      "field": "defenseStats",
+      "schema": 1,
+      "optional": true,
+      "counts": "Actual successful dash execution, unique observed guard window, counter and shield-break triggers; no input-request or damage inference.",
+      "amounts": "Actual capped counter recovery, shield absorption and natural recovery; actual enemy HP damage attributed within synchronous counter/shield-break scopes.",
+      "puppets": "Actual condition-time denominators and effective time; actual spawned arrows only, extra bolts are a subset. No projectile metadata or claimed extra damage.",
+      "coverage": "New-run start clock is recorded, including nonzero legacy chapter presets. Missing old field begins a partial observation at restore time. Endless loops continue one accumulator.",
+      "persistence": "Detached snapshots/summaries follow existing save/restore/history/observation boundaries; no new save cadence, root key, receipt or leaderboard field.",
+      "invalid": "Malformed checkpoint telemetry uses existing explicit recovery/error/original-preservation flow. Missing or invalid old summaries display unknown instead of zero.",
+      "legacyTimer": "Deduplication marker follows previously accepted timer bounds. Counters are independent of distinct-window count; old accepted rule1/2 state and rule3 rejection remain unchanged.",
+      "clock": "Observed actual battle-clock delta for total and puppet durations; original dt still drives movement/cooldown/physics. Long valid clocks do not accumulate a false span overflow."
+    },
+    "automated": {
+      "tests": 705,
+      "passed": 705,
+      "failed": 0,
+      "skipped": 0,
+      "added": 31
+    },
+    "lint": {
+      "newDiagnostics": 0,
+      "inheritedBaseline": 19
+    },
+    "typescript": true,
+    "webBuild": true,
+    "sourceAudit": {
+      "baselineModules": 109,
+      "unchanged": 103,
+      "modified": [
+        "game/gameplay/Game.jsx",
+        "game/gameplay/RecordsPanel.jsx",
+        "game/gameplay/combat-feedback.js",
+        "game/gameplay/engine.js",
+        "game/gameplay/expedition.js",
+        "game/gameplay/game.css"
+      ],
+      "added": [
+        "game/gameplay/defense-telemetry.js",
+        "game/gameplay/DefenseReport.jsx"
+      ]
+    },
+    "semanticParity": {
+      "configurations": 216,
+      "frames": 25920,
+      "comparisons": 3752,
+      "rngDraws": 19464,
+      "restores": 20,
+      "unchangedRejections": 4,
+      "pass": true
+    },
+    "method": "Isolated declared engine/state/checkpoint fixtures, frozen-source same-input comparison and actual browser input. Not new natural players or physical-device validation.",
+    "remainingThemesInPriorityOrder": [
+      "T14"
+    ],
+    "retainedDetails": {
+      "T13/R23-05": "Per-chapter survival belongs to the next per-chapter review; not inferred from the last five hits.",
+      "T13/R25-02": "Focus-proc and interruption breakdown remains separate work.",
+      "T19/R20-02": "Portrait/landscape separately saved preferences remain deferred.",
+      "T17/T12/T29": "No inferred pair/fire-line attribution, uncollected damage breakdown, or combat keyboard targeting."
+    },
+    "evidence": "local-archive/fixes/2026-10-12-priority-batch7/",
+    "longClockRegression": {
+      "rulesVersions": [
+        1,
+        2,
+        3
+      ],
+      "startTimes": [
+        1000000,
+        50000000
+      ],
+      "framesPerCase": 600,
+      "actualSaveRestore": true
+    },
+    "browserMain": {
+      "pass": true,
+      "checks": 256,
+      "profiles": 2,
+      "suitesPerProfile": 12,
+      "rows": [
+        {
+          "profile": "webp",
+          "suite": "batch1",
+          "checks": 13,
+          "pageErrors": 0,
+          "externalRequests": 0
+        },
+        {
+          "profile": "webp",
+          "suite": "batch2",
+          "checks": 4,
+          "pageErrors": 0,
+          "externalRequests": 0
+        },
+        {
+          "profile": "webp",
+          "suite": "batch3",
+          "checks": 11,
+          "pageErrors": 0,
+          "externalRequests": 0
+        },
+        {
+          "profile": "webp",
+          "suite": "experience",
+          "checks": 24,
+          "pageErrors": 0,
+          "externalRequests": null
+        },
+        {
+          "profile": "webp",
+          "suite": "release",
+          "checks": 7,
+          "pageErrors": 0,
+          "externalRequests": 0
+        },
+        {
+          "profile": "webp",
+          "suite": "release-1.2",
+          "checks": 34,
+          "pageErrors": 0,
+          "externalRequests": 0
+        },
+        {
+          "profile": "webp",
+          "suite": "priority-batch2",
+          "checks": 4,
+          "pageErrors": 0,
+          "externalRequests": 0
+        },
+        {
+          "profile": "webp",
+          "suite": "priority-batch3",
+          "checks": 5,
+          "pageErrors": 0,
+          "externalRequests": 0
+        },
+        {
+          "profile": "webp",
+          "suite": "priority-batch4",
+          "checks": 7,
+          "pageErrors": 0,
+          "externalRequests": 0
+        },
+        {
+          "profile": "webp",
+          "suite": "priority-batch5",
+          "checks": 7,
+          "pageErrors": 0,
+          "externalRequests": 0
+        },
+        {
+          "profile": "webp",
+          "suite": "priority-batch6",
+          "checks": 5,
+          "pageErrors": 0,
+          "externalRequests": 0
+        },
+        {
+          "profile": "webp",
+          "suite": "priority-batch7",
+          "checks": 7,
+          "pageErrors": 0,
+          "externalRequests": 0
+        },
+        {
+          "profile": "png",
+          "suite": "batch1",
+          "checks": 13,
+          "pageErrors": 0,
+          "externalRequests": 0
+        },
+        {
+          "profile": "png",
+          "suite": "batch2",
+          "checks": 4,
+          "pageErrors": 0,
+          "externalRequests": 0
+        },
+        {
+          "profile": "png",
+          "suite": "batch3",
+          "checks": 11,
+          "pageErrors": 0,
+          "externalRequests": 0
+        },
+        {
+          "profile": "png",
+          "suite": "experience",
+          "checks": 24,
+          "pageErrors": 0,
+          "externalRequests": null
+        },
+        {
+          "profile": "png",
+          "suite": "release",
+          "checks": 7,
+          "pageErrors": 0,
+          "externalRequests": 0
+        },
+        {
+          "profile": "png",
+          "suite": "release-1.2",
+          "checks": 34,
+          "pageErrors": 0,
+          "externalRequests": 0
+        },
+        {
+          "profile": "png",
+          "suite": "priority-batch2",
+          "checks": 4,
+          "pageErrors": 0,
+          "externalRequests": 0
+        },
+        {
+          "profile": "png",
+          "suite": "priority-batch3",
+          "checks": 5,
+          "pageErrors": 0,
+          "externalRequests": 0
+        },
+        {
+          "profile": "png",
+          "suite": "priority-batch4",
+          "checks": 7,
+          "pageErrors": 0,
+          "externalRequests": 0
+        },
+        {
+          "profile": "png",
+          "suite": "priority-batch5",
+          "checks": 7,
+          "pageErrors": 0,
+          "externalRequests": 0
+        },
+        {
+          "profile": "png",
+          "suite": "priority-batch6",
+          "checks": 5,
+          "pageErrors": 0,
+          "externalRequests": 0
+        },
+        {
+          "profile": "png",
+          "suite": "priority-batch7",
+          "checks": 7,
+          "pageErrors": 0,
+          "externalRequests": 0
+        }
+      ],
+      "htmlHashes": {
+        "凡人修仙传_青竹剑阵.html": "0c1c4cc374a400a02787d77cc9d1f8115fea77107a4ae914c1b8c888cddb9422",
+        "凡人修仙传_青竹剑阵_兼容PNG.html": "96a9e3b4aa6992815f6b10b607ebdb00c81a57f6eef432f5d5fc6d8eb3e5079c"
+      },
+      "method": "Final local 1.3 HTML; declared fixtures and actual browser input. No additional natural player completions or physical-device validation. Experience suite does not collect external-request counts."
+    },
+    "displayChecks": {
+      "pass": true,
+      "checks": 18,
+      "perProfile": 9,
+      "viewports": [
+        [
+          320,
+          568
+        ],
+        [
+          568,
+          320
+        ],
+        [
+          1024,
+          768
+        ]
+      ],
+      "method": "Declared dense-number and partial-record fixtures; actual text Range rectangles, clipping ancestors, point-hit occlusion checks, and visual screenshot review.",
+      "evidence": "display-final-clock-review.json"
+    },
+    "playerPackage": {
+      "status": "passed",
+      "result": {
+        "version": "1.3",
+        "archive": "青竹剑阵_1.3_免安装版.zip",
+        "method": "Extract actual player ZIP; launch file URLs in offline Chromium with fresh browser contexts, normal UI and no debug API.",
+        "checks": [
+          {
+            "entry": "开始游戏.html",
+            "width": 1440,
+            "height": 900,
+            "offline": true,
+            "normalLaunch": true,
+            "movementAndDash": true,
+            "pause": true,
+            "saveSurvivesReload": true
+          },
+          {
+            "entry": "兼容版/开始游戏_PNG.html",
+            "width": 390,
+            "height": 844,
+            "offline": true,
+            "normalLaunch": true,
+            "movementAndDash": true,
+            "pause": true,
+            "saveSurvivesReload": true
+          }
+        ],
+        "errors": [],
+        "externalRequests": []
+      }
+    },
+    "releasePackaging": {
+      "status": "passed",
+      "sourceFiles": 663,
+      "rootReleasePlayerHtmlBytesEqual": true,
+      "sourceMatchesArchive": true,
+      "manifestAndChecksumsMatch": true,
+      "guideAndNoticesMatch": true,
+      "finalEvidence": "local-archive/fixes/2026-10-12-priority-batch7/delivery-verification.json",
+      "hashes": {
+        "凡人修仙传_青竹剑阵.html": "0c1c4cc374a400a02787d77cc9d1f8115fea77107a4ae914c1b8c888cddb9422",
+        "凡人修仙传_青竹剑阵_兼容PNG.html": "96a9e3b4aa6992815f6b10b607ebdb00c81a57f6eef432f5d5fc6d8eb3e5079c"
+      },
+      "note": "Final archive digests stay in release/1.3/release-manifest.json and local delivery evidence to avoid a self-referential source ZIP hash."
+    },
+    "githubPublication": "Not changed by this local follow-up."
+  },
+  "priorityBatch8": {
+    "date": "2026-10-12",
+    "scope": "Post-publication local T14 chapter resource, damage and survival observations; includes T13/R23-05. Existing v1.3 tag and published evidence are unchanged.",
+    "implementedSuggestionIds": [
+      "R03-05",
+      "R04-02",
+      "R22-04",
+      "R25-04",
+      "R30-01",
+      "R30-04",
+      "R09-05",
+      "R10-05",
+      "R23-05"
+    ],
+    "rulesChanged": false,
+    "saveFormatChanged": false,
+    "recordsSchemaChanged": false,
+    "telemetry": {
+      "field": "chapterStats",
+      "schema": 1,
+      "optional": true,
+      "retainedChapters": 12,
+      "omittedRowsExplicit": true,
+      "damage": "Observed opening cumulative damage baseline and current/end difference for eight sources. Existing per-rule contribution semantics, including legacy overkill, are preserved; no added synergy damage.",
+      "reserve": "Actual successful cast costs; distinct actual rest, chapter-entry and configuration gains, known rest capacity clipping and cap losses.",
+      "otherResources": "Observed opening/end balances for gold, rerolls and consumables including bonus medicine; no fabricated gross income or spending.",
+      "survival": "Minimum combat HP before revival with its then-current cap, actual player hits, HP loss, shield absorption, revivals and successful bag uses. Noncombat sacrifices and objective hits are not player hit events.",
+      "nodes": "At most four node/wave records per chapter, actual battle-clock increments, explicit unfinished/partial flags. Not formal chapterSplits or ranking data.",
+      "combos": "Each combo effect at most once: actual new formation after a trait choice, chapter/loop/node or wave/level/time/trait ID. Existing initial/restored combos have no invented timestamp.",
+      "boundaries": "Chapter-end rest remains in the outgoing chapter; next chapter opening uses pre-refill handoff balances. Incoming chapter receives its actual refill.",
+      "persistence": "Pure detached snapshots and summaries, restore collection disabled during the original reconstruction, then retained observations or a fresh partial origin. Successful candidate commit adopts independent observations; failed/quote candidates do not affect the live run.",
+      "oldAndInvalid": "Missing checkpoints start at actual restored state; missing/bad history shows unknown. Malformed checkpoint observation fields are refused through the existing original-preserving recovery flow."
+    },
+    "automated": {
+      "tests": 742,
+      "passed": 742,
+      "failed": 0,
+      "skipped": 0,
+      "added": 37
+    },
+    "lint": {
+      "newDiagnostics": 0,
+      "inheritedBaseline": 19
+    },
+    "typescript": true,
+    "webBuild": true,
+    "semanticParity": {
+      "configurations": 216,
+      "frames": 25920,
+      "comparisons": 3752,
+      "rngDraws": 19485,
+      "restores": 20,
+      "unchangedRejections": 4,
+      "pass": true
+    },
+    "chapterTransactionParity": {
+      "cases": 18,
+      "actions": 1824,
+      "comparisons": 1934,
+      "restores": 92,
+      "pass": true
+    },
+    "sourceAudit": {
+      "baselineModules": 111,
+      "unchanged": 103,
+      "modifiedModules": 8,
+      "addedModules": 2,
+      "frozenRuleAndSaveModules": 27
+    },
+    "fixtureMaintenance": "Old synthetic chapter/clock/loop jumps start explicit observation baselines, or declare missing observations for legacy fixtures. The frozen touch comparison excludes only new chapterStats; other saved state remains exact. All 211 prior assertions in six browser fixture files retain their original source.",
+    "method": "Declared engine/state/checkpoint and display fixtures, same-input frozen-source parity, actual browser input and offline package launches. Not new natural-speed player completions or physical-device validation.",
+    "remainingThemesInPriorityOrder": [],
+    "retainedDetails": {
+      "T13/R25-02": "Focus-proc/interruption detail remains outside this chapter-observation scope.",
+      "T19/R20-02": "Portrait/landscape independently saved preferences remain deferred.",
+      "T17/T12/T29": "No invented pair/fire-line attribution, uncollected damage breakdown or combat keyboard targeting."
+    },
+    "originalSuggestionsUnchanged": true,
+    "originalSuggestionsSha256": "ce1d5f8b8c02a48ae590dff12a227b1622bb2c4833f6ec6933bf75a0f5253393",
+    "evidence": "local-archive/fixes/2026-10-12-priority-batch8/",
+    "githubPublication": "Not changed by this local follow-up.",
+    "layoutRegression": {
+      "finding": "Additional fixed intermission navigation reduced the scroll body below the original viewport-based floor.",
+      "fix": "The same navigation now lives inside the original scrolling body; fixed header/departure geometry and original acceptance floor are retained.",
+      "evidence": "browser-attempt-01/finding.json",
+      "finalRetest": {
+        "webp": [
+          {
+            "name": "cramped rest: departure pinned, body usable",
+            "w": 320,
+            "h": 568,
+            "body": 130
+          },
+          {
+            "name": "cramped rest: departure pinned, body usable",
+            "w": 360,
+            "h": 640,
+            "body": 216
+          },
+          {
+            "name": "cramped rest: departure pinned, body usable",
+            "w": 568,
+            "h": 320,
+            "body": 95
+          }
+        ],
+        "png": [
+          {
+            "name": "cramped rest: departure pinned, body usable",
+            "w": 320,
+            "h": 568,
+            "body": 130
+          },
+          {
+            "name": "cramped rest: departure pinned, body usable",
+            "w": 360,
+            "h": 640,
+            "body": 216
+          },
+          {
+            "name": "cramped rest: departure pinned, body usable",
+            "w": 568,
+            "h": 320,
+            "body": 95
+          }
+        ]
+      }
+    },
+    "playerPackage": {
+      "status": "passed",
+      "result": {
+        "version": "1.3",
+        "archive": "青竹剑阵_1.3_免安装版.zip",
+        "method": "Extract actual player ZIP; launch file URLs in offline Chromium with fresh browser contexts, normal UI and no debug API.",
+        "checks": [
+          {
+            "entry": "开始游戏.html",
+            "width": 1440,
+            "height": 900,
+            "offline": true,
+            "normalLaunch": true,
+            "movementAndDash": true,
+            "pause": true,
+            "saveSurvivesReload": true
+          },
+          {
+            "entry": "兼容版/开始游戏_PNG.html",
+            "width": 390,
+            "height": 844,
+            "offline": true,
+            "normalLaunch": true,
+            "movementAndDash": true,
+            "pause": true,
+            "saveSurvivesReload": true
+          }
+        ],
+        "errors": [],
+        "externalRequests": []
+      }
+    },
+    "browserMain": {
+      "status": "passed",
+      "checks": 272,
+      "perProfile": 136,
+      "suitesPerProfile": 13,
+      "newThemeGroupsIncluded": 16,
+      "pageErrors": 0,
+      "externalRequestsInCollectingSuites": 0,
+      "uncollectedRequestCountSuites": [
+        "experience"
+      ],
+      "hashes": {
+        "凡人修仙传_青竹剑阵.html": "cfaaae8cbdbdde81ed347dd4d6f42492e9432f26a0b623e518451f947031467d",
+        "凡人修仙传_青竹剑阵_兼容PNG.html": "a72eddabdd4ae80025cd3315ea0533f3d8540978c5884e5e4a87efefaea7b72b"
+      },
+      "evidence": "browser-main-summary.json"
+    },
+    "uiVerification": {
+      "pass": true,
+      "groupsAlreadyIncludedInMain": 16,
+      "viewports": [
+        [
+          320,
+          568
+        ],
+        [
+          568,
+          320
+        ],
+        [
+          1024,
+          768
+        ]
+      ],
+      "visualInspectionCount": 15,
+      "method": "Actual text Range clipping and point-hit occlusion, explicit dense-number fixtures, visual screenshot inspection.",
+      "evidence": "ui-verification.json"
+    },
+    "releasePackaging": {
+      "directory": "release/1.3/",
+      "sourceFiles": 668,
+      "finalEvidence": "local-archive/fixes/2026-10-12-priority-batch8/delivery-verification.json",
+      "hashes": {
+        "凡人修仙传_青竹剑阵.html": "cfaaae8cbdbdde81ed347dd4d6f42492e9432f26a0b623e518451f947031467d",
+        "凡人修仙传_青竹剑阵_兼容PNG.html": "a72eddabdd4ae80025cd3315ea0533f3d8540978c5884e5e4a87efefaea7b72b"
+      },
+      "archiveDigests": "Final source/player ZIP digests stay in release-manifest.json and local delivery evidence to avoid a source ZIP self-reference."
+    }
+  },
+  "latestLocalVerification": "priorityBatch8",
+  "publicationRefresh": {
+    "date": "2026-10-12",
+    "tag": "v1.3",
+    "scope": [
+      "priorityBatch7",
+      "priorityBatch8"
+    ],
+    "previousTagCommit": "168074421f885ac9aa04b34adddbe55d702cbfe7",
+    "versionChanged": false,
+    "htmlBaseline": "priorityBatch8.browserMain.hashes",
+    "release": "https://github.com/jindx1020-crypto/qingzhu-sword-array/releases/tag/v1.3",
+    "actions": "https://github.com/jindx1020-crypto/qingzhu-sword-array/actions",
+    "status": "Commit-specific CI, clean-source reconstruction and uploaded/downloaded asset verification are recorded in the publication evidence; do not reuse initial-release fingerprints.",
+    "evidence": "local-archive/releases/2026-10-12-v1.3-refresh/publication-verification.json"
   }
 }

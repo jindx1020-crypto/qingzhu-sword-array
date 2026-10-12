@@ -26,7 +26,9 @@ function oldAim(b,point,{allowLock=true,scale=1}={}){
 }
 function oldUpdate(b){if(b.touchLockId==null)return;const e=b.enemies.find(e=>e.id===b.touchLockId);if(!oldAvailable(b)||b.modeState!=='battle'){oldClear(b,true);return;}if(!oldLegal(b,e)){oldClear(b);b.cue('touch-lock-release','目标已失效或离开射程 · 已退回定点瞄准','#e3d2ab',2);return;}b.input.aim={x:e.x,y:e.y};b.input.focus=true;b.input.touchAim=true;}
 function same(a,z){
- assert.equal(JSON.stringify(a.serialize()),JSON.stringify(z.serialize()),'complete saved snapshot, rule markers and both RNG states stay identical');
+ // The frozen methods predate optional chapter observations; compare every pre-existing saved field.
+ const existing=b=>{const snapshot=b.serialize();delete snapshot.chapterStats;return JSON.stringify(snapshot);};
+ assert.equal(existing(a),existing(z),'pre-existing saved snapshot, rule markers and both RNG states stay identical');
  assert.deepEqual(a.input,z.input);assert.deepEqual([a.dashIntent,a.dashFeedback],[z.dashIntent,z.dashFeedback]);
  assert.deepEqual(a.combatCues.map(({text:_text,...c})=>c),z.combatCues.map(({text:_text,...c})=>c),'cue keys, colours, lifetimes and throttling unchanged');assert.deepEqual(a.cueTimers,z.cueTimers);
 }

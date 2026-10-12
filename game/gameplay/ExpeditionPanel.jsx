@@ -2,6 +2,7 @@
  * Copyright (C) 2026 bilibili@卡布奇诺ultra
  */
 import ChapterReview from './ChapterReview';
+import ReviewNavigation from './ReviewNavigation';
 import {routeCompletion,routeTactics,reserveRestGuidance} from './player-guidance';
 import StoryItemSummary from './StoryItemSummary';
 import SceneAction from './SceneAction';
@@ -33,7 +34,7 @@ export function ExpeditionPanel({b,save,art,onBuy,onReplace,onSell,replace,setRe
  function locateDeparture(){gate.invalidate();const target=departureRef.current?.disabled?departureDockRef.current:departureRef.current;target?.scrollIntoView({block:'nearest',behavior:'smooth'});target?.focus({preventScroll:true});}
  function locate(t){const ref={event:eventRef,core:coreRef,route:routeRef}[t.target];ref.current?.scrollIntoView({block:'start',behavior:'smooth'});ref.current?.focus({preventScroll:true});}
  function equip(id,index=-1){const result=b.equipCore(id,index);if(result==='coreSlots'||result==='replace')setPendingCore(id);else if(result===true)setPendingCore(null);}
- return <div className="expedition-rest"><div className="rest-scroll"><section className="rest-priority" aria-label="整备优先待办"><div className="rest-checklist" aria-label="整备进度"><strong>{overview.next}</strong><div>{[...tasks].sort((a,z)=>Number(a.done)-Number(z.done)).map(t=><button key={t.target} onClick={()=>locate(t)}>{t.label} · {t.state}{!t.done?' · 前往选择':''}</button>)}</div><small>{overview.queued?'待处理悟道 '+overview.queued+' 次；完成选择后由下方出发按钮进入。':'未提交的暂选不改变当前资源；购物与补养即时生效。'}{rest.shop?' 商店可跳过。':''}</small><button className="rest-focus-departure" onClick={locateDeparture}>跳到出发操作 ↓</button></div><div className={'rest-current-resources '+(overview.lowHp?'low-health':'')}><strong>{overview.identity} · 当前资源</strong><p>{overview.resources}</p><p className={overview.emptyBags?'empty-bags':''}>药囊：{overview.bags}{overview.emptyBags?' · 已空':''}</p><small>不含尚未提交的机缘与核心；雷源仅为储量预算，仍需灵力与规则允许。</small></div></section>
+ return <div className="expedition-rest"><div className="rest-scroll"><ReviewNavigation items={[[".rest-priority",'整备待办'],[".chapter-ledger",'逐章收支']]}/><section className="rest-priority" aria-label="整备优先待办"><div className="rest-checklist" aria-label="整备进度"><strong>{overview.next}</strong><div>{[...tasks].sort((a,z)=>Number(a.done)-Number(z.done)).map(t=><button key={t.target} onClick={()=>locate(t)}>{t.label} · {t.state}{!t.done?' · 前往选择':''}</button>)}</div><small>{overview.queued?'待处理悟道 '+overview.queued+' 次；完成选择后由下方出发按钮进入。':'未提交的暂选不改变当前资源；购物与补养即时生效。'}{rest.shop?' 商店可跳过。':''}</small><button className="rest-focus-departure" onClick={locateDeparture}>跳到出发操作 ↓</button></div><div className={'rest-current-resources '+(overview.lowHp?'low-health':'')}><strong>{overview.identity} · 当前资源</strong><p>{overview.resources}</p><p className={overview.emptyBags?'empty-bags':''}>药囊：{overview.bags}{overview.emptyBags?' · 已空':''}</p><small>不含尚未提交的机缘与核心；雷源仅为储量预算，仍需灵力与规则允许。</small></div></section>
  {readiness.eventReason&&<output className="rest-invalid">暂选机缘已失效：{readiness.eventReason}。请重新选择机缘。</output>}
  {rest.coreSelection?.replaceId&&<p className="core-replacement-notice">确认出发时将换下「{EQUIPMENT.find(c=>c.id===rest.coreSelection.replaceId)?.name}」，装配「{EQUIPMENT.find(c=>c.id===rest.coreSelection.id)?.name}」。出发前可改选。</p>}
 

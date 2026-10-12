@@ -2,6 +2,8 @@
  * Copyright (C) 2026 bilibili@卡布奇诺ultra
  */
 import {emptySigilStats,validateSigilStats} from './sigil-metrics.js';
+import {restoreDefenseStats,validateDefenseStats} from './defense-telemetry.js';
+import {validateChapterStats} from './chapter-telemetry.js';
 import {CONSUMABLES} from './data.js';
 import {FIXED_NODE_SECONDS} from './pacing-rules.js';
 export const FIRE_KINDS=['burn','sigil','echo','ember','line','other','history'];
@@ -23,6 +25,7 @@ export function consumableState(b,index){
  return {item,count,bonus,blocked,gain,reason,summon,label:reason||summon?.text||(gain!==null?'可恢复 '+shown(gain)+(item.effect==='heal'?' 生命':' 灵力'):'可使用'),pendingBonus:!bonus&&!!slot?.bonusHeal};
 }
 export function restoreFeedback(b,data){
+ b.defenseStats=restoreDefenseStats(data.defenseStats,data.time);
  b.fireBreakdown=data.fireBreakdown?structuredClone(data.fireBreakdown):{...emptyFire(),history:data.damageSources?.fire||0};
  b.sigilStats=data.sigilStats?structuredClone(data.sigilStats):emptySigilStats(data.time);b.recentHits=structuredClone(data.recentHits||[]);b.combatCues=[];b.cueTimers={};b.numberTimers={};
 }
@@ -76,6 +79,8 @@ export function defeatReview(b){
  return {objective:unfinishedObjective(b),fatal,target,count:relevant.length,dominant:sorted.filter(([,loss])=>loss===max).map(([kind])=>kind),loss:max||0};
 }
 export function validateFeedback(d){
+ validateChapterStats(d.chapterStats,d);
+ validateDefenseStats(d.defenseStats,d);
  validateSigilStats(d.sigilStats,d);
  const fail=()=>{throw Error('战斗反馈记录无效');},num=(v,max=1e200)=>Number.isFinite(v)&&v>=0&&v<=max;
  if(d.fireBreakdown!==undefined){const f=d.fireBreakdown;if(!f||typeof f!=='object'||Array.isArray(f)||Object.keys(f).length!==FIRE_KINDS.length||!FIRE_KINDS.every(k=>num(f[k])))fail();const total=Object.values(f).reduce((a,b)=>a+b,0),aggregate=d.damageSources?.fire||0;if(Math.abs(total-aggregate)>Math.max(1e-5,aggregate*1e-9))fail();}

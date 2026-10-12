@@ -10,7 +10,8 @@ for(const balanceVersion of [1,2,3])for(const growthVersion of [1,3,4])for(const
 export const STATIONS=[[0,0],[1,1],[2,1],[3,0],[4,1],[5,0]];
 const hash=x=>createHash('sha256').update(JSON.stringify(x)).digest('hex').slice(0,24);
 // Batch A left presentation-only sigil fields (armedTargets/killsAtArming/cleared) ungated; they never change damage, RNG or timers.
-const normalize=d=>{const o=JSON.parse(JSON.stringify(d));delete o.runId;if(o.expedition){delete o.expedition.runId;for(const z of o.expedition.zones||[]){delete z.armedTargets;delete z.killsAtArming;delete z.cleared;}if(o.expedition.sigilStats?.recent)for(const r of o.expedition.sigilStats.recent)delete r.cleared;}return o;};
+// Optional observation metadata is outside this historical fixture; pre-existing gameplay fields stay in the comparison.
+const normalize=d=>{const o=JSON.parse(JSON.stringify(d));delete o.defenseStats;delete o.chapterStats;delete o.runId;if(o.expedition){delete o.expedition.runId;for(const z of o.expedition.zones||[]){delete z.armedTargets;delete z.killsAtArming;delete z.cleared;}if(o.expedition.sigilStats?.recent)for(const r of o.expedition.sigilStats.recent)delete r.cleared;}return o;};
 export function drive(b,seconds){
  const t0=b.time;let stalls=0,frames=0;
  while(b.time-t0<seconds&&!b.finished&&frames<seconds*60+600){
