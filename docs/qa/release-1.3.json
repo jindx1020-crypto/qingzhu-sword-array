@@ -1106,6 +1106,12 @@
       "lintNewDiagnostics": 0,
       "inheritedLintDiagnostics": 19,
       "typescript": true
+    },
+    "pauseOverlapFix": {
+      "finding": "At390x844 the pause point overlaps the close button of the taller review dialog; the second pointer press could resume combat. An exiting entry overlay could swallow the first test press and mask the failure.",
+      "fix": "Only native pointer close-press on the pause dialog uses the existing same-point48px/450ms duplicate-gesture guard. Other dialogs, keyboard close and Escape are unchanged.",
+      "test": "Wait for entry overlay detachment and trial-actionability before two real clicks/taps150ms apart; keep the original paused-state assertion and also verify normal later close and keyboard close.",
+      "failedCI": 38215000151
     }
   }
 }

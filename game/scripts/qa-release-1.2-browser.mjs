@@ -58,9 +58,15 @@ try{
   await shot(page,'practice-b-'+w+'x'+h);report.checks.push({name:'practice step 3 target B visible and completable by '+(touch?'tap':'held click'),w,h});await context.close();}
 
  // A double activation of pause (one gesture, two presses) leaves the game paused instead of resuming at once.
- for(const [w,h] of [[1440,900],[390,844]]){const {page,context,touch}=await open(w,h);await enterBattle(page);const box=await page.getByRole('button',{name:'暂停',exact:true}).boundingBox(),x=box.x+box.width/2,y=box.y+box.height/2;
+ for(const [w,h] of [[1440,900],[390,844]]){const {page,context,touch}=await open(w,h);await enterBattle(page);
+  // A closing intro/cinematic overlay otherwise eats the first press, testing only one real pause.
+  await page.locator('[data-slot=dialog-overlay]').waitFor({state:'detached'});await page.getByRole('button',{name:'暂停',exact:true}).click({trial:true});
+  const box=await page.getByRole('button',{name:'暂停',exact:true}).boundingBox(),x=box.x+box.width/2,y=box.y+box.height/2;
   if(touch){await page.touchscreen.tap(x,y);await page.waitForTimeout(150);await page.touchscreen.tap(x,y);}else{await page.mouse.click(x,y);await page.waitForTimeout(150);await page.mouse.click(x,y);}
-  await page.waitForTimeout(400);assert.deepEqual(await state(page),{mode:'pause',scene:'pause',risk:null});report.checks.push({name:'double pause stays paused',w,h});await context.close();}
+  await page.waitForTimeout(400);assert.deepEqual(await state(page),{mode:'pause',scene:'pause',risk:null});
+  const close=page.locator('.scene-pause [data-slot=dialog-close]');if(touch)await close.tap();else await close.click();await page.waitForFunction(()=>window.__FANREN__.battle.modeState==='battle');assert.deepEqual(await state(page),{mode:'battle',scene:null,risk:null},'an explicit close after the repeat window still resumes');
+  await page.locator('[data-slot=dialog-overlay]').waitFor({state:'detached'});await page.getByRole('button',{name:'暂停',exact:true}).click();await page.waitForSelector('.scene-pause');await page.locator('.scene-pause [data-slot=dialog-close]').focus();await page.keyboard.press('Enter');await page.waitForFunction(()=>window.__FANREN__.battle.modeState==='battle');assert.deepEqual(await state(page),{mode:'battle',scene:null,risk:null},'keyboard close remains immediate');
+  report.checks.push({name:'double pause stays paused',w,h,explicitClose:true,keyboardClose:true});await context.close();}
 
  // 「再历此境」 repeats the finished run, even after the run was resumed from the home page.
  {const {page,context}=await open(1440,900);await page.getByRole('button',{name:/踏入修仙路/}).click();await page.waitForSelector('.journey-launch');
