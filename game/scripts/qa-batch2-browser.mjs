@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-only
  * Copyright (C) 2026 bilibili@卡布奇诺ultra
  */
+import {seedOfflineStorage} from './browser-storage.mjs';
 // Historical synthetic recovery fixtures omit later chapter-split/challenge data; live UI starts still use current defaults.
 /* oxlint-disable typescript/unbound-method -- QA fault injection restores Storage.prototype with its original receiver. */
 import {launchBrowser,qaOutput,offlineURL} from './browser-runtime.mjs';
@@ -8,7 +9,7 @@ import fs from 'node:fs';import path from 'node:path';import assert from 'node:a
 const out=qaOutput('batch2'),report={method:'Isolated actual Chrome with controlled QA fixtures and WebAudio/MediaRecorder; synthetic completion is not player speedrun evidence; no human listening or phone hardware',checks:[],views:[],errors:[],external:[]};
 const browser=await launchBrowser();
 // `raw` seeds exact save bytes as-is (B3 reopens what the game wrote); otherwise the fixture object is serialized with the practice guide marked seen.
-async function open(w=1440,h=1000,save=initialSave(),png=false,raw=JSON.stringify({...save,guidesSeen:['practice-v1']})){const context=await browser.newContext({viewport:{width:w,height:h},hasTouch:true}),page=await context.newPage();page.on('pageerror',e=>report.errors.push(e.message));page.on('request',r=>{if(/^https?:/.test(r.url()))report.external.push(r.url());});await page.addInitScript(bytes=>{if(!sessionStorage.seeded){localStorage.setItem('fanren-qingzhu-v1',bytes);sessionStorage.seeded='1';}},raw);await page.goto(offlineURL(png));await page.waitForFunction(()=>window.__FANREN__?.art);return {page,context};}
+async function open(w=1440,h=1000,save=initialSave(),png=false,raw=JSON.stringify({...save,guidesSeen:['practice-v1']})){const context=await browser.newContext({viewport:{width:w,height:h},hasTouch:true}),page=await context.newPage();page.on('pageerror',e=>report.errors.push(e.message));page.on('request',r=>{if(/^https?:/.test(r.url()))report.external.push(r.url());});await seedOfflineStorage(page,offlineURL(png),{'fanren-qingzhu-v1':raw});return {page,context};}
 async function view(page,selector){await page.waitForTimeout(350);return page.locator(selector).first().evaluate(e=>{const r=e.getBoundingClientRect(),hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return {top:r.top,bottom:r.bottom,width:r.width,height:r.height,visible:r.left>=0&&r.right<=innerWidth+1&&r.top>=0&&r.bottom<=innerHeight+1&&(hit===e||e.contains(hit))};});}
 async function shot(page,name){await page.waitForTimeout(300);await page.screenshot({path:path.join(out,name+'.png')});}
 function prior(){const b=new Expedition({segmentVersion:0,challengeVersion:0,runId:'browser-prior',seed:'browser-prior'});b.receipts=b.routes.flat().map(n=>n.id);b.time=120.125;b.won=true;/* Synthetic prior score has no observed chapter ledger. */delete b.chapterStats;return settleRunResult(initialSave(),b.summary());}

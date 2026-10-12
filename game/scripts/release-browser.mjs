@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-only
  * Copyright (C) 2026 bilibili@卡布奇诺ultra
  */
+import {seedOfflineStorage} from './browser-storage.mjs';
 // Real browser inputs plus explicitly synthetic save fixtures; no personal profile is opened.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -14,8 +15,8 @@ const browser=await launchBrowser();
 async function open(width=390,height=844,slots=null,debug=true){
  const context=await browser.newContext({viewport:{width,height},hasTouch:true}),page=await context.newPage();
  page.on('pageerror',e=>report.errors.push(e.message));page.on('request',r=>{if(/^https?:/.test(r.url()))report.external.push(r.url());});
- if(slots)await page.addInitScript(slots=>{if(!sessionStorage.releaseFixture){for(const [k,v]of Object.entries(slots))localStorage.setItem(k,v);sessionStorage.releaseFixture='1';}},slots);
- await page.goto(debug?offlineURL():offlineURL().replace('?test=1',''));if(slots)await page.waitForFunction(()=>window.__FANREN__?.art);else await page.getByRole('button',{name:/开源许可与源码/}).waitFor();return {page,context};
+ if(slots)await seedOfflineStorage(page,offlineURL(),slots);
+ else{await page.goto(debug?offlineURL():offlineURL().replace('?test=1',''));await page.getByRole('button',{name:/开源许可与源码/}).waitFor();}return {page,context};
 }
 const snapshot=page=>page.evaluate(()=>Object.fromEntries(['fanren-qingzhu-v1','fanren-qingzhu-v1-backup','fanren-qingzhu-v1-backup-journal','fanren-qingzhu-v1-unreadable'].map(k=>[k,localStorage.getItem(k)])));
 const cancel=page=>page.locator('.risk-dialog').getByRole('button',{name:'取消 · 保留当前状态'}).click();

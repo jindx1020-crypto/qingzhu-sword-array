@@ -5,6 +5,7 @@
 import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import {createHash} from 'node:crypto';
 import {launchBrowser,offlineURL,projectRoot,variant,htmlPath} from './browser-runtime.mjs';
 import {prepareQuietChapterFixture} from './browser-save-fixtures.mjs';
+import {seedBrowserSave,readBrowserSave} from './browser-storage.mjs';
 import {initialSave,TRAITS} from '../gameplay/data.js';import {createRun,restoreRun} from '../gameplay/run-factory.js';import {chapterReview} from '../gameplay/chapter-telemetry.js';import {DAMAGE_SOURCES} from '../gameplay/combat-values.js';
 const out=path.join(projectRoot,'game/qa/release',variant,'priority-batch8');fs.mkdirSync(out,{recursive:true});
 const hash=()=>createHash('sha256').update(fs.readFileSync(htmlPath)).digest('hex');
@@ -14,17 +15,10 @@ const fmt=n=>n>0&&n<.1?'不足0.1':Number(n.toFixed(1)).toLocaleString('zh-CN');
 function monitor(page){currentPage=page;page.setDefaultTimeout(10000);page.on('pageerror',e=>report.errors.push(e.message));page.on('request',r=>{if(/^https?:/.test(r.url()))report.external.push(r.url());});}
 async function open(w,h,save={}){
  const context=await browser.newContext({viewport:{width:w,height:h},hasTouch:true}),page=await context.newPage();monitor(page);
- // Seed once from the Node driver. No reload init script may replace a persisted checkpoint,
- // including when sessionStorage is empty in a new page or was cleared independently.
- await page.goto(offlineURL());await page.waitForFunction(()=>window.__FANREN__?.art);
- const seeded=JSON.stringify({...initialSave(),guidesSeen:['practice-v1',0,1,2,3,4,5],...save});
- await page.evaluate(raw=>localStorage.setItem('fanren-qingzhu-v1',raw),seeded);await page.reload();await page.waitForFunction(()=>window.__FANREN__?.art);
- assert.equal(await page.evaluate(()=>localStorage.getItem('fanren-qingzhu-v1')),seeded,'initial fixture load does not rewrite the seeded record');return {page,context};
+ const fixture={...initialSave(),guidesSeen:['practice-v1',0,1,2,3,4,5],...save},seeded=JSON.stringify(fixture);await seedBrowserSave(page,offlineURL(),fixture);assert.equal(await page.evaluate(()=>localStorage.getItem('fanren-qingzhu-v1')),seeded,'initial fixture load does not rewrite the seeded record');return {page,context};
 }
-async function storageEvidence(page,label){
- const value=await page.evaluate(()=>{const F=window.__FANREN__;return {href:location.href,localStorage:Object.fromEntries(Object.keys(localStorage).sort().map(k=>[k,localStorage.getItem(k)])),sessionStorage:Object.fromEntries(Object.keys(sessionStorage).sort().map(k=>[k,sessionStorage.getItem(k)])),save:F?.save,battle:F?.battle?.serialize(),risk:document.querySelector('.risk-dialog')?.innerText||null,status:document.querySelector('.checkpoint-status')?.innerText||null,body:document.body.innerText};});
- fs.writeFileSync(path.join(out,label+'.json'),JSON.stringify(value,null,2)+'\n');return value;
-}
+async function storageEvidence(page,label){const value=await readBrowserSave(page);fs.writeFileSync(path.join(out,label+'.json'),JSON.stringify(value,null,2)+'\n');return value;}
+
 async function enterQuiet(page){await page.getByRole('button',{name:/^继续历练/}).click();await page.locator('.scene-pause').waitFor();await page.locator('.scene-pause .primary-start').click();await page.waitForFunction(()=>window.__FANREN__.battle.modeState==='battle');await page.locator('[data-slot=dialog-overlay]').waitFor({state:'detached'});}
 
 async function settle(page){await page.waitForTimeout(160);await page.waitForFunction(()=>[...document.querySelectorAll('.game-dialog')].flatMap(e=>e.getAnimations({subtree:true})).filter(a=>a.effect?.getComputedTiming().iterations!==Infinity).every(a=>a.playState!=='running'));await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));}

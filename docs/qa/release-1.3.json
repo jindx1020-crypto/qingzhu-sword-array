@@ -1156,11 +1156,11 @@
     },
     "evidence": "local-archive/fixes/2026-10-12-ci-resume/",
     "automated": {
-      "tests": 747,
-      "passed": 747,
+      "tests": 750,
+      "passed": 750,
       "failed": 0,
       "skipped": 0,
-      "addedFixtureTests": 4,
+      "addedFixtureTests": 7,
       "lintNewDiagnostics": 0,
       "inheritedDiagnostics": 19,
       "typescript": true
@@ -1202,6 +1202,30 @@
       "dependenciesChanged": false,
       "registeredExistingUnfixedException": "GHSA-vfj7-8cjw-p6xm"
     },
-    "fullChecks": "Exact candidate-commit and v1.3-tag workflow outcomes, artifact fingerprints and public downloads are recorded in this repair archive before the updated release is published."
+    "fullChecks": "Exact candidate-commit and v1.3-tag workflow outcomes, artifact fingerprints and public downloads are recorded in this repair archive before the updated release is published.",
+    "followupInitializerAudit": {
+      "failedTagRun": 38229951369,
+      "candidateCommit": "3a16bca93c4abc8d8f4e07bf4468baad354f3b8b",
+      "finding": "The next tag run passed WebP chapter checks but failed PNG defense history after reload. The retained screenshot showed a normal atlas with zero history; pre/post storage traces were absent in that old defense case.",
+      "legacyInitializerScripts": 11,
+      "sharedInitializerScripts": 12,
+      "repair": "All fixture openers now seed via a single driver-only helper. No fixture-writing addInitScript remains; the layout suite retains its write observer. Real reload checks remain, including ordinary package entries without fixtures.",
+      "defenseFixtures": "Guard and puppet cases start from validated zero-frame snapshots; no clearing of live allocated XP drops. Resources and target offsets are explicit test-only options.",
+      "defenseBrowser": {
+        "profiles": [
+          "webp",
+          "png"
+        ],
+        "checks": 14,
+        "pass": true,
+        "originalAssertionsRetained": 46,
+        "addedAssertions": 20,
+        "timeoutUnchanged": true,
+        "diskHistoryAndCheckpointVerified": true,
+        "sessionClearReloadAndNewPage": true
+      },
+      "productionGameAndBothHTMLUnchanged": true,
+      "historicalCITraceLimitPreserved": true
+    }
   }
 }

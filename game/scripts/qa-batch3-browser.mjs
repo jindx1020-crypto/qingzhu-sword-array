@@ -1,13 +1,14 @@
 /* SPDX-License-Identifier: GPL-3.0-only
  * Copyright (C) 2026 bilibili@卡布奇诺ultra
  */
+import {seedBrowserSave} from './browser-storage.mjs';
 import {initChapterStats} from '../gameplay/chapter-telemetry.js';
 // Reopen observation only after this synthetic fixture selects its destination chapter.
 // Historical synthetic recovery fixtures omit later chapter-split/challenge data; live UI starts still use current defaults.
 import {launchBrowser,qaOutput,offlineURL} from './browser-runtime.mjs';import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import {Expedition} from '../gameplay/expedition.js';import {initialSave} from '../gameplay/data.js';import {GROWTH_VERSION} from '../gameplay/growth-rules.js';
 const out=qaOutput('batch3'),report={method:'Isolated desktop Chrome, real DOM/key/CDP touch inputs; declared synthetic node/practice positioning fixtures. No phone hardware.',checks:[],errors:[],external:[]};
 const browser=await launchBrowser();
-async function open(w,h,save=initialSave(),png=false){const context=await browser.newContext({viewport:{width:w,height:h},hasTouch:true}),page=await context.newPage();page.on('pageerror',e=>report.errors.push(e.message));page.on('request',r=>{if(/^https?:/.test(r.url()))report.external.push(r.url());});await page.addInitScript(s=>{localStorage.setItem('fanren-qingzhu-v1',JSON.stringify(s));},{...save,guidesSeen:['practice-v1']});await page.goto(offlineURL(png));await page.waitForFunction(()=>window.__FANREN__?.art);return {context,page};}
+async function open(w,h,save=initialSave(),png=false){const context=await browser.newContext({viewport:{width:w,height:h},hasTouch:true}),page=await context.newPage();page.on('pageerror',e=>report.errors.push(e.message));page.on('request',r=>{if(/^https?:/.test(r.url()))report.external.push(r.url());});await seedBrowserSave(page,offlineURL(png),{...save,guidesSeen:['practice-v1']});return {context,page};}
 async function shot(page,name){await page.waitForTimeout(400);await page.screenshot({path:path.join(out,name+'.png')});}
 async function geometry(page,selector){return page.locator(selector).first().evaluate(e=>{const r=e.getBoundingClientRect(),hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return {x:r.x,y:r.y,w:r.width,h:r.height,visible:r.x>=0&&r.right<=innerWidth+1&&r.top>=0&&r.bottom<=innerHeight+1&&(hit===e||e.contains(hit))};});}
 try{

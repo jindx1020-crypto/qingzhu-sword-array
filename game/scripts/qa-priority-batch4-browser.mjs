@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-only
  * Copyright (C) 2026 bilibili@卡布奇诺ultra
  */
+import {seedBrowserSave} from './browser-storage.mjs';
 // Declared isolated review fixtures. Actual keyboard/touch controls; not natural player runs.
 import {launchBrowser,offlineURL,projectRoot,variant} from './browser-runtime.mjs';
 import {initialSave} from '../gameplay/data.js';
@@ -8,7 +9,7 @@ import fs from 'node:fs';import path from 'node:path';import assert from 'node:a
 const out=path.join(projectRoot,'game/qa/release',variant,'priority-batch4');fs.mkdirSync(out,{recursive:true});
 const report={method:'Isolated review-state fixtures, real keyboard and touch navigation on built offline HTML. No natural-play, phone hardware or screen-reader claim.',checks:[],errors:[],external:[],pass:false};
 const browser=await launchBrowser();let currentPage;
-async function open(w,h){const context=await browser.newContext({viewport:{width:w,height:h},hasTouch:true}),page=await context.newPage();currentPage=page;page.on('pageerror',e=>report.errors.push(e.message));page.on('request',r=>{if(/^https?:/.test(r.url()))report.external.push(r.url());});await page.addInitScript(s=>localStorage.setItem('fanren-qingzhu-v1',JSON.stringify(s)),{...initialSave(),guidesSeen:['practice-v1',0,1,2,3,4,5]});await page.goto(offlineURL());await page.waitForFunction(()=>window.__FANREN__?.art);return {context,page};}
+async function open(w,h){const context=await browser.newContext({viewport:{width:w,height:h},hasTouch:true}),page=await context.newPage();currentPage=page;page.on('pageerror',e=>report.errors.push(e.message));page.on('request',r=>{if(/^https?:/.test(r.url()))report.external.push(r.url());});await seedBrowserSave(page,offlineURL(),{...initialSave(),guidesSeen:['practice-v1',0,1,2,3,4,5]});return {context,page};}
 const snap=page=>page.evaluate(()=>({battle:JSON.stringify(window.__FANREN__.battle.serialize()),disk:localStorage.getItem('fanren-qingzhu-v1')}));
 async function geometry(page,scene){return page.locator('.scene-'+scene).evaluate(e=>{const rect=n=>{const r=n.getBoundingClientRect();return {top:r.top,bottom:r.bottom,left:r.left,right:r.right,width:r.width,height:r.height};};const dock=e.querySelector('.review-action-dock'),body=e.querySelector('.panel-body');return {dialog:rect(e),dock:rect(dock),body:rect(body),width:e.clientWidth,scroll:e.scrollWidth,buttons:[...dock.querySelectorAll('button')].map(rect)};});}
 function assertGeometry(g,w,h){assert.ok(g.dialog.top>=0&&g.dialog.bottom<=h+1);assert.ok(g.dock.bottom<=g.dialog.bottom&&g.dock.top>=g.body.bottom-1);assert.ok(g.scroll<=g.width+1);for(const r of g.buttons){assert.ok(r.height>=44&&r.left>=0&&r.right<=w+1);}}

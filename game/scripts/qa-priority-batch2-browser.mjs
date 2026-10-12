@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-only
  * Copyright (C) 2026 bilibili@卡布奇诺ultra
  */
+import {seedBrowserSave} from './browser-storage.mjs';
 // Isolated, declared UI fixtures. These checks are not additional natural-speed playtest runs.
 import {launchBrowser,offlineURL,projectRoot,variant} from './browser-runtime.mjs';
 import {initialSave,TRAITS} from '../gameplay/data.js';
@@ -10,8 +11,7 @@ const report={method:'Isolated Chromium; declared configuration fixtures and rea
 const browser=await launchBrowser();let currentPage;
 async function open(w,h){const context=await browser.newContext({viewport:{width:w,height:h},hasTouch:w<900}),page=await context.newPage();currentPage=page;
  page.on('pageerror',e=>report.errors.push(e.message));page.on('request',r=>{if(/^https?:/.test(r.url()))report.external.push(r.url());});
- await page.addInitScript(s=>localStorage.setItem('fanren-qingzhu-v1',JSON.stringify(s)),{...initialSave(),guidesSeen:['practice-v1',0,1,2,3,4,5],wins:1,unlocked:5});
- await page.goto(offlineURL());await page.waitForFunction(()=>window.__FANREN__?.art);return {page,context};
+ await seedBrowserSave(page,offlineURL(),{...initialSave(),guidesSeen:['practice-v1',0,1,2,3,4,5],wins:1,unlocked:5});return {page,context};
 }
 async function battle(page,path=2){await page.evaluate(path=>window.__FANREN__.start({mode:'story',path,skipPractice:true}),path);await page.locator('.scene-intro .primary-start').click();const skip=page.getByRole('button',{name:'跳过过场',exact:true});if(await skip.count())await skip.click();await page.waitForFunction(()=>window.__FANREN__.battle.modeState==='battle');}
 const shot=(page,name)=>page.screenshot({path:path.join(out,name+'.png')});

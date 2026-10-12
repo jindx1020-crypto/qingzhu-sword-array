@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-only
  * Copyright (C) 2026 bilibili@卡布奇诺ultra
  */
+import {seedBrowserSave} from './browser-storage.mjs';
 // Historical synthetic recovery fixtures omit later chapter-split/challenge data; live UI starts still use current defaults.
 import {launchBrowser,qaOutput,offlineURL} from './browser-runtime.mjs';
 import assert from 'node:assert/strict';
@@ -11,7 +12,7 @@ import {initialSave} from '../gameplay/data.js';
 import {settleRunResult} from '../gameplay/records.js';
 const out=qaOutput('batch1'),report={method:'isolated Chrome, visible coordinate mouse clicks, wheel, keyboard and synthetic CDP touch; no phone hardware',views:[],checks:[],errors:[],external:[]};
 const browser=await launchBrowser();
-async function open(w,h,save=initialSave(),png=false){const context=await browser.newContext({viewport:{width:w,height:h},hasTouch:true});const page=await context.newPage();page.on('pageerror',e=>report.errors.push(e.message));page.on('request',r=>{if(/^https?:/.test(r.url()))report.external.push(r.url());});await page.addInitScript(s=>localStorage.setItem('fanren-qingzhu-v1',JSON.stringify(s)),{...save,guidesSeen:['practice-v1']});await page.goto(offlineURL(png));await page.waitForFunction(()=>window.__FANREN__?.art);return {page,context};}
+async function open(w,h,save=initialSave(),png=false){const context=await browser.newContext({viewport:{width:w,height:h},hasTouch:true});const page=await context.newPage();page.on('pageerror',e=>report.errors.push(e.message));page.on('request',r=>{if(/^https?:/.test(r.url()))report.external.push(r.url());});await seedBrowserSave(page,offlineURL(png),{...save,guidesSeen:['practice-v1']});return {page,context};}
 async function visible(page,selector){return page.locator(selector).first().evaluate(e=>{const r=e.getBoundingClientRect(),x=(r.left+r.right)/2,y=(r.top+r.bottom)/2,hit=document.elementFromPoint(x,y);return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height,hit:hit?.tagName+':'+hit?.className,visible:r.left>=0&&r.top>=0&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1&&!!hit&&(e===hit||e.contains(hit))};});}
 async function click(page,selector){let box=await visible(page,selector);for(let i=0;!box.visible&&i<10;i++){await page.waitForTimeout(50);box=await visible(page,selector);}assert.ok(box.visible,selector+' not visible '+JSON.stringify(box));await page.mouse.click((box.left+box.right)/2,(box.top+box.bottom)/2);}
 try{

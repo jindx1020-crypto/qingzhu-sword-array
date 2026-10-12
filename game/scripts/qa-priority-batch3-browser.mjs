@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-only
  * Copyright (C) 2026 bilibili@卡布奇诺ultra
  */
+import {seedBrowserSave} from './browser-storage.mjs';
 // Isolated UI regression fixtures, not new normal-speed player runs or physical-device validation.
 import {launchBrowser,offlineURL,projectRoot,variant} from './browser-runtime.mjs';
 import {initialSave} from '../gameplay/data.js';import {DEFAULT_KEYS} from '../gameplay/keybindings.js';
@@ -9,7 +10,7 @@ const out=path.join(projectRoot,'game/qa/release',variant,'priority-batch3');fs.
 const report={method:'Isolated Chromium, explicit resource fixtures and actual touch/keyboard/mouse input. No physical phone or screen-reader testing.',checks:[],errors:[],external:[],pass:false};
 const browser=await launchBrowser();let currentPage;
 async function open(w,h,keymap={...DEFAULT_KEYS,formation:'KeyR',dash:'KeyF',thunder:'KeyT'}){const context=await browser.newContext({viewport:{width:w,height:h},hasTouch:true}),page=await context.newPage();currentPage=page;page.on('pageerror',e=>report.errors.push(e.message));page.on('request',r=>{if(/^https?:/.test(r.url()))report.external.push(r.url());});
- await page.addInitScript(s=>localStorage.setItem('fanren-qingzhu-v1',JSON.stringify(s)),{...initialSave(),guidesSeen:['practice-v1',0,1,2,3,4,5],keymap});await page.goto(offlineURL());await page.waitForFunction(()=>window.__FANREN__?.art);return {page,context};}
+ await seedBrowserSave(page,offlineURL(),{...initialSave(),guidesSeen:['practice-v1',0,1,2,3,4,5],keymap});return {page,context};}
 async function battle(page,path=2){await page.evaluate(path=>window.__FANREN__.start({mode:'training',path,skipPractice:true}),path);await page.locator('.scene-intro .primary-start').click();const skip=page.getByRole('button',{name:'跳过过场',exact:true});if(await skip.count())await skip.click();await page.waitForFunction(()=>window.__FANREN__.battle.modeState==='battle');await page.waitForSelector('[data-slot=dialog-overlay]',{state:'detached'});}
 const snap=page=>page.evaluate(()=>({battle:JSON.stringify(window.__FANREN__.battle.serialize()),disk:localStorage.getItem('fanren-qingzhu-v1')}));
 const shot=(page,name)=>page.screenshot({path:path.join(out,name+'.png')});

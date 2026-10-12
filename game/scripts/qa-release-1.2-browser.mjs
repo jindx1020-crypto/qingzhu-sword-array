@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-only
  * Copyright (C) 2026 bilibili@卡布奇诺ultra
  */
+import {seedBrowserSave} from './browser-storage.mjs';
 // 1.2 review fixes driven by real Playwright mouse, touchscreen and keyboard input (no synthetic DOM events), so :hover, stacking contexts,
 // focus and gesture timing behave as for a player. ?test=1 hooks only jump to declared states. No phone hardware.
 import {launchBrowser,offlineURL,projectRoot,variant} from './browser-runtime.mjs';import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import {initialSave,TRAITS} from '../gameplay/data.js';
@@ -8,7 +9,7 @@ const out=path.join(projectRoot,'game/qa/release',variant,'release-1.2');fs.mkdi
 const report={method:'Isolated headless Chromium; real Playwright mouse, touchscreen and keyboard input on the offline HTML; ?test=1 hooks only reach declared states. No phone hardware.',checks:[],errors:[],external:[]};
 const veteran={...initialSave(),guidesSeen:['practice-v1',0,1,2,3,4,5],wins:1,unlocked:5,insight:500,completed:[0,1,2,3,4,5]};
 const browser=await launchBrowser();
-async function open(w,h,{save=veteran,touch=w<900}={}){const context=await browser.newContext({viewport:{width:w,height:h},hasTouch:touch,isMobile:touch&&w<900});const page=await context.newPage();page.on('pageerror',e=>report.errors.push(e.message));page.on('request',r=>{if(/^https?:/.test(r.url()))report.external.push(r.url());});await page.addInitScript(s=>{if(!sessionStorage.fixture){localStorage.setItem('fanren-qingzhu-v1',s);sessionStorage.fixture='1';}},JSON.stringify(save));await page.goto(offlineURL());await page.waitForFunction(()=>window.__FANREN__?.art);return {context,page,touch};}
+async function open(w,h,{save=veteran,touch=w<900}={}){const context=await browser.newContext({viewport:{width:w,height:h},hasTouch:touch,isMobile:touch&&w<900});const page=await context.newPage();page.on('pageerror',e=>report.errors.push(e.message));page.on('request',r=>{if(/^https?:/.test(r.url()))report.external.push(r.url());});await seedBrowserSave(page,offlineURL(),save);return {context,page,touch};}
 const shot=(page,name)=>page.screenshot({path:path.join(out,name+'.png')});
 const state=page=>page.evaluate(()=>{const b=window.__FANREN__.battle;return {mode:b?.modeState??null,scene:b?.scene??null,risk:document.querySelector('.risk-dialog [data-slot=alert-dialog-title]')?.textContent||null};});
 async function tap(page,touch,x,y){if(touch)await page.touchscreen.tap(x,y);else{await page.mouse.move(x-60,y+40);await page.mouse.move(x,y,{steps:6});await page.mouse.down();await page.mouse.up();}}

@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-only
  * Copyright (C) 2026 bilibili@卡布奇诺ultra
  */
+import {seedBrowserSave} from './browser-storage.mjs';
 // Synthetic finish fixtures exercise actual settlement and UI; they are not natural completions.
 import {launchBrowser,offlineURL,projectRoot,variant,htmlPath} from './browser-runtime.mjs';
 import {initialSave} from '../gameplay/data.js';import {defaultGarden} from '../gameplay/expedition-data.js';
@@ -9,7 +10,7 @@ const out=path.join(projectRoot,'game/qa/release',variant,'priority-batch6');fs.
 const hash=()=>createHash('sha256').update(fs.readFileSync(htmlPath)).digest('hex');
 const report={htmlSha256:hash(),method:'Fresh isolated contexts and declared synthetic completed-run fields followed by real engine finish/persist. Real keyboard/touch disclosure, result navigation, download and retry. No natural completion, user-save or physical-device claim.',checks:[],errors:[],external:[],pass:false};
 const browser=await launchBrowser();let currentPage;
-async function open(w,h){const context=await browser.newContext({viewport:{width:w,height:h},hasTouch:true}),page=await context.newPage();currentPage=page;page.setDefaultTimeout(8000);page.on('pageerror',e=>report.errors.push(e.message));page.on('request',r=>{if(/^https?:/.test(r.url()))report.external.push(r.url());});await page.addInitScript(s=>localStorage.setItem('fanren-qingzhu-v1',JSON.stringify(s)),{...initialSave(),insight:12,garden:{...defaultGarden(),points:1},guidesSeen:['practice-v1',0,1,2,3,4,5]});await page.goto(offlineURL());await page.waitForFunction(()=>window.__FANREN__?.art);await page.evaluate(()=>window.__FANREN__.start({mode:'seed',path:2,difficulty:1,seed:'batch6-原始种子',runId:'batch6-synthetic-finish',recordVersion:0,segmentVersion:0,challengeVersion:0,skipPractice:true}));await page.waitForSelector('.scene-intro');return {page,context};}
+async function open(w,h){const context=await browser.newContext({viewport:{width:w,height:h},hasTouch:true}),page=await context.newPage();currentPage=page;page.setDefaultTimeout(8000);page.on('pageerror',e=>report.errors.push(e.message));page.on('request',r=>{if(/^https?:/.test(r.url()))report.external.push(r.url());});await seedBrowserSave(page,offlineURL(),{...initialSave(),insight:12,garden:{...defaultGarden(),points:1},guidesSeen:['practice-v1',0,1,2,3,4,5]});await page.evaluate(()=>window.__FANREN__.start({mode:'seed',path:2,difficulty:1,seed:'batch6-原始种子',runId:'batch6-synthetic-finish',recordVersion:0,segmentVersion:0,challengeVersion:0,skipPractice:true}));await page.waitForSelector('.scene-intro');return {page,context};}
 const capture=page=>page.evaluate(()=>{const b=window.__FANREN__.battle;return {disk:JSON.stringify(Object.fromEntries(Object.keys(localStorage).sort().map(k=>[k,localStorage.getItem(k)]))),battle:JSON.stringify(b.serialize()),rng:b.rng.state(),contentRng:b.contentRng.state()};});
 const shot=async(page,name)=>{await page.waitForFunction(()=>document.getAnimations().filter(a=>a.effect?.getTiming().iterations!==Infinity).every(a=>a.playState!=='running'));await page.screenshot({path:path.join(out,name+'.png')});};
 async function visibleGlyphs(page,selector,clipSelector,checkOcclusion=false){
