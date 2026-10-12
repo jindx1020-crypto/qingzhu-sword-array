@@ -1226,6 +1226,17 @@
       },
       "productionGameAndBothHTMLUnchanged": true,
       "historicalCITraceLimitPreserved": true
+    },
+    "workflowBudget": {
+      "passedMainRun": 38234615993,
+      "cancelledTagRun": 38237369888,
+      "candidateCommit": "a62c25ad4d00acfe8f1c1f614525090a17edb8ca",
+      "reason": "GitHub explicitly cancelled the tag job for exceeding its overall25-minute execution limit; do not count unexecuted checks as passes.",
+      "previousMinutes": 25,
+      "minutes": 35,
+      "perCaseTimeoutsAndAssertionsChanged": false,
+      "gameplayAndSaveValidationChanged": false,
+      "newCommitRequiresFreshMainAndTagCI": true
     }
   }
 }

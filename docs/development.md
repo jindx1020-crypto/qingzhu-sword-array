@@ -80,7 +80,7 @@ npm run check:release
 
 `check:release` 要求两份 HTML、源码 ZIP、免安装玩家 ZIP 四个附件齐全，并与 manifest、SHA256SUMS 一致；根目录两份 HTML 与发布副本逐字节相同；源码 ZIP 与公开清单逐字节一致，存在 .git 时清单内文件必须已被 Git 跟踪；两份 HTML 内嵌的第三方许可须与 THIRD_PARTY_NOTICES.md 打包表及依赖清单 bundledInOffline 标记逐项一致；隐私扫描在通用规则之外，按本机仓库根、主目录、临时目录和用户名生成路径形态，覆盖源码、两份 HTML 与玩家包文本。`npm run test:player` 从实际玩家 ZIP 解压，在断网浏览器中核对两种入口。公开清单是 `scripts/release-files.mjs`，新增交付文件须同步它，新文件先 `git add`。
 
-WebP 与 PNG 的离线画面应在浏览器中核对；半透明预乘通道可能有取整差异，不宣称逐像素完全相同。CI 验证技术行为，不能代替手机真机体验。GitHub Actions 在含空格和中文的检出目录 `qingzhu 青竹` 中运行完整流程（含 audit:gate、build:intro、test:intro），发布产物按 version.js 的版本命名上传。
+WebP 与 PNG 的离线画面应在浏览器中核对；半透明预乘通道可能有取整差异，不宣称逐像素完全相同。CI 验证技术行为，不能代替手机真机体验。GitHub Actions 整体作业预算为 35 分钟；该预算只避免完整双版流程被总时长截断，各用例仍保留自身操作超时和全部断言。GitHub Actions 在含空格和中文的检出目录 `qingzhu 青竹` 中运行完整流程（含 audit:gate、build:intro、test:intro），发布产物按 version.js 的版本命名上传。
 
 依赖审计以 `npm run audit:gate` 为准：高危及以上一律失败，仅 `scripts/audit-gate.mjs` 中登记、上游尚未发布修复的公告放行；该包一旦发布不受影响的版本，门禁重新失败，须升级并移除登记。`offline-build/bundled-packages.json` 同时记录 Tailwind 编译进样式表的包与按来源包 shadcn 识别的组件源码副本，`docs:deps` 按锁文件路径标记 bundledInOffline。
 

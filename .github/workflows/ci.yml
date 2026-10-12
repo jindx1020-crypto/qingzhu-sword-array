@@ -10,7 +10,8 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    # Full dual-profile UI/storage checks need runner headroom; per-case assertions and waits remain unchanged.
+    timeout-minutes: 35
     # The checkout folder contains a space and CJK characters so path-encoding regressions fail here first.
     defaults:
       run:
