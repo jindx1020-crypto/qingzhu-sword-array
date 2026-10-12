@@ -12,6 +12,7 @@
     "lint": "node scripts/lint.mjs",
     "format": "oxfmt",
     "build:offline": "node scripts/embed-assets.mjs && node scripts/build-offline.mjs",
+    "pretest": "node scripts/embed-assets.mjs",
     "test": "node --test tests/*.test.mjs",
     "test:balance": "node scripts/expedition-simulate.mjs",
     "prebuild": "node scripts/embed-assets.mjs && node scripts/embed-docs.mjs",

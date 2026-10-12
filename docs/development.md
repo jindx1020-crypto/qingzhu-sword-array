@@ -61,6 +61,7 @@ npm run check:release
 
 - `check`：lint、全部规则测试、TypeScript；JS 未全面启用 checkJs，不将此描述为全引擎类型认证。
 - lint 基线只有 19 条原通用组件诊断，并锁定文件哈希；不允许扩大基线来掩盖新诊断。
+- `npm test`（含 `npm run check` 内的测试）先校验图片与编码副本哈希并生成 `assets.generated.js`，干净源码无需先执行 Web 构建即可运行渲染读数回归；生成物仍不进入源码包。
 - `test:browser`：项目内 Playwright 的 Chromium，两个离线变体分别运行十一组套件。`qa-release-1.2-browser.mjs` 保留历史名称并继续覆盖整卡点击、弹窗提示、小屏正文、练习靶位、连点和冲突重提示；五组 priority 回归继续覆盖后续显示、输入、设置与结算改进。运行对象为当前构建成品，结果不能由套件文件名推断版本。输出在 game/qa/release，可包含合成存档、截图和声音片段，不进源码包。
 - Linux 可用 `npx playwright install --with-deps chromium` 安装系统依赖。需指定已安装 Chromium 时设置 `PLAYWRIGHT_CHROMIUM_EXECUTABLE`；默认不使用个人浏览器资料。
 - 单组调试可执行 `node scripts/release-browser.mjs`；`QINGZHU_ASSET_PROFILE=png` 选择 PNG，`QINGZHU_HTML` 可指定待测文件。

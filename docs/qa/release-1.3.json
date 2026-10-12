@@ -110,20 +110,35 @@
     ],
     "changedVersionLiteralOnly": true,
     "ruleAndSaveModulesUnchanged": true,
+    "packageVersionOnly": false,
+    "packageChangesExactlyVersionAndTestPrerequisite": true,
     "dependenciesUnchanged": true,
     "historicalReportsUnchanged": true,
     "packages": [
       {
         "file": "game/package.json",
-        "versionOnly": true,
-        "dependenciesUnchanged": true
+        "versionOnly": false,
+        "dependenciesUnchanged": true,
+        "permittedScriptChanges": {
+          "pretest": "node scripts/embed-assets.mjs"
+        }
       },
       {
         "file": "game/package-lock.json",
         "versionOnly": true,
-        "dependenciesUnchanged": true
+        "dependenciesUnchanged": true,
+        "permittedScriptChanges": {}
       }
     ],
+    "testPrerequisite": {
+      "script": "pretest",
+      "command": "node scripts/embed-assets.mjs",
+      "newScriptOnly": true,
+      "generator": "game/scripts/embed-assets.mjs",
+      "generatorByteIdentical": true,
+      "generatorSha256": "017ad41d4685ae207aba0ad9f225ea88c88167bbcd36b317781dba74117413cf",
+      "meaning": "Generate the existing ignored asset module before tests; no test removed or runtime/rule change."
+    },
     "historicalReports": [
       {
         "file": "docs/release-1.2.md",
@@ -191,7 +206,8 @@
         "skipped": 0,
         "lintNewDiagnostics": 0,
         "inheritedLintDiagnostics": 19,
-        "typescript": true
+        "typescript": true,
+        "generatedAssetsInitiallyAbsent": true
       }
     },
     "dependencyAudit": {
@@ -492,5 +508,17 @@
     "pageErrors": 0,
     "externalRequests": 0
   },
-  "ciPackagingOrder": "Generate public introduction narration before source packaging; check its browser behavior after Chromium installation."
+  "ciPackagingOrder": "Generate public introduction narration before source packaging; check its browser behavior after Chromium installation.",
+  "cleanSourceTestPrerequisite": {
+    "finding": "Fresh source archive npm check could not load assets.generated.js imported by the renderer regression.",
+    "fix": "npm test pretest validates original/encoded image hashes and generates the ignored asset module. Original regression retained; no runtime or rule change.",
+    "firstAttempt": "local-archive/releases/2026-10-12-v1.3/clean-source/attempt-2026-10-12T01-08-53.287759Z/",
+    "recheckedLocally": {
+      "tests": 674,
+      "passed": 674,
+      "failed": 0,
+      "generatedAssetsInitiallyAbsent": true
+    },
+    "initialCI": "https://github.com/jindx1020-crypto/qingzhu-sword-array/actions/runs/38190786790"
+  }
 }
