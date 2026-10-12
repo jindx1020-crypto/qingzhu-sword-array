@@ -1089,6 +1089,23 @@
     "release": "https://github.com/jindx1020-crypto/qingzhu-sword-array/releases/tag/v1.3",
     "actions": "https://github.com/jindx1020-crypto/qingzhu-sword-array/actions",
     "status": "Commit-specific CI, clean-source reconstruction and uploaded/downloaded asset verification are recorded in the publication evidence; do not reuse initial-release fingerprints.",
-    "evidence": "local-archive/releases/2026-10-12-v1.3-refresh/publication-verification.json"
+    "evidence": "local-archive/releases/2026-10-12-v1.3-refresh/publication-verification.json",
+    "compatibilityFix": {
+      "field": "chapterStats.rows[].survival.minHp / minHpMax",
+      "finding": "An old valid hp=100.0000005/maxHp=100 snapshot restored successfully but the new observed minimum was rejected at its next immediate checkpoint.",
+      "fix": "Only this observed relationship follows original player maxHp+1e-6 tolerance. Actual HP, original snapshot limit and all other statistical tolerances are unchanged.",
+      "regression": "Old snapshot without chapterStats -> normalize -> restore -> beginNode/checkpoint -> normalize -> restore; greater-than-original tolerance remains rejected.",
+      "supersededCandidateCommit": "95a9b098fd97f2b6cc9e097be8159251989195d4",
+      "supersededCI": 38213568142
+    },
+    "automated": {
+      "tests": 743,
+      "passed": 743,
+      "failed": 0,
+      "skipped": 0,
+      "lintNewDiagnostics": 0,
+      "inheritedLintDiagnostics": 19,
+      "typescript": true
+    }
   }
 }
