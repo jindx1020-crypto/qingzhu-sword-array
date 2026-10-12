@@ -1113,5 +1113,95 @@
       "test": "Wait for entry overlay detachment and trial-actionability before two real clicks/taps150ms apart; keep the original paused-state assertion and also verify normal later close and keyboard close.",
       "failedCI": 38215000151
     }
+  },
+  "ciResumeRepair": {
+    "date": "2026-10-12",
+    "failedTagRun": 38219328912,
+    "baselineCommit": "162d2878679f6298269b802d2461577570d05fb1",
+    "productionChanged": false,
+    "gameplayRulesChanged": false,
+    "saveFlowChanged": false,
+    "oldCICauseLimit": "Original run lacks pre/post raw and initialization traces; ordinary local reload did not reproduce session flag loss. Do not label the full original sequence proved or a harmless flake.",
+    "confirmedFixtureDefects": [
+      "Clearing a live scene can discard allocated XP drops without settling the ledger; validator correctly rejects it and preserves earlier disk checkpoint.",
+      "A reload-time init script can reseed an empty profile when its test session flag is absent; controlled flag removal reproduces the empty-home symptom and overwrites a valid checkpoint."
+    ],
+    "fix": [
+      "Construct a quiet, current-rule first-node snapshot in Node synchronously before native frames; validate using normalizeSave and restoreRun.",
+      "Seed the isolated browser once from the driver, with no reload initialization writer or session flag dependency.",
+      "Assert actual successful persistence, run identity, revision and chapter observations before reload. Clear test sessionStorage and reopen a page, verifying exact stored bytes and saved statistics.",
+      "Capture isolated local/session raw, active/saved snapshots, save status and page text on failure."
+    ],
+    "naturalSaveVerification": {
+      "profiles": [
+        "webp",
+        "png"
+      ],
+      "noInitialSaveInjection": true,
+      "noEngineMutation": true,
+      "wallSecondsApprox": 12.5,
+      "normalUI": true,
+      "flows": [
+        "pause",
+        "confirmed return to home",
+        "continue",
+        "reload",
+        "close and reopen page in same context"
+      ],
+      "sameStorageBytes": true,
+      "sameRunAndRules": true,
+      "pageErrors": 0,
+      "externalRequests": 0,
+      "method": "Short real-time save-flow verification; not full playthrough. Returning home intentionally rolls back unsaved battle to the existing checkpoint."
+    },
+    "evidence": "local-archive/fixes/2026-10-12-ci-resume/",
+    "automated": {
+      "tests": 747,
+      "passed": 747,
+      "failed": 0,
+      "skipped": 0,
+      "addedFixtureTests": 4,
+      "lintNewDiagnostics": 0,
+      "inheritedDiagnostics": 19,
+      "typescript": true
+    },
+    "focusedBrowser": {
+      "pass": true,
+      "profiles": [
+        {
+          "profile": "webp",
+          "checks": 8,
+          "pass": true,
+          "hash": "9b1858c99d687f680ef1f4bf1fffd453afa6fbbbcb13918b0cb14de2474502ff",
+          "reloadDelays": [
+            0,
+            500
+          ],
+          "sessionClearedAndNewPageVerified": true
+        },
+        {
+          "profile": "png",
+          "checks": 8,
+          "pass": true,
+          "hash": "60ea18f0514442462869a308768497f38126c18abdc684ede5a40e0bd6aca65b",
+          "reloadDelays": [
+            0,
+            500
+          ],
+          "sessionClearedAndNewPageVerified": true
+        }
+      ],
+      "checks": 16,
+      "allProductionGameplayFilesUnchanged": 113,
+      "method": "Node-side declared valid fixture + real touch, keyboard, readonly views, actual checkpoint save; explicit session clear/reload/new-page checks. Not natural playthrough."
+    },
+    "webBuild": true,
+    "introChecks": 7,
+    "dependencyAudit": {
+      "passed": true,
+      "dependenciesChanged": false,
+      "registeredExistingUnfixedException": "GHSA-vfj7-8cjw-p6xm"
+    },
+    "fullChecks": "Exact candidate-commit and v1.3-tag workflow outcomes, artifact fingerprints and public downloads are recorded in this repair archive before the updated release is published."
   }
 }

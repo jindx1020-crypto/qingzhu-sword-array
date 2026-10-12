@@ -63,6 +63,7 @@ npm run check:release
 - lint 基线只有 19 条原通用组件诊断，并锁定文件哈希；不允许扩大基线来掩盖新诊断。
 - `npm test`（含 `npm run check` 内的测试）先校验图片与编码副本哈希并生成 `assets.generated.js`，干净源码无需先执行 Web 构建即可运行渲染读数回归；生成物仍不进入源码包。
 - `test:browser`：项目内 Playwright 的 Chromium，两个离线变体分别运行十三组套件。`qa-release-1.2-browser.mjs` 保留历史名称并继续覆盖整卡点击、弹窗提示、小屏正文、练习靶位、连点和冲突重提示；七组 priority 回归继续覆盖后续显示、输入、设置、结算和逐章观测改进。运行对象为当前构建成品，结果不能由套件文件名推断版本。输出在 game/qa/release，可包含合成存档、截图和声音片段，不进源码包。
+- 逐章续玩回归的初态由 `browser-save-fixtures.mjs` 在零帧推进时构造，并先通过真实存档校验；不能在已有经验掉落后清场却留下分配账本。该套件由驱动一次写入隔离测试存档，不在刷新初始化脚本中重新写入。检查先断言保存成功、实际磁盘快照与修订／局标识，再主动清空测试 sessionStorage、刷新和同上下文重新开页，逐字节验证主档仍在；失败保存完整隔离状态供诊断。不得通过延长等待、跳过断言、收集或补发奖励来掩盖无效夹具。
 - Linux 可用 `npx playwright install --with-deps chromium` 安装系统依赖。需指定已安装 Chromium 时设置 `PLAYWRIGHT_CHROMIUM_EXECUTABLE`；默认不使用个人浏览器资料。
 - 单组调试可执行 `node scripts/release-browser.mjs`；`QINGZHU_ASSET_PROFILE=png` 选择 PNG，`QINGZHU_HTML` 可指定待测文件。
 - 普通打开不暴露调试接口；只有 `?test=1` 暴露 `window.__FANREN__`。测试中的合成完成或改位仅用于检查界面与保存，不作通关速度证据。
