@@ -35,7 +35,7 @@ try{
   assert.match(await page.locator('.practice-panel p').innerText(),new RegExp(joystickSide==='right'?'右侧摇杆':'左侧摇杆'));
   await page.keyboard.press('ArrowRight');assert.match(await page.locator('.practice-panel p').innerText(),/WASD/);
   await page.evaluate(()=>{const b=window.__FANREN__.battle;b.practice=null;b.player.mana=100;b.player.reserve=0;b.objective={kind:'defend',x:640,y:410,hp:360,maxHp:360,invuln:0};b.input.focus=true;b.input.touchAim=true;b.input.aim={x:640,y:400};b.emit({type:'update'});});await page.waitForTimeout(80);
-  assert.match(await page.locator('.thunder-button small').innerText(),/灵力已满.*雷源不足/);assert.match(await page.locator('.defend-assignment').innerText(),/集火中/);
+  assert.match(await page.locator('.thunder-button small').innerText(),/灵力已满.*雷源不足/);assert.match(await page.locator('.defend-assignment').innerText(),/单点集火|目标指引/);
   await click(page,'.thumb-clear');assert.match(await page.locator('.defend-assignment').innerText(),/分守中/);
   const dims=[];for(const [width,height]of [[390,844],[844,390],[360,640]]){await page.setViewportSize({width,height});await page.waitForTimeout(80);dims.push(await page.evaluate(()=>({width:innerWidth,height:innerHeight,camera:window.__FANREN__.camera,stick:(()=>{const r=document.querySelector('.touch-joystick').getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height};})()})));assert.ok(dims.at(-1).camera.bottom>dims.at(-1).camera.top);if(width===844&&joystickSide==='left'&&skillSide==='right'&&joystickSize==='standard')await page.screenshot({path:path.join(out,'landscape-844x390.png')});}
   report.checks.push({name:'layout/input/rotation',joystickSide,skillSide,joystickSize,dims});await context.close();

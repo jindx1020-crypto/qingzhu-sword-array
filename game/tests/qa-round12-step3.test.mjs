@@ -1,7 +1,10 @@
 /* SPDX-License-Identifier: GPL-3.0-only
  * Copyright (C) 2026 bilibili@卡布奇诺ultra
  */
-import {EVENTS} from '../gameplay/data.js';
+import {EVENTS,CONSUMABLES} from '../gameplay/data.js';
+import {consumableDetails,supplyDetails} from '../gameplay/consumable-display.js';
+import {supplyState} from '../gameplay/late-supply.js';
+import {challengeOffer} from '../gameplay/experience-rules.js';
 import test from 'node:test';import assert from 'node:assert/strict';import {BALANCE4} from '../gameplay/balance.js';import {Expedition} from '../gameplay/expedition.js';import {beginPracticeStep as currentPractice,updatePractice} from '../gameplay/practice.js';import {beginPracticeStep as priorPractice} from '../scripts/fixtures/qa-round12-practice-before.js';import {starterStatus,starterDetails} from '../gameplay/starters.js';import {cultivationUse,META} from '../gameplay/cultivation.js';
 void test('R12 S0 places the actual training target near the player without changing RNG or rewards',()=>{for(let seed=0;seed<12;seed++){const options={seed:'r12-s0-check-'+seed,path:4,mode:'training',guidedPractice:true},a=new Expedition(options),b=new Expedition(options);a.start();b.start();priorPractice(a,5);currentPractice(b,5);const target=b.enemies.find(e=>e.practiceTarget);assert.deepEqual({x:target.x,y:target.y},{x:640,y:410});assert.equal(a.rng.state(),b.rng.state());assert.equal(b.totalXP,0);assert.equal(b.research,0);assert.equal(b.receipts.length,0);updatePractice(b,1/60);assert.match(b.practice.sigilHint,/靠近|距离合适/);}});
 void test('R12 guard status reports the real available window without causing a counter or touching the run',()=>{const b=new Expedition({path:5,seed:'r12-status',balanceVersion:3});b.beginNode();b.clearField();b.input={x:1,y:0};b.requestDash();const snapshot=structuredClone(b.serialize());assert.match(starterStatus(b),/待化解 0.24/);assert.ok(b.combatCues.some(c=>c.key==='guard-window'&&c.until===b.time+.24));assert.deepEqual(b.serialize(),snapshot);b.hitPlayer(10);assert.match(starterStatus(b),/本次闪避已反击/);const shield=b.player.shield;b.hitPlayer(10);assert.equal(b.player.shield,shield);});
@@ -12,3 +15,50 @@ function restFixture(node){const b=new Expedition({path:0,seed:'r12-quote',runId
 void test('R12 supply quote is read-only, exposes chapter healing overlap, permits the unchanged zero-retained policy and rejects stale quotes',()=>{const b=restFixture('4:3');b.player.hp=b.player.maxHp-20;const before=b.serialize(),rng=b.rng.state(),q=b.supplyQuote('hp');assert.deepEqual(b.serialize(),before);assert.equal(b.rng.state(),rng);assert.equal(q.retainedGain,0);b.gold--;const changed=b.serialize();assert.equal(b.buySupply('hp',q),false);assert.deepEqual(b.serialize(),changed);const fresh=b.supplyQuote('hp');assert.equal(b.buySupply('hp',fresh),true);assert.equal(b.economy.supplyPurchases.length,1);assert.equal(b.economy.supplyPurchases[0].price,80);assert.equal(b.player.hp,b.player.maxHp);});
 
 void test('R12 quote identifies the paid draft invalidated by spending; failed departure keeps it editable',()=>{const b=restFixture('4:0'),event=EVENTS.find(e=>e.choices.some(c=>c.effect==='buyHeal')),choice=event.choices.findIndex(c=>c.effect==='buyHeal');b.rest.event={type:'single',index:event.id,choice:null};b.rest.eventDone=false;b.rest.eventApplied=false;b.player.hp=b.player.maxHp-40;b.gold=90;assert.equal(b.chooseInteraction(choice),true);const q=b.supplyQuote('hp');assert.ok(q.draftImpact.includes(event.name));assert.match(q.draftImpact,/不可提交|改选/);assert.equal(b.buySupply('hp',q),true);assert.equal(b.gold,10);assert.equal(b.restReadiness().ready,false);const node=b.node.id;b.continueRest();assert.equal(b.node.id,node);assert.equal(b.chooseInteraction(event.choices.length-1),true);assert.equal(b.restReadiness().ready,true);Expedition.restore(b.serialize());});
+
+function itemFixture(id,count=1){const b=new Expedition({seed:'consumable-display',path:2});b.beginNode();b.consumables=[{id,count},{id:'mana',count:0}];return b;}
+void test('T23 near-full and full pure restoration read the same gain as consume and do not spend while explaining',()=>{
+ for(const id of ['heal','heal2','mana','mana2'])for(const missing of [0,2,20]){const b=itemFixture(id),item=CONSUMABLES.find(c=>c.id===id),key=item.effect==='heal'?'hp':'mana',max=key==='hp'?b.player.maxHp:100;b.player[key]=max-missing;
+  const before=JSON.stringify(b.serialize()),rng=b.rng.state(),view=consumableDetails(b,0);for(let i=0;i<4;i++)consumableDetails(b,0);assert.equal(JSON.stringify(b.serialize()),before);assert.equal(b.rng.state(),rng);
+  assert.equal(view.actualGain,missing);const value=b.player[key],used=b.consume(0);assert.equal(used,missing>0);assert.equal(b.player[key]-value,view.actualGain);assert.equal(b.consumables[0].count,missing>0?0:1);if(!missing)assert.match(view.reason,/已满/);
+ }
+ const empty=itemFixture('heal',0);empty.player.hp=10;const view=consumableDetails(empty,0);assert.equal(view.actualGain,0);assert.equal(view.available,false);assert.match(view.reason,/用尽/);assert.equal(empty.consume(0),false);
+ for(const missing of [.01,.00001]){const b=itemFixture('heal');b.player.hp=b.player.maxHp-missing;const detail=consumableDetails(b,0);assert.equal(detail.available,true);assert.match(detail.effect,missing===.01?/可恢复 0\.01 生命/:/可恢复 不足 0\.001 生命/);assert.equal(b.consume(0),true);assert.equal(b.player.hp,b.player.maxHp);}
+});
+void test('T23 shield item distinguishes filling the normal gap from extra shield without imposing a new cap',()=>{
+ for(const shield of [0,20,70]){const b=itemFixture('shield');b.player.maxShield=20;b.player.shield=shield;const view=consumableDetails(b,0),before=b.player.shield;assert.equal(view.actualGain,45);assert.match(view.effect,new RegExp('补足常驻缺口 '+Math.min(45,Math.max(0,20-shield))));assert.equal(b.consume(0),true);assert.equal(b.player.shield,before+45);assert.equal(b.player.maxShield,20);}
+});
+void test('T23 timed and mixed effects remain usable at full and never claim immediate timed recovery',()=>{
+ for(const id of ['recovery','wind','shield2','sword','blink','guard']){const b=itemFixture(id);b.player.hp=b.player.maxHp;b.player.dashCD=0;const view=consumableDetails(b,0),hp=b.player.hp;assert.equal(view.available,true);assert.equal(view.actualGain,null);assert.equal(b.consume(0),true);assert.equal(b.consumables[0].count,0);assert.equal(b.player.hp,hp);if(id==='recovery')assert.match(view.notes.join(' '),/没有即时回血/);if(id==='blink')assert.match(view.notes.join(' '),/仍会消耗/);}
+});
+void test('T23 temporary summons show quantity versus refresh and the same expiry used by consume',()=>{
+ for(const id of ['puppet','insect']){const b=itemFixture(id),item=CONSUMABLES.find(c=>c.id===id);b.time=10;const first=consumableDetails(b,0);assert.match(first.effect,/临时增加/);assert.equal(b.consume(0),true);assert.equal(b.player.buffs[item.effect],10+item.value);
+  b.consumables[0].count=1;b.time=13;const again=consumableDetails(b,0);assert.match(again.effect,/数量不变/);assert.match(again.notes.join(' '),/不叠加数量/);assert.equal(b.consume(0),true);assert.equal(b.player.buffs[item.effect],13+item.value);
+ }
+ const capped=itemFixture('puppet');capped.stats.puppets=12;assert.match(consumableDetails(capped,0).effect,/数量已达 12/);
+});
+void test('T23 gifted medicine chooses the real next item and preserves its underlying slot',()=>{
+ const b=itemFixture('mana');b.consumables[0].bonusHeal=1;b.player.hp=b.player.maxHp;b.player.mana=80;
+ const full=consumableDetails(b,0);assert.equal(full.name,'回灵药包');assert.match(full.notes.join(' '),/加赠回元药包 1 份/);assert.equal(b.consume(0),true);assert.equal(b.consumables[0].bonusHeal,1);
+ b.player.hp=b.player.maxHp-3;const hurt=consumableDetails(b,0);assert.equal(hurt.name,'回元药包·加赠');assert.equal(hurt.actualGain,3);assert.match(hurt.notes.join(' '),/优先使用加赠/);assert.equal(b.consume(0),true);assert.equal(b.consumables[0].bonusHeal,0);assert.equal(b.consumables[0].count,0);
+});
+void test('T23 challenge explanation uses the actual ordinary-node restriction and the same boss exemptions',()=>{
+ const seed=Array.from({length:20},(_,i)=>'t23-items-'+i).find(seed=>challengeOffer(seed,1)==='items'),b=new Expedition({seed,mode:'endless'});
+ // Declared progression fixture: preserve the valid completed first loop before choosing its next challenge.
+ for(let step=0;step<600&&!(b.endlessLoop===1&&b.modeState==='intro');step++){if(b.scene==='cinematic')b.advanceCinematic(true);else if(b.modeState==='intro')b.start();else if(b.modeState==='choice')b.chooseTrait(b.choices[0].id);else if(b.modeState==='battle'){b.time+=1;b.waveTime=1;b.completeNode();}else if(b.scene==='intermission'){if(!b.rest.eventDone)b.chooseInteraction(b.eventText().choices.length-1);if(!b.rest.coreDone)b.skipCore();if(!b.rest.routeDone)b.chooseRoute(0);b.continueRest();}}
+ assert.equal(b.endlessLoop,1);assert.equal(b.chooseChallenge('items'),true);b.start();if(b.scene==='cinematic')b.advanceCinematic(true);Expedition.restore(b.serialize());b.consumables=[{id:'heal',count:1}];b.player.hp=10;
+ const before=JSON.stringify(b.serialize()),blocked=consumableDetails(b,0);assert.equal(blocked.available,false);assert.equal(blocked.actualGain,0);assert.match(blocked.reason,/普通节点禁用/);assert.equal(JSON.stringify(b.serialize()),before);assert.equal(b.consume(0),false);assert.equal(b.consumables[0].count,1);
+ b.wave=3;b.beginNode();assert.equal(b.encounter.kind,'serpent');assert.equal(consumableDetails(b,0).available,true);assert.equal(b.consume(0),true);
+});
+void test('T23 supply display splits exact quoted gain, keeps existing price and cap, and explains near-full threshold',()=>{
+ for(const gap of [20,5,0,-8,-12,-12.5]){const b=restFixture('4:0');b.player.maxShield=20;b.player.shield=20-gap;const q=b.supplyQuote('shield'),before=JSON.stringify(b.serialize()),view=supplyDetails(b,q);assert.equal(JSON.stringify(b.serialize()),before);assert.equal(view.actualGain,q.ready?q.gain:0);assert.equal(view.restored+view.extra,view.actualGain);
+  if(q.ready){const gold=b.gold,shield=b.player.shield;assert.equal(b.buySupply('shield',q),true);assert.equal(gold-b.gold,80);assert.equal(b.player.shield-shield,view.actualGain);}else assert.match(view.reason,/达到本补养上限|不足 1 点/);
+ }
+ const b=restFixture('4:0');b.player.hp=b.player.maxHp-.5;const q=b.supplyQuote('hp'),view=supplyDetails(b,q);assert.equal(view.actualGain,0);assert.match(view.reason,/不足 1 点/);assert.equal(b.buySupply('hp',q),false);
+});
+void test('T23 supply display explains each unavailable condition and retains the original departure projection',()=>{
+ const b=restFixture('4:3');b.player.hp=b.player.maxHp-20;const q=b.supplyQuote('hp');assert.equal(q.retainedGain,0);const before=JSON.stringify(q);supplyDetails(b,q);assert.equal(JSON.stringify(q),before);assert.equal(b.buySupply('hp',q),true);assert.match(supplyDetails(b,b.supplyQuote('shield')).reason,/本处整备已购买/);
+ const empty=restFixture('4:0');empty.player.hp=10;empty.gold=79;assert.match(supplyDetails(empty,empty.supplyQuote('hp')).reason,/还缺 1 灵石/);empty.gold=500;empty.player.hp=empty.player.maxHp;assert.match(supplyDetails(empty,empty.supplyQuote('hp')).reason,/生命已满/);
+ empty.economy.supplyPurchases=[{loop:0,node:'0:0'},{loop:0,node:'0:1'},{loop:0,node:'0:2'}];const limited=supplyDetails(empty,empty.supplyQuote('hp'));assert.match(limited.reason,/额度已用尽/);assert.match(limited.quota,/本局剩余 0 \/ 3/);
+ empty.options.economyVersion=3;assert.equal(supplyState(empty).visible,false);assert.match(supplyDetails(empty,supplyState(empty)).reason,/旧经济规则/);
+});

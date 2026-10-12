@@ -3,7 +3,7 @@
  */
 import {practiceSwordLaunch} from './practice.js';
 import {clearTouchLock,updateTouchLock} from './touch-controls.js';
-import {PATHS,TRAITS,COMBOS,RELICS,CONSUMABLES,ENEMIES,CHAPTERS,EVENTS,DIFFICULTIES,seeded,hashSeed} from './data.js';
+import {PATHS,TRAITS,RELICS,CONSUMABLES,ENEMIES,CHAPTERS,EVENTS,DIFFICULTIES,seeded,hashSeed} from './data.js';
 import {layoutFor,hazardPoints,MID_ENCOUNTERS} from './encounters.js';
 import {validateCommonSnapshot} from './snapshot-validation.js';
 import {emptySigilStats,beginSigil,observeSigil,emptySigilStreak} from './sigil-metrics.js';
@@ -11,15 +11,14 @@ import {emptyFire,shieldReward,consumableState,restoreFeedback,recordHit,cue,FIR
 import {applySlow,tickSlow} from './slow.js';
 import {directFocus} from './targeting.js';
 import {expandedContent} from './content-rules.js';
-import {revisedBalance,phase3Balance,dashCooldown,thunderCost,sigilGrowth,sigilArming,sigilTargets,sigilWarn,sigilCooldown,stationaryActive,puppetReady,starterExtras,reserveFor,traitMods,afterThunderWindow,levelHpBonus,allyBaseScale,insectLeash,insectFocusFirst,guardCounterScale,swordPuppetInherit,fireGuardShield} from './balance.js';
+import {revisedBalance,phase3Balance,dashCooldown,thunderCost,sigilGrowth,sigilArming,sigilTargets,sigilWarn,sigilCooldown,stationaryActive,puppetReady,reserveFor,afterThunderWindow,levelHpBonus,allyBaseScale,insectLeash,insectFocusFirst,guardCounterScale,swordPuppetInherit} from './balance.js';
 import {xpCostFor} from './growth-rules.js';
-import {cultivationMods} from './cultivation.js';
+import {additiveStats,traitPathCounts,statCombos,derivedStats,maxReserveForStats,reserveAfterStats} from './stat-sources.js';
 import {DAMAGE_SOURCES,WORLD} from './combat-values.js';
 import {clearDashInput,requestDash,tickDashInput} from './battle-input.js';
 import {feedbackSound} from './presentation-feedback.js';
 export {WORLD} from './combat-values.js';
 const TAU=Math.PI*2,clamp=(n,a,b)=>Math.max(a,Math.min(b,n)),dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
-const sumMods=(o,mods)=>{for(const [k,v]of Object.entries(mods))o[k]=(o[k]||0)+v;};
 export class Battle {
  constructor(options={},emit=()=>{}){
   this.emit=emit;this.seed=options.seed||String(Date.now());this.rng=seeded(hashSeed(this.seed));this.rulesVersion=options.rulesVersion??2;this.options={...options,rulesVersion:this.rulesVersion,metaRulesVersion:options.metaRulesVersion??1};this.stillTime=0;this.setupUntil=-1;this.lastSigil=-100;this.lastCounter=-100;this.notices=new Set();
@@ -46,34 +45,27 @@ export class Battle {
  toastLimited(key,text){this.messageLimits??={};const old=this.messageLimits[key];if(old?.text===text&&old.until>this.time)return;this.messageLimits[key]={text,until:this.time+2.5};this.toast(text);}
  toast(text){this.toastText=text;this.toastUntil=this.time+3;this.emit({type:'toast',text});}
  recalc(){
-  const old=this.stats||{},s={};sumMods(s,PATHS[this.path].perk);if(this.rulesVersion>=2)sumMods(s,starterExtras(this));
-  sumMods(s,cultivationMods(this.options,this.path));
-  for(const [id,count]of Object.entries(this.traits)){const t=TRAITS.find(x=>x.id===id);if(t)for(let i=0;i<count;i++)sumMods(s,traitMods(this,t));}
-  for(const id of this.relics){const r=RELICS.find(x=>x.id===id);if(r)sumMods(s,r.mods);}
-  this.pathCounts=PATHS.map(p=>Object.keys(this.traits).filter(id=>id.startsWith(p.id+'-')).length);
-  const combos=COMBOS.filter(c=>this.pathCounts[PATHS.findIndex(p=>p.id===c.a)]>=3&&this.pathCounts[PATHS.findIndex(p=>p.id===c.b)]>=3);
+  const old=this.stats||{},base=additiveStats(this);
+  this.pathCounts=traitPathCounts(this.traits);
+  const combos=statCombos(this.pathCounts);
   for(const c of combos)if(!this.comboSet.has(c.effect)){this.newCombos.push(c.name);this.toast('联动成型 · '+c.name);}
   this.comboSet=new Set(combos.map(c=>c.effect));this.combos=combos;
-  if(this.comboSet.has('puppetInsect')){s.puppets=(s.puppets||0)+1;s.insects=(s.insects||0)+1;}
-  if(this.comboSet.has('puppetGuard'))s.armor=(s.armor||0)+(s.puppets||0)*3;
-  s.armor=(s.armor||0)+Math.floor((s.insects||0)/4)*(s.insectGuard||0);
-  s.shield=(s.shield||0)+(s.puppets||0)*(s.puppetShield||0);
-  const fireGuard=fireGuardShield(this);if(fireGuard)s.shield=(s.shield||0)+fireGuard;
+  const s=derivedStats(this,base);
   this.stats=s;
   if(this.player){const p=this.player;const bonus=(this.options.metaRulesVersion<2?this.options.meta||[]:[]).filter(x=>x.endsWith('-meta-2')).length*2;
-   const levelHp=levelHpBonus(this);this.levelHpApplied=levelHp;p.maxHp=100+(s.hp||0)+bonus+levelHp;p.maxShield=s.shield||0;p.maxReserve=reserveFor(this)+(s.reserve||0);
+   const levelHp=levelHpBonus(this);this.levelHpApplied=levelHp;p.maxHp=100+(s.hp||0)+bonus+levelHp;p.maxShield=s.shield||0;p.maxReserve=maxReserveForStats(this,s);
    p.hp=clamp(p.hp+Math.max(0,(s.hp||0)-(old.hp||0)),0,p.maxHp);
    p.shield=clamp(p.shield+Math.max(0,(s.shield||0)-(old.shield||0)),0,Math.max(p.maxShield,p.shield));
-   p.reserve=clamp(p.reserve+Math.max(0,(s.reserve||0)-(old.reserve||0)),0,p.maxReserve);
+   p.reserve=reserveAfterStats(p.reserve,old,s,p.maxReserve);
   }
  }
  // Level-derived state has one sync hook: the sword count and, under balance 4, the max-HP bonus (+4 per 8 levels). A level change
  // that has not been recalculated yet is reconciled here; the gained maximum is also added to current HP once.
  syncSwords(){if(this.player&&this.stats&&levelHpBonus(this)!==(this.levelHpApplied||0)){const before=this.player.maxHp;this.recalc();this.player.hp=Math.min(this.player.maxHp,this.player.hp+Math.max(0,this.player.maxHp-before));}const n=Math.min(72,this.level);while(this.swords.length<n)this.swords.push({x:this.player.x,y:this.player.y,px:this.player.x,py:this.player.y,a:0,cool:this.swords.length*.012,target:null,hits:[],life:0});}
  start(){this.scene=null;this.modeState='battle';this.waveTime=0;if(this.wave===3&&!this.boss)this.spawnBoss();this.emit({type:'scene',scene:null});if(this.time===0){this.spawn(4,{x:790,y:430});this.spawn(4,{x:440,y:400});this.spawn(5,{x:640,y:210});}this.toast(CHAPTERS[this.chapter].name+' · 第 '+(this.wave+1)+' 波');}
- pause(){clearDashInput(this);clearTouchLock(this,true);if(this.modeState==='battle'){this.modeState='pause';this.scene='pause';this.emit({type:'scene',scene:'pause'});}}
+ pause(reason='pause'){clearDashInput(this);clearTouchLock(this,true,reason);if(this.modeState==='battle'){this.modeState='pause';this.scene='pause';this.emit({type:'scene',scene:'pause'});}}
  requestDash(){return requestDash(this);}
- clearDashInput(){clearDashInput(this);clearTouchLock(this,true);}
+ clearDashInput(reason='input-cleared'){clearDashInput(this);clearTouchLock(this,true,reason);}
  feedbackSound(name,interval){feedbackSound(this,name,interval);}
  resume(){if(this.modeState==='pause'){this.modeState='battle';this.scene=null;this.emit({type:'scene',scene:null});}}
  changeFormation(){if(this.stats.metaSwordRecall&&this.time-(this.player.metaSwitchAt??-100)>=8&&this.swords.some(sw=>sw.cool>.25)){this.player.metaSwitchAt=this.time;for(const sw of this.swords)sw.cool=Math.min(sw.cool,.25);}this.formation=((this.formation||0)+1)%3;this.toast(['御剑 · 分组追击','御剑 · 环绕护身','御剑 · 定向穿刺'][this.formation]);}
@@ -93,7 +85,7 @@ export class Battle {
   const picked=[];while(picked.length<3&&pool.length){const weights=pool.map(t=>t.path===this.path?(this.options.metaRulesVersion<2&&(this.options.meta||[]).includes(PATHS[this.path].id+'-meta-4')?5:3):1);let v=this.rng()*weights.reduce((a,b)=>a+b,0),idx=0;for(;idx<weights.length-1;idx++){v-=weights[idx];if(v<=0)break;}picked.push(pool.splice(idx,1)[0]);}
   return picked;
  }
- openChoices(){clearDashInput(this);clearTouchLock(this,true);this.modeState='choice';this.scene='choice';this.choices=this.traitChoices();this.emit({type:'scene',scene:'choice'});}
+ openChoices(){clearDashInput(this);clearTouchLock(this,true,'choice');this.modeState='choice';this.scene='choice';this.choices=this.traitChoices();this.emit({type:'scene',scene:'choice'});}
  reroll(){if(this.modeState!=='choice'||this.rerolls<=0)return;this.rerolls--;this.choices=this.traitChoices();this.emit({type:'scene',scene:'choice'});}
  dash(){
   const p=this.player,s=this.stats;if(this.modeState!=='battle'||p.dashCD>0)return false;
@@ -164,7 +156,7 @@ export class Battle {
   if(revived)this.toast('守心 · 化解致命伤，恢复 '+Number(p.hp.toFixed(1))+' 生命');else if(p.hp<=0){this.finish(false,'生命耗尽');return;}
   if(s.thorns)this.explode(p.x,p.y,95,25+this.level*1.4,'fire');
  }
- finish(won,reason='历练未完成'){if(this.finished)return;clearTouchLock(this,true);this.finished=true;this.modeState='result';this.scene='result';this.won=won;this.failureReason=won?null:reason;this.emit({type:'finish',won,summary:this.summary()});}
+ finish(won,reason='历练未完成'){if(this.finished)return;clearTouchLock(this,true,'finish');this.finished=true;this.modeState='result';this.scene='result';this.won=won;this.failureReason=won?null:reason;this.emit({type:'finish',won,summary:this.summary()});}
  summary(){return {studyVersion:this.options.studyVersion||0,won:!!this.won,failureReason:this.failureReason||null,chapter:this.chapter,level:this.level,kills:this.kills,time:this.time,thunders:this.thunders,gold:this.gold,path:this.path,seed:this.seed,mode:this.mode,damageSources:this.damageSources,fireBreakdown:this.fireBreakdown,sigilStats:this.sigilStats,recentHits:this.recentHits,traits:this.traits,combos:this.combos.map(c=>c.name),hitCount:this.hitCount,maxEnemies:this.maxEnemies,insight:this.options.studyVersion===1?0:Math.floor(this.kills/30)+this.chapter*8+(this.won?40:8)};}
  rebuildHash(){this.hash.clear();for(const e of this.enemies)if(e.hp>0&&!e.untargetable){const k=(e.x/96|0)+','+(e.y/96|0);if(!this.hash.has(k))this.hash.set(k,[]);this.hash.get(k).push(e);}}
  near(x,y,r){const result=[];for(let a=Math.floor((x-r)/96);a<=Math.floor((x+r)/96);a++)for(let b=Math.floor((y-r)/96);b<=Math.floor((y+r)/96);b++){const bucket=this.hash.get(a+','+b);if(bucket)for(const e of bucket)if(e.hp>0&&(e.x-x)**2+(e.y-y)**2<r*r)result.push(e);}return result;}

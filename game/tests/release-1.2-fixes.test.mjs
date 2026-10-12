@@ -96,7 +96,8 @@ void test('UI-only 1.2 flows keep their source markers',()=>{
  // Pending chain: checks read the record persist() builds on; garden and supply hand over updaters; a retried result is marked saved.
  assert.match(game,/function baseSave\(\)\{return pendingSaveRef\.current\?\.next\|\|saveRef\.current;\}/);assert.match(game,/function unlockMeta\(m\)\{const s=baseSave\(\);/);
  assert.equal(game.split('onChange={update=>persist(s=>({...s,garden:update(s.garden||defaultGarden())}))}').length-1,2);assert.match(panel,/onChange\(base=>base\.unlocked\.includes\(s\.id\)\?\{\.\.\.base,selected:s\.id\}:base\)/);
- assert.match(game,/try\{next\.achievements=achievementList\(next\)/);assert.match(game,/pendingSaveRef\.current=null;markResultSaved\(value\);options\.onSuccess/);
+ assert.match(game,/try\{next\.achievements=achievementList\(next\)/);assert.match(game,/setSaved\(value\);pendingSaveRef\.current=null;markResultSaved\(value,!\(options\.recoveryCandidate\|\|options\.resolveRecovery\)\);options\.onSuccess/,'only successful persistence confirms the observed outcome, and recovery adoption is excluded');
+ assert.match(game,/function markResultSaved\(value,allowOutcome=true\)\{const run=battleRef\.current;if\(!run\?\.finished\|\|run\.mode==='training'\|\|studyRun\(run\)\)return;if\(run\.resultFeedback&&!run\.resultFeedback\.saved&&resultAlreadyClaimed\(value,run\.summary\(\)\)\)run\.resultFeedback\.saved=true;confirmSettlement\(run,value,\{allowOutcome\}\);\}/,'existing finished-run and receipt guards still mark retried results saved');
  // Dialog and input hygiene.
  assert.match(game,/function confirmRestDeparture\(\)\{const run=battleRef\.current;if\(!run\?\.rest\|\|!run\.restReadiness\(\)\.ready\|\|riskRef\.current\)return;if\(conflictRef\.current\)\{previewLatest\(\);return;\}/);
  assert.ok(game.split('earlyOutsidePress(details)').length-1>=5);assert.match(game,/repeatPress\(closeGesture\.current,e,400\)\|\|!capturePointer\(e\)/);assert.match(game,/repeatPress\(openGesture\.current,details\.event,450\)/);
@@ -107,7 +108,9 @@ void test('UI-only 1.2 flows keep their source markers',()=>{
  assert.match(css,/\.choice-card \.scene-action:hover,\.choice-card \.scene-action:active\{filter:none;translate:none\}/);assert.match(css,/\.toast-layer\{position:fixed;inset:0;z-index:200/);
  assert.match(css,/@media\(max-height:600px\),\(max-width:420px\)\{\.page-journey \.journey-launch\{gap:6px;padding:6px 0\}/);assert.match(css,/\.page-journey \.journey-launch>\.fr-btn:not\(\.primary-start\),\.page-journey \.journey-launch>\.study-entry\{flex:1 1 0;/);
  assert.match(css,/\.rest-action-dock \.rest-missing\{display:flex;flex-wrap:nowrap;/);assert.doesNotMatch(css,/\.page-journey \.launch-selection\{display:none\}/,'the pinned dock keeps its difficulty select');
- assert.match(help,/else target\.scrollIntoView\(\{block:'start'\}\)/);
+ // T18 now keeps an independent reader viewport and locates each word, including horizontal table scrolling.
+ // The browser suites check that the actual marked glyph stays in view; the former outer-dialog fallback is obsolete.
+ assert.match(help,/data-help-match/);assert.match(help,/table\.scrollLeft/);assert.match(help,/node\.scrollTop\+=target\.getBoundingClientRect/);
  assert.match(panel,/进入第 '\+\(\(b\.endlessLoop\|\|0\)\+2\)\+' 圈/);assert.match(panel,/onClick=\{\(\)=>\{setReplace\(null\);b\.refreshShop\(\);\}\}/);
 });
 
@@ -127,5 +130,78 @@ void test('result dialogs keep one shrinkable column and the compact HUD keeps t
  assert.match(css,/\.hud-compact \.skill-controls \.reserve-label>\.reserve-rest-hint:last-child\{display:none\}/);
  assert.ok(css.lastIndexOf('.hud-compact .skill-controls .reserve-label>.reserve-rest-hint:last-child{display:none}')>css.lastIndexOf('.skill-controls .reserve-label>.reserve-rest-hint:last-child{display:inline'),'the compact rule comes after the rule that shows the hint again');
  assert.match(game,/每次神雷耗用 \{thunder\.cost\} 雷源\{b\.isExpedition&&hasReserveRest\(b\)&&<> · \{reserveRestText\(b\)\}<\/>\}/);
- assert.equal(game.split('reserveRestText(b)').length-1,2,'HUD and summary share one hint text');
+ assert.equal((game+src('BattleFooter.jsx')).split('reserveRestText(b)').length-1,2,'shared footer and summary both call the same hint helper');
+ assert.match(src('player-guidance.js'),/export const reserveRestText=b=>/);
+});
+
+// T02: these fixtures reach the illusion through the real intermission/choice flow. The
+// presentation-only counterpart suppresses cues, so full saved-state equality catches RNG,
+// protection, reward or completion changes rather than comparing only the new wording.
+function readyIllusion(options={}){
+ const b=new Expedition({seed:'release12-illusion-cues',runId:'release12-illusion-cues',difficulty:1,chapter:0,recordVersion:0,segmentVersion:0,...options});
+ const choose=()=>{if(b.rest?.event&&!b.restReadiness().event){for(let i=0;i<b.eventText().choices.length;i++)if(!b.interactionReadiness(i).blocked){b.chooseInteraction(i);break;}}};
+ toRest(b,'3:0',choose);
+ for(let guard=0;guard<100&&b.modeState!=='battle';guard++){
+  if(b.scene==='choice')b.chooseTrait(b.choices[0].id);
+  else if(b.scene==='intermission'){choose();if(!b.rest.coreDone)b.skipCore();if(!b.rest.routeDone)b.chooseRoute(0);b.continueRest();}
+  else if(b.scene==='cinematic')b.advanceCinematic(true);
+  else if(b.scene==='intro')b.start();
+ }
+ assert.equal(b.node.id,'3:1');assert.equal(b.modeState,'battle');return b;
+}
+function enterTrueGate(b){
+ const q=b.objective,wait=q.next-b.waveTime;b.time+=wait;b.waveTime=q.next;b.player.x=q.gates[q.trueGate].x;b.player.y=q.gates[q.trueGate].y;
+ b.updateDirector(0);return q;
+}
+void test('T02 first two true gates guide onward, the third reports completion under legacy and current encounter rules',()=>{
+ for(const encounterVersion of [1,6,7,8]){
+  const b=readyIllusion({encounterVersion});
+  for(let pass=1;pass<=3;pass++){
+   const q=enterTrueGate(b),message=b.combatCues.findLast(c=>c.key==='illusion-true')?.text;
+   assert.equal(q.done,pass);assert.equal(message,'已辨真 '+pass+' / 3 · '+(pass===3?'幻境已破':'寻找下一道双环'));
+   if(encounterVersion>=7)assert.equal(q.returnProtectedUntil,b.time+.45);
+   else assert.equal(q.returnProtectedUntil,undefined);
+   assert.equal(b.receipts.includes('3:1'),pass===3);
+  }
+  assert.equal(b.scene,'intermission');assert.doesNotMatch(b.combatCues.findLast(c=>c.key==='illusion-true').text,/下一道/);
+ }
+});
+void test('T02 illusion cue changes preserve full combat snapshots, protection and both RNG streams',()=>{
+ for(const encounterVersion of [6,7,8]){
+  const shown=readyIllusion({encounterVersion}),silent=readyIllusion({encounterVersion});silent.cue=()=>{};
+  for(let pass=1;pass<=3;pass++){
+   const a=enterTrueGate(shown),b=enterTrueGate(silent);
+   assert.deepEqual(a,b,'gate order, next opening, cooldown and protection are identical');
+   assert.deepEqual(shown.serialize(),silent.serialize(),'all persisted battle, reward, completion and version state is identical');
+   assert.equal(shown.rng.state(),silent.rng.state());assert.equal(shown.contentRng.state(),silent.contentRng.state());
+   if(pass<3&&encounterVersion>=7){
+    const hp=shown.player.hp;shown.player.invuln=silent.player.invuln=0;
+    shown.hitPlayer(30,true);silent.hitPlayer(30,true);
+    assert.equal(shown.player.hp,hp,'return protection is not merely a cue');assert.deepEqual(shown.serialize(),silent.serialize());
+   }
+  }
+ }
+});
+void test('T02 entering the next node clears only illusion cues and their throttle keys',()=>{
+ const b=readyIllusion();for(let pass=0;pass<3;pass++)enterTrueGate(b);
+ const choose=()=>{if(b.rest?.event&&!b.restReadiness().event){for(let i=0;i<b.eventText().choices.length;i++)if(!b.interactionReadiness(i).blocked){b.chooseInteraction(i);break;}}};
+ // Leave the completed node through real choices and its chapter intro, with menus keeping time still.
+ for(let guard=0;guard<100&&b.scene!=='intro';guard++){
+  if(b.scene==='choice')b.chooseTrait(b.choices[0].id);
+  else if(b.scene==='intermission'){choose();if(!b.rest.coreDone)b.skipCore();if(!b.rest.routeDone)b.chooseRoute(0);b.continueRest();}
+ }
+ assert.equal(b.chapter,4);assert.equal(b.wave,0);assert.equal(b.scene,'intro');
+ const control=Expedition.restore(copy(b.serialize()));
+ const stale=['illusion-true','illusion-false','illusion-return'].map(key=>({key,text:'old illusion',color:'#abc',until:b.time+3}));
+ const retained=[{key:'formation-ready',text:'七十二剑齐出',color:'#abc',until:b.time+2.4},{key:'counter',text:'已化解',color:'#def',until:b.time+1.2}];
+ b.combatCues=[...stale,...retained];b.cueTimers={'illusion-true':b.time+1.5,'illusion-false':b.time+1.5,'illusion-return':b.time+1.5,'formation-ready':b.time+1.5,counter:b.time+1.5,'gnaw:17':b.time+30};
+ control.combatCues=structuredClone(retained);control.cueTimers={'formation-ready':b.time+1.5,counter:b.time+1.5,'gnaw:17':b.time+30};
+ b.beginNode();control.beginNode();
+ assert.deepEqual(b.combatCues,retained,'formation and skill confirmations retain their original lifetimes');
+ assert.deepEqual(b.cueTimers,control.cueTimers,'per-target gnaw and unrelated throttles remain untouched');
+ assert.deepEqual(b.serialize(),control.serialize(),'cue cleanup does not change next-node gameplay or protection');
+ assert.equal(b.rng.state(),control.rng.state());assert.equal(b.contentRng.state(),control.contentRng.state());
+ const timers=structuredClone(b.cueTimers);b.cue('illusion-true','later illusion','#abc',3);
+ assert.equal(b.combatCues.at(-1).text,'later illusion','a stale illusion throttle cannot suppress a later prompt');
+ for(const key of Object.keys(timers))assert.equal(b.cueTimers[key],timers[key]);
 });

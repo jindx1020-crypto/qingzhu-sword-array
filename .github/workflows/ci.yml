@@ -32,13 +32,14 @@ jobs:
       - run: npm run audit:gate
       - run: npm run check
       - run: npm run build
+      # Intro generation updates the public narration source before source packaging.
+      - run: npm run build:intro
       - run: npm run build:release
       - run: npx playwright install --with-deps chromium
+      - run: npm run test:intro
       - run: npm run test:browser
       - run: npm run test:player
       - run: npm run check:release
-      - run: npm run build:intro
-      - run: npm run test:intro
       - uses: actions/upload-artifact@v4
         if: always()
         with:

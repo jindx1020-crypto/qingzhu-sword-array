@@ -4,6 +4,8 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {Expedition} from '../gameplay/expedition.js';import {initialSave,TRAITS,RELICS,EVENTS} from '../gameplay/data.js';
 import {META,cultivationDetail} from '../gameplay/cultivation.js';import {statSources} from '../gameplay/stat-sources.js';import {compareRunRecord,settleRunResult,withProgressRecord,formatRecordTime,recordGroup} from '../gameplay/records.js';import {completeRecordLoop} from '../gameplay/record-rules.js';import {normalizeSave} from '../gameplay/save-store.js';import {Sound} from '../gameplay/audio.js';import {encounterLabel} from '../gameplay/encounter-labels.js';
+import {restOverview,resultIdentity,resultSaveState,runConfigurationText,copyReadonlyText} from '../gameplay/rest-result-guidance.js';
+import {createSceneInput} from '../gameplay/scene-input.js';
 const copy=structuredClone;
 function result(id='qa-b2-result',options={}){const b=new Expedition({segmentVersion:0,challengeVersion:0,seed:'batch2-fixed',runId:id,...options});b.time=120.125;b.receipts=b.routes.flat().map(n=>n.id);b.won=true;return b;}
 void test('B1 result comparison is read-only and handles first/faster/slower/tied and replay/old/incomplete',()=>{let save=initialSave();const b=result();assert.equal(compareRunRecord(save,b.summary()).kind,'first');save=settleRunResult(save,b.summary());const before=JSON.stringify(save);for(const [ms,kind,delta] of [[100125,'faster',-20000],[140125,'slower',20000],[120125,'tied',0]]){const c=result('comparison-'+kind);c.time=ms/1000;const feedback=compareRunRecord(save,c.summary());assert.equal(feedback.kind,kind);assert.equal(feedback.prior.timeMs,120125);assert.equal(feedback.deltaMs,delta);}assert.equal(JSON.stringify(save),before);assert.equal(compareRunRecord(save,b.summary()).kind,'recorded');for(const options of [{mode:'replay'},{recordVersion:0}])assert.equal(compareRunRecord(save,result('excluded',options).summary()).eligible,false);const partial=result('partial');partial.receipts.pop();assert.match(compareRunRecord(save,partial.summary()).reason,/22/);assert.equal(formatRecordTime(44125),'00:44.1');assert.equal(formatRecordTime(null),'未记录');});
@@ -18,3 +20,53 @@ function audioContext(){const oscillators=[];const ctx={state:'running',currentT
 void test('B4 dense sound events are throttled, capped at 12, protect warnings and stop synchronously',()=>{const mock=audioContext(),s=new Sound();s.ctx=mock.ctx;s.configure({music:.15,sfx:.4});for(let i=0;i<100;i++)for(const name of ['thunder','level','item','dash'])s.play(name);assert.ok(mock.oscillators.length<=9);s.play('sigil');s.play('hurt');assert.ok([...s.voiceMeta.values()].some(v=>v.name==='hurt'));assert.ok([...s.voiceMeta.values()].some(v=>v.name==='sigil'));assert.ok(s.voices.size<=12);for(let i=1;i<500;i++){mock.step(i*.01);for(const name of ['kill','thunder','dash','hurt','item','level','focus','sigil','counter'])s.play(name);s.update(i*.01);assert.ok(s.voices.size<=12);}s.setPaused(true);assert.equal(s.voices.size,0);s.play('hurt');assert.equal(s.voices.size,0);s.setPaused(false);mock.step(6);s.play('thunder');assert.ok(s.voices.size>0);s.configure({music:.15,sfx:0});assert.equal([...s.voiceMeta.values()].filter(v=>v.channel==='sfx').length,0);});
 
 void test('B3 all 72 event choices retain story2 transaction semantics, draft resources and exact-once commits',()=>{for(let index=0;index<EVENTS.length;index++)for(let choice=0;choice<3;choice++){const outcomes=[];for(const storyVersion of [2,3]){const b=new Expedition({segmentVersion:0,challengeVersion:0,storyVersion,seed:'all-event-transactions'});b.beginNode();b.chains=[];b.completeNode();b.rest.event={type:'single',index,choice:null};b.rest.eventDone=false;b.gold=1000;b.player.hp=50;b.player.mana=20;b.consumables=[{id:'heal',count:0},{id:'mana',count:0}];const resources=()=>JSON.stringify({gold:b.gold,hp:b.player.hp,shield:b.player.shield,mana:b.player.mana,rerolls:b.rerolls,consumables:b.consumables}),before=resources();assert.equal(b.chooseInteraction(choice),true);assert.equal(resources(),before);const restored=Expedition.restore(b.serialize());assert.equal(restored.rest.event.choice,choice);assert.equal(b.commitRestSelections(),true);const committed=resources();b.commitRestSelections();assert.equal(resources(),committed);outcomes.push(committed);}assert.equal(outcomes[0],outcomes[1],index+'/'+choice);}assert.equal(initialSave().settings.skipSeenCinematics,false);});
+
+void test('rest priorities show actual resources and unmet selections without applying draft rewards or touching RNG',()=>{
+ const b=new Expedition({seed:'rest-overview',path:1,difficulty:2});b.beginNode();b.completeNode();b.player.hp=12;b.player.shield=3.25;b.player.reserve=10;b.consumables=[{id:'heal',count:0},{id:'mana',count:0}];
+ const before=JSON.stringify(b.serialize()),rng=b.rng.state(),content=b.contentRng.state(),view=restOverview(b);
+ assert.equal(view.identity,'雷法 · 险境求生');assert.match(view.resources,/生命 12 \/ 100/);assert.match(view.resources,/雷源 10 \/ 140（可支撑 0 次，每次 22）/);assert.equal(view.lowHp,true);assert.equal(view.emptyBags,true);assert.ok(view.missing.length);assert.match(view.next,/先选择/);
+ for(let i=0;i<5;i++)restOverview(b);assert.equal(JSON.stringify(b.serialize()),before);assert.equal(b.rng.state(),rng);assert.equal(b.contentRng.state(),content);
+ const index=EVENTS.findIndex(e=>e.choices.some(c=>c.effect==='heal'));b.rest.event={type:'single',index,choice:null};b.rest.eventDone=false;b.chooseInteraction(EVENTS[index].choices.findIndex(c=>c.effect==='heal'));
+ const draft=JSON.stringify(b.serialize()),pending=restOverview(b);assert.equal(pending.tasks.find(t=>t.target==='event').state,'已暂选 · 待提交');assert.match(pending.resources,/生命 12 \/ 100/);assert.equal(JSON.stringify(b.serialize()),draft);
+ b.consumables[0].bonusHeal=1;assert.equal(restOverview(b).emptyBags,false);assert.match(restOverview(b).bags,/加赠回元药包 ×1/);
+});
+void test('rest priorities preserve invalid draft, legacy applied choices, preparation and ending branches',()=>{
+ const b=new Expedition({seed:'rest-states'});b.beginNode();b.completeNode();const index=EVENTS.findIndex(e=>e.choices.some(c=>c.effect==='buyHeal'));
+ b.rest.event={type:'single',index,choice:EVENTS[index].choices.findIndex(c=>c.effect==='buyHeal')};b.rest.eventDone=true;b.gold=0;
+ assert.equal(restOverview(b).tasks[0].state,'暂选已失效');assert.equal(restOverview(b).missing[0].target,'event');
+ b.rest.eventApplied=true;b.rest.legacyClaimed=true;b.rest.coreOffers=['K01'];b.rest.coreDone=true;b.rest.coreApplied=false;b.rest.coreSelection={id:null,replaceId:null};
+ assert.equal(restOverview(b).tasks[0].state,'已生效');assert.equal(restOverview(b).tasks[1].state,'已暂选 · 待提交','a legacy event does not mark a new draft core applied');
+ b.rest.event=null;b.rest.coreOffers=[];b.rest.routeDone=true;b.rest.preparation=true;b.queuedChoices=2;
+ assert.equal(restOverview(b).missing.length,0);assert.match(restOverview(b).next,/处理 2 次悟道/);b.queuedChoices=0;b.rest.ending=true;assert.deepEqual(restOverview(b).tasks,[]);assert.equal(restOverview(b).next,'接下来收拢所得');
+ b.player.hp=b.player.maxHp;assert.equal(restOverview(b).lowHp,false);
+});
+void test('result identity retains exact seed and separates current lock history from completed endless group without filling old history',()=>{
+ const b=result('identity',{mode:'endless',path:2,difficulty:2});b.seed=' 原始 种子 空格 ';completeRecordLoop(b);b.options.touchLockUsed=true;
+ const before=JSON.stringify(b.serialize()),summary=b.summary(),identity=resultIdentity(summary,b),group=recordGroup(compareRunRecord(initialSave(),summary).entry);
+ assert.equal(identity.seed,b.seed);assert.equal(identity.difficulty,'险境求生');assert.equal(identity.lock,'曾开启锁敌');assert.equal(identity.completedLock,'未开启锁敌');
+ const old=resultIdentity({mode:'seed',path:1});assert.equal(old.seed,null);assert.equal(old.difficulty,'难度未记录');assert.equal(old.lock,'锁敌历史未记录');
+ for(const mode of ['constructor','__proto__'])assert.equal(resultIdentity({mode,path:0}).mode,'旧历练');
+ const current=JSON.parse(runConfigurationText(b,summary));assert.equal(current.原始种子,b.seed);assert.equal(current.已完成圈成绩锁敌,'未开启锁敌');assert.equal(JSON.stringify(b.serialize()),before);assert.equal(recordGroup(compareRunRecord(initialSave(),b.summary()).entry),group);
+});
+void test('configuration copy reports live trait ranks, carried items and only enabled cultivation without grants',()=>{
+ const b=new Expedition({seed:'copy-configuration',path:2,metaRulesVersion:3,meta:META.map(m=>m.id)});b.traits={'puppet-0':2,'guard-1':1};b.relics=['K05','kit-1-2'];b.recalc();
+ const before=JSON.stringify(b.serialize()),rng=b.rng.state(),content=b.contentRng.state(),text=runConfigurationText(b),config=JSON.parse(text);
+ assert.deepEqual(config.悟道.map(t=>[t.id,t.rank]),[['puppet-0',2],['guard-1',1]]);assert.deepEqual(config.携行.map(t=>t.id),b.relics);assert.equal(config.启用修持.length,6);assert.ok(config.启用修持.every(id=>id.startsWith('puppet-')));assert.match(config.说明,/不.*补发资源/);
+ assert.equal(JSON.stringify(b.serialize()),before);assert.equal(b.rng.state(),rng);assert.equal(b.contentRng.state(),content);
+});
+void test('result save label follows the actual settlement flag, never a generic saved status or comparison result',()=>{
+ const b={mode:'story',options:{}};
+ assert.equal(resultSaveState(b,{saved:false,eligible:true,kind:'first'},'saved').saved,false);
+ assert.equal(resultSaveState(b,{saved:false},'saved').label,'本次结算未保存成功');
+ for(const status of ['error','conflict','recovery']){const v=resultSaveState(b,{saved:true},status);assert.equal(v.saved,true);assert.equal(v.label,'本次结算已保存');assert.ok(v.detail.length>0,'later storage warning stays separate from a successful settlement');}
+ assert.match(resultSaveState(b,{saved:true,restored:true},'saved').label,/此前已保存/);assert.match(resultSaveState({mode:'training',options:{}},{saved:true},'saved').label,/不写入/);assert.match(resultSaveState({mode:'story',options:{studyVersion:1}},{saved:true},'saved').label,/不写入/);
+});
+void test('clipboard says success only after actual fulfillment and exposes fallback on missing or denied API',async()=>{
+ const text='exact seed \n中文';let accept,received,settled=false;const pending=copyReadonlyText(text,{writeText:value=>{received=value;return new Promise(resolve=>{accept=resolve;});}}).then(value=>{settled=true;return value;});
+ await Promise.resolve();assert.equal(received,text);assert.equal(settled,false);accept();assert.equal(await pending,true);
+ assert.equal(await copyReadonlyText(text,undefined),false);assert.equal(await copyReadonlyText(text,{writeText:async()=>{throw Error('denied');}}),false);assert.equal(await copyReadonlyText(text,{writeText:()=>{throw Error('unavailable');}}),false);
+});
+void test('jumping to departure invalidates the held key but fresh keyboard, mouse and touch cycles still work',()=>{
+ for(const code of ['Enter','Space']){const gate=createSceneInput();gate.keyDown({code});const old=gate.armKey({code});gate.invalidate();assert.equal(gate.armKey({code}),null);gate.keyUp({code});assert.equal(gate.consume(old,{detail:0}),false);gate.keyDown({code});const fresh=gate.armKey({code});gate.keyUp({code});assert.equal(gate.consume(fresh,{detail:0}),true);}
+ for(const pointerType of ['mouse','touch']){const gate=createSceneInput(),event={pointerType,pointerId:1,button:0,clientX:10,clientY:10};gate.pointerDown(event);const arm=gate.armPointer(event);gate.pointerUp(event);assert.equal(gate.consume(arm,{detail:1}),true);assert.equal(gate.consume(arm,{detail:1}),false);}
+});

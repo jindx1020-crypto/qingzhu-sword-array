@@ -3,7 +3,7 @@
  */
 // 1.2 review fixes driven by real Playwright mouse, touchscreen and keyboard input (no synthetic DOM events), so :hover, stacking contexts,
 // focus and gesture timing behave as for a player. ?test=1 hooks only jump to declared states. No phone hardware.
-import {launchBrowser,offlineURL,projectRoot,variant} from './browser-runtime.mjs';import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import {initialSave} from '../gameplay/data.js';
+import {launchBrowser,offlineURL,projectRoot,variant} from './browser-runtime.mjs';import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import {initialSave,TRAITS} from '../gameplay/data.js';
 const out=path.join(projectRoot,'game/qa/release',variant,'release-1.2');fs.mkdirSync(out,{recursive:true});
 const report={method:'Isolated headless Chromium; real Playwright mouse, touchscreen and keyboard input on the offline HTML; ?test=1 hooks only reach declared states. No phone hardware.',checks:[],errors:[],external:[]};
 const veteran={...initialSave(),guidesSeen:['practice-v1',0,1,2,3,4,5],wins:1,unlocked:5,insight:500,completed:[0,1,2,3,4,5]};
@@ -128,6 +128,32 @@ try{
   const cards=await page.locator('.codex-card').evaluateAll(cs=>cs.map(c=>({chip:c.firstElementChild.textContent,name:c.querySelector('h3').textContent,source:c.querySelector('small')?.textContent||''})));
   assert.equal(cards.find(c=>c.name==='灵犀佩').chip,'游戏化器物');assert.deepEqual(cards.filter(c=>c.chip.includes('原著器物')&&/非原著/.test(c.source)),[]);
   report.checks.push({name:'codex relic labels agree with their source lines',lingxi:cards.find(c=>c.name==='灵犀佩')});await context.close();}
+
+ // Declared configuration fixtures verify the text players use to choose, then a real card click applies it.
+ for(const fixture of [
+  {path:5,traits:{},relics:['K11'],id:'guard-1',text:'本局护盾上限 21.25 → 34.85',shield:34.85},
+  {path:2,traits:{'puppet-10':1},relics:[],id:'puppet-0',text:'常驻傀儡 2 → 3 · 本局护盾上限 8 → 12',shield:12},
+  {path:1,traits:{'thunder-2':1},relics:['K03'],id:'thunder-2',text:'本局每次神雷耗用 21 → 17',cost:17}
+ ]){const {page,context}=await open(320,568);await enterBattle(page,{mode:'story',path:fixture.path});
+  await page.evaluate(({fixture,candidate})=>{const b=window.__FANREN__.battle;b.traits=fixture.traits;b.relics=fixture.relics;b.recalc();b.player.reserve=110;b.queuedChoices=1;b.openChoices();b.choices=[candidate];b.emit({type:'update'});},{fixture,candidate:TRAITS.find(t=>t.id===fixture.id)});
+  await page.waitForSelector('.trait-effective');await settled(page);assert.ok((await page.locator('.trait-effective').innerText()).includes(fixture.text));
+  if(fixture.cost)assert.match(await page.locator('.trait-effective').innerText(),/雷源可支撑 5 → 6 次.*仅储量预算/);
+  await shot(page,'priority-five-preview-'+fixture.id);await page.locator('.choice-card .fr-btn').click();await page.waitForFunction(()=>window.__FANREN__.battle.modeState==='battle');
+  const actual=await page.evaluate(()=>{const b=window.__FANREN__.battle;return {shield:b.player.maxShield,cost:b.thunderReadiness().cost};});
+  if(fixture.shield!==undefined)assert.equal(actual.shield,fixture.shield);if(fixture.cost!==undefined)assert.equal(actual.cost,fixture.cost);
+  report.checks.push({name:'priority five: effective candidate preview agrees with selected result',candidate:fixture.id,text:fixture.text,actual});await context.close();}
+
+ // Normal-speed playtest follow-up: declared failure fixtures, not extra natural-play sessions.
+ // The actual hit/finish path supplies the fatal record; check its rendered distinction from recent melee losses.
+ for(const [w,h] of [[320,568],[568,320],[1024,768]]){const {page,context}=await open(w,h);await enterBattle(page);
+  await page.evaluate(()=>{const b=window.__FANREN__.battle;b.clearField();b.player.shield=0;b.player.hp=100;b.recentHits=[];for(let i=0;i<4;i++){b.time=60+i;b.player.invuln=0;b.hitPlayer(20,true,{name:'追兵',kind:'近身'});}b.time=64;b.waveTime=64;b.player.invuln=0;b.hitPlayer(1000,true,{name:'毒雾',kind:'险地'});});
+  await page.waitForSelector('.defeat-review');await settled(page);await page.waitForFunction(()=>!document.querySelector('.toast-layer .game-toast'));const review=page.locator('.defeat-review');
+  assert.match(await review.locator('.defeat-objective').innerText(),/64 \/ 65 秒.*还差 1 秒/);
+  assert.match(await review.locator('.defeat-fatal').innerText(),/毒雾 · 险地 → 韩立/);
+  assert.match(await review.locator('.defeat-dominant').innerText(),/主要类型：近身.*80.*不是整局统计/);
+  const filter=page.getByLabel('查看对象');await filter.selectOption('阵盘');assert.equal(await page.locator('.recent-hits li').count(),0);assert.match(await page.locator('.recent-hits').innerText(),/这 5 次记录中没有阵盘受击/);await filter.selectOption('韩立');assert.equal(await page.locator('.recent-hits li').count(),5);
+  for(const selector of ['.defeat-objective','.defeat-fatal','.defeat-dominant']){const row=review.locator(selector);await row.evaluate(e=>e.scrollIntoView({block:'center'}));const r=await row.evaluate(e=>{const r=e.getBoundingClientRect();return {left:r.left,right:r.right,overflow:e.scrollWidth-e.clientWidth,vw:innerWidth};});assert.ok(r.left>=0&&r.right<=r.vw+1&&r.overflow<=1,'readable defeat review '+w+'x'+h+' '+selector);}
+  await review.locator('.defeat-objective').evaluate(e=>e.scrollIntoView({block:'start'}));await shot(page,'priority-five-defeat-'+w+'x'+h);report.checks.push({name:'priority five: unfinished objective and fatal vs bounded main damage readable',w,h});await context.close();}
 
  assert.deepEqual(report.errors,[]);assert.deepEqual(report.external,[]);
 }finally{fs.writeFileSync(path.join(out,'browser.json'),JSON.stringify(report,null,2));await browser.close();}

@@ -69,6 +69,7 @@ try{
  // ---------------- 桌面：结算页固定计时下限（C-5）
  await page.evaluate(()=>{const b=window.__FANREN__.battle;b.receipts=b.routes.flat().map(n=>n.id);b.routes.forEach(ch=>ch.forEach(n=>{if(n.selected===null)n.selected=0;}));b.won=true;b.finished=true;b.showScene('result','result');window.__FANREN__.step(0);});
  await page.waitForTimeout(600);
+ await page.locator('.result-record-details>summary').click();
  const result=await page.evaluate(()=>{const s=document.querySelector('.result-record');return s?{text:s.innerText.slice(0,900),floor:document.querySelector('.record-fixed-floor')?.innerText||null}:null;});
  report.measurements.result=result;
  ok('C-5 结算页显示「固定计时下限」与其余可压缩时间',!!result?.floor&&/固定计时下限/.test(result.floor)&&/其余/.test(result.floor),result?.floor);

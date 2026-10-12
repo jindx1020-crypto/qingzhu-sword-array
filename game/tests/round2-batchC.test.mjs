@@ -58,18 +58,20 @@ void test('C-1 battle toasts are dimmed and short while menu messages keep the l
  const rule=css.match(/\.in-battle \.game-toast\{[^}]*\}/)[0];
  assert.match(rule,/background:#11291e99/,'battle toast background alpha is 0x99 ≈ 0.60 ≤ 0.6');
  assert.match(game,/function message\(text,duration=3500\)/);
- assert.match(game,/ev\.type==='toast'\)message\(ev\.text,battleRef\.current\?\.modeState==='battle'\?1200:3500\)/);
+ assert.match(game,/else message\(ev\.text,run\?\.modeState==='battle'\?1200:3500\)/);
+ assert.match(game,/ev\.text==='机缘与核心已提交 · 已按选择处理；当前资源无额外变化'/,'only the unchanged-resource ending confirmation becomes inline');
 });
 
 // ---------------------------------------------------------------- C-2 手机 HUD
-void test('C-2 compact HUD keeps one status row, stacks the boss bar below it and makes the card body a target',()=>{
+void test('C-2 compact HUD keeps measured status information below the header and the boss below that, with one card target',()=>{
  const css=src('game.css'),game=src('Game.jsx'),scene=src('SceneAction.jsx');
  const status=css.match(/\.hud-compact \.mobile-status\{[^}]*\}/)[0];
  assert.match(status,/display:flex/,'compact mode keeps the starter/guard status row instead of hiding it');
  assert.match(status,/top:var\(--battle-header-base/,'the row is measured from the header itself, not from the derived band height');
  assert.doesNotMatch(status,/display:none/);
- const boss=css.match(/\.hud-compact \.boss-bar\{[^}]*\}/)[0];
- assert.match(boss,/top:calc\(var\(--battle-header-base,86px\) \+ 23px\)/,'the boss bar sits below the status row, not on top of it');
+ const boss=css.match(/\.fanren \.boss-bar\{[^}]*--battle-status-height[^}]*\}/)[0];
+ assert.match(boss,/var\(--battle-header-base,86px\) \+ var\(--battle-status-height,20px\)/,'the boss follows the actual status height, including separate target rows');
+ assert.match(game,/setProperty\('--battle-status-height',\(mainRef\.current\.querySelector\('\.mobile-status'\)\?\.getBoundingClientRect\(\)\.height\|\|0\)/,'measure only the status box, not the derived total HUD extent');
  assert.match(css.match(/\.boss-bar\{position:absolute[^}]*\}/)[0],/pointer-events:none;-webkit-user-select:none;user-select:none/);
  assert.match(game,/--battle-header-base/,'Game.jsx publishes the header-only base so the band cannot feed back on itself');
  assert.match(game,/radius=Math\.min\(45\*scale,r\.width\/2\)/,'full joystick deflection uses min(45px, visual radius)');
@@ -145,11 +147,11 @@ void test('C-3 the K03 cost floors the guide quotes are what thunderCost actuall
  assert.match(table,/任何起手都可能买到/);
 });
 void test('C-3 the rest page hides the shop hint when there is no shop and the reserve line shows the live stock',()=>{
- const panel=src('ExpeditionPanel.jsx'),guidance=src('player-guidance.js'),game=src('Game.jsx');
- assert.match(panel,/\(rest\.shop\?' · 商店购物可跳过':''\)/);
+ const panel=src('ExpeditionPanel.jsx'),guidance=src('player-guidance.js');
+ assert.match(panel,/rest\.shop\?' 商店可跳过。':''/,'optional shopping hint remains conditional after the checklist layout changed');
  assert.match(guidance,/到账后储量 '\+Math\.floor\(p\.reserve\)\+' \/ '\+p\.maxReserve/);
  assert.match(guidance,/cost=thunderCost\(b\)/,'the per-cast cost comes from the balance gate, not a literal');
- assert.match(game,/'合格休整：基础'\+reserveRestBase\(b\)/,'the HUD reserve-rest base is read from reserveRestBase');
+ assert.match(src('player-guidance.js'),/'合格休整：基础'\+reserveRestBase\(b\)/,'the HUD reserve-rest base is read from reserveRestBase');
 });
 
 // ---------------------------------------------------------------- C-4 试剑台

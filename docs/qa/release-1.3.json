@@ -1,0 +1,496 @@
+{
+  "version": "1.3",
+  "packageVersion": "1.3.0",
+  "date": "2026-10-12",
+  "status": "local-release-verified",
+  "scope": "Display-version release of completed post-v1.2 feedback improvements. This file does not relabel old browser or build results as new 1.3 acceptance.",
+  "gameArc": "虚天殿篇",
+  "license": "GPL-3.0-only",
+  "compatibility": {
+    "rulesChanged": false,
+    "saveFormat": 1,
+    "saveKey": "fanren-qingzhu-v1",
+    "recordsSchema": 1,
+    "ruleKeysUnchanged": true,
+    "oldSavesConverted": false,
+    "dependenciesChanged": false,
+    "newDefaultRules": {
+      "rulesVersion": 3,
+      "balanceVersion": 4,
+      "metaRulesVersion": 3,
+      "contentVersion": 3,
+      "growthVersion": 5,
+      "encounterVersion": 8,
+      "economyVersion": 4,
+      "storyVersion": 3,
+      "focusVersion": 3,
+      "inputVersion": 2,
+      "recordVersion": 1,
+      "segmentVersion": 1,
+      "endlessChallengeVersion": 2,
+      "otherChallengeVersion": 0
+    },
+    "displayMetadata": "recordDetails already reads GAME_VERSION. A newly produced record may say gameVersion 1.3. Existing records are not rewritten; the original RULE_KEYS and recordGroup omit the display version and remain unchanged."
+  },
+  "completedFeatureGroups": [
+    {
+      "ids": [
+        "T01",
+        "T02",
+        "T03",
+        "T06",
+        "T07",
+        "T15"
+      ],
+      "description": "Readable small-window and choice layouts, completed illusion guidance, effective stats/reserve budget and final-state defeat review."
+    },
+    {
+      "ids": [
+        "T04",
+        "T05",
+        "T08",
+        "T12",
+        "T18",
+        "T24",
+        "T26",
+        "T29"
+      ],
+      "description": "Pending rest choices, conditional core effects, actual sigil timing, damage scope, exact help search, result identity/copy, mixed combo progress and navigation focus."
+    },
+    {
+      "ids": [
+        "T10",
+        "T11",
+        "T21",
+        "T22",
+        "T23"
+      ],
+      "description": "Current target units, resource sources, device-specific input guidance, observed lock-release reasons and consumable/rest explanations."
+    },
+    {
+      "ids": [
+        "T16",
+        "T27",
+        "T17",
+        "T09",
+        "T28"
+      ],
+      "description": "Review navigation, objective/reward timer semantics, recorded sigil outcomes, actual tactical windows and progression after 72 swords."
+    },
+    {
+      "ids": [
+        "T19",
+        "T20"
+      ],
+      "description": "Source-aware settings return, read-only actual layout preview, supplies-follow-skills preference and atomic left/right presets."
+    },
+    {
+      "ids": [
+        "T25"
+      ],
+      "description": "Observed actual result gains, current saved balances, confirmed first victory, returnable growth/configuration navigation and read-only current-run item details."
+    }
+  ],
+  "evidenceMethod": {
+    "originalPlaytest": "30 separate AI players at native speed from blank context to natural win/loss; original 150 suggestions preserved.",
+    "fixRegression": "Automated tests and declared isolated state/checkpoint/storage fixtures using actual browser mouse, keyboard and emulated touch where recorded.",
+    "notClaimed": [
+      "New natural-speed playthroughs for the version bump",
+      "Physical phone or screen-reader certification",
+      "Unrecorded historical telemetry"
+    ]
+  },
+  "versionOnlyAudit": {
+    "status": "passed",
+    "baselineSourceZipSha256": "cdd4b987e88bb3a8501d986bfe53142f9b60a8628e848309ede8a16227ee2c58",
+    "gameplayFiles": 109,
+    "identicalFiles": 108,
+    "changedFiles": [
+      "game/gameplay/version.js"
+    ],
+    "changedVersionLiteralOnly": true,
+    "ruleAndSaveModulesUnchanged": true,
+    "dependenciesUnchanged": true,
+    "historicalReportsUnchanged": true,
+    "packages": [
+      {
+        "file": "game/package.json",
+        "versionOnly": true,
+        "dependenciesUnchanged": true
+      },
+      {
+        "file": "game/package-lock.json",
+        "versionOnly": true,
+        "dependenciesUnchanged": true
+      }
+    ],
+    "historicalReports": [
+      {
+        "file": "docs/release-1.2.md",
+        "baselineSha256": "6621f9b68f126c4b310885ef01b7e4a93a5ce379830c81d36bb69c22bee94c26",
+        "currentSha256": "6621f9b68f126c4b310885ef01b7e4a93a5ce379830c81d36bb69c22bee94c26",
+        "byteIdentical": true
+      },
+      {
+        "file": "docs/qa/release-1.2.json",
+        "baselineSha256": "9d331a2c1bb357a7328b28853e4409fa99c9fefd8a027e1d31e6474207ace5e1",
+        "currentSha256": "9d331a2c1bb357a7328b28853e4409fa99c9fefd8a027e1d31e6474207ace5e1",
+        "byteIdentical": true
+      }
+    ],
+    "evidence": "local-archive/releases/2026-10-12-v1.3/version-only-audit.json",
+    "method": "Source byte comparison only; not the new 1.3 build, browser, dependency audit, packaging or GitHub acceptance."
+  },
+  "inheritedEvidence": {
+    "version": "1.2",
+    "date": "2026-10-12",
+    "meaning": "Historical completed batch6 acceptance only, not a new 1.3 test run.",
+    "report": "docs/release-1.2.md",
+    "data": "docs/qa/release-1.2.json#priorityBatch6",
+    "automated": {
+      "tests": 674,
+      "passed": 674,
+      "failed": 0,
+      "skipped": 0,
+      "addedSincePriorityBatch5": 24
+    },
+    "lint": {
+      "newDiagnostics": 0,
+      "unchangedBaseline": 19
+    },
+    "typescript": true,
+    "webBuild": true,
+    "browserMainChecks": 242,
+    "focusedChecks": 68,
+    "totalBrowserChecks": 310,
+    "sourceArchiveFiles": 656,
+    "htmlSha256": {
+      "凡人修仙传_青竹剑阵.html": "c73182fecbcd625c353dd10dcff1a0b75d912285bcc6d00c8a676aa7391e83d5",
+      "凡人修仙传_青竹剑阵_兼容PNG.html": "d8abf7df1cdc1a78dd98597dac64b9d0c7de9d455a68dbd08981d6db386c9b2b"
+    },
+    "ruleAudit": {
+      "productFiles": 204,
+      "identicalProductFiles": 197,
+      "modifiedProductFiles": 4,
+      "addedProductFiles": 3,
+      "removedProductFiles": 0,
+      "baselineJavaScriptModulesCompared": 73,
+      "allBaselineJavaScriptModulesByteIdentical": true,
+      "settlementParityCases": 360,
+      "legacySavedMarkerParityCases": 128
+    },
+    "deliveryEvidence": "local-archive/fixes/2026-10-12-priority-batch6/delivery-verification.json"
+  },
+  "currentVerification": {
+    "check": {
+      "status": "passed",
+      "result": {
+        "tests": 674,
+        "passed": 674,
+        "failed": 0,
+        "skipped": 0,
+        "lintNewDiagnostics": 0,
+        "inheritedLintDiagnostics": 19,
+        "typescript": true
+      }
+    },
+    "dependencyAudit": {
+      "status": "passed",
+      "result": {
+        "highOrCritical": 1,
+        "registeredUnfixedExceptions": 1,
+        "exception": "GHSA-vfj7-8cjw-p6xm",
+        "dependenciesChanged": false
+      }
+    },
+    "webBuild": {
+      "status": "passed",
+      "result": {
+        "command": "npm run build"
+      }
+    },
+    "introduction": {
+      "status": "passed",
+      "result": {
+        "checks": 7,
+        "slides": 8,
+        "pageErrors": 0,
+        "externalRequests": 0,
+        "versionLabels": "1.3"
+      }
+    },
+    "dualOfflineBuild": {
+      "status": "passed",
+      "result": {
+        "凡人修仙传_青竹剑阵.html": "ccf524873e794be86f2f163de7ac217874ee82a04becc6bdfb85954eecc063c7",
+        "凡人修仙传_青竹剑阵_兼容PNG.html": "7eaa8079036485ca8f394164a89cc4ca39cad56f9ea0270fea3a80bd6a93a187"
+      }
+    },
+    "browserMain": {
+      "status": "passed",
+      "result": {
+        "checks": 242,
+        "rows": [
+          {
+            "profile": "webp",
+            "suite": "batch1",
+            "checks": 13,
+            "pageErrors": 0,
+            "externalRequests": 0
+          },
+          {
+            "profile": "webp",
+            "suite": "batch2",
+            "checks": 4,
+            "pageErrors": 0,
+            "externalRequests": 0
+          },
+          {
+            "profile": "webp",
+            "suite": "batch3",
+            "checks": 11,
+            "pageErrors": 0,
+            "externalRequests": 0
+          },
+          {
+            "profile": "webp",
+            "suite": "experience",
+            "checks": 24,
+            "pageErrors": 0,
+            "externalRequests": null
+          },
+          {
+            "profile": "webp",
+            "suite": "release",
+            "checks": 7,
+            "pageErrors": 0,
+            "externalRequests": 0
+          },
+          {
+            "profile": "webp",
+            "suite": "release-1.2",
+            "checks": 34,
+            "pageErrors": 0,
+            "externalRequests": 0
+          },
+          {
+            "profile": "webp",
+            "suite": "priority-batch2",
+            "checks": 4,
+            "pageErrors": 0,
+            "externalRequests": 0
+          },
+          {
+            "profile": "webp",
+            "suite": "priority-batch3",
+            "checks": 5,
+            "pageErrors": 0,
+            "externalRequests": 0
+          },
+          {
+            "profile": "webp",
+            "suite": "priority-batch4",
+            "checks": 7,
+            "pageErrors": 0,
+            "externalRequests": 0
+          },
+          {
+            "profile": "webp",
+            "suite": "priority-batch5",
+            "checks": 7,
+            "pageErrors": 0,
+            "externalRequests": 0
+          },
+          {
+            "profile": "webp",
+            "suite": "priority-batch6",
+            "checks": 5,
+            "pageErrors": 0,
+            "externalRequests": 0
+          },
+          {
+            "profile": "png",
+            "suite": "batch1",
+            "checks": 13,
+            "pageErrors": 0,
+            "externalRequests": 0
+          },
+          {
+            "profile": "png",
+            "suite": "batch2",
+            "checks": 4,
+            "pageErrors": 0,
+            "externalRequests": 0
+          },
+          {
+            "profile": "png",
+            "suite": "batch3",
+            "checks": 11,
+            "pageErrors": 0,
+            "externalRequests": 0
+          },
+          {
+            "profile": "png",
+            "suite": "experience",
+            "checks": 24,
+            "pageErrors": 0,
+            "externalRequests": null
+          },
+          {
+            "profile": "png",
+            "suite": "release",
+            "checks": 7,
+            "pageErrors": 0,
+            "externalRequests": 0
+          },
+          {
+            "profile": "png",
+            "suite": "release-1.2",
+            "checks": 34,
+            "pageErrors": 0,
+            "externalRequests": 0
+          },
+          {
+            "profile": "png",
+            "suite": "priority-batch2",
+            "checks": 4,
+            "pageErrors": 0,
+            "externalRequests": 0
+          },
+          {
+            "profile": "png",
+            "suite": "priority-batch3",
+            "checks": 5,
+            "pageErrors": 0,
+            "externalRequests": 0
+          },
+          {
+            "profile": "png",
+            "suite": "priority-batch4",
+            "checks": 7,
+            "pageErrors": 0,
+            "externalRequests": 0
+          },
+          {
+            "profile": "png",
+            "suite": "priority-batch5",
+            "checks": 7,
+            "pageErrors": 0,
+            "externalRequests": 0
+          },
+          {
+            "profile": "png",
+            "suite": "priority-batch6",
+            "checks": 5,
+            "pageErrors": 0,
+            "externalRequests": 0
+          }
+        ],
+        "method": "Current 1.3 HTML; declared isolated fixtures and actual mouse/keyboard/emulated touch input. Not additional natural completions."
+      }
+    },
+    "playerPackage": {
+      "status": "passed",
+      "result": {
+        "version": "1.3",
+        "archive": "青竹剑阵_1.3_免安装版.zip",
+        "method": "Extract actual player ZIP; launch file URLs in offline Chromium with fresh browser contexts, normal UI and no debug API.",
+        "checks": [
+          {
+            "entry": "开始游戏.html",
+            "width": 1440,
+            "height": 900,
+            "offline": true,
+            "normalLaunch": true,
+            "movementAndDash": true,
+            "pause": true,
+            "saveSurvivesReload": true
+          },
+          {
+            "entry": "兼容版/开始游戏_PNG.html",
+            "width": 390,
+            "height": 844,
+            "offline": true,
+            "normalLaunch": true,
+            "movementAndDash": true,
+            "pause": true,
+            "saveSurvivesReload": true
+          }
+        ],
+        "errors": [],
+        "externalRequests": []
+      }
+    },
+    "releasePackaging": {
+      "status": "passed",
+      "result": {
+        "version": "1.3",
+        "sourceFiles": 658,
+        "sourceMatchesArchive": true,
+        "manifestMatches": true,
+        "guideMatches": true,
+        "linksAndPrivacy": true,
+        "bundledNotices": [
+          "react@19.2.8",
+          "scheduler@0.27.0",
+          "react-dom@19.2.8",
+          "@floating-ui/utils@0.2.12",
+          "@base-ui/utils@0.3.2",
+          "@base-ui/react@1.7.0",
+          "clsx@2.1.1",
+          "class-variance-authority@0.7.1",
+          "tailwind-merge@3.6.0",
+          "shadcn@4.18.0",
+          "use-sync-external-store@1.6.0",
+          "lucide-react@1.31.0",
+          "tailwindcss@4.2.1",
+          "tw-animate-css@1.4.0",
+          "rolldown@1.2.8"
+        ]
+      }
+    },
+    "githubActions": {
+      "status": "tracked-on-github",
+      "url": "https://github.com/jindx1020-crypto/qingzhu-sword-array/actions",
+      "result": null
+    },
+    "githubRelease": {
+      "status": "tracked-on-github",
+      "url": "https://github.com/jindx1020-crypto/qingzhu-sword-array/releases/tag/v1.3",
+      "evidence": "local-archive/releases/2026-10-12-v1.3/publication-verification.json",
+      "result": null
+    }
+  },
+  "remainingThemes": [
+    "T13",
+    "T14"
+  ],
+  "followUpBoundaries": {
+    "T13/T14": "Historical defense/stationary benefit and per-chapter damage/resource telemetry remain separate work; never infer unavailable history.",
+    "T19/R20-02": "Separate saved portrait/landscape preferences remain unimplemented.",
+    "T17/T12": "No invented pair/fire-line attribution or historical damage breakdown.",
+    "T29": "Combat keyboard targeting remains deferred."
+  },
+  "knownFrozenBehavior": "Existing 1.2 compatibility boundaries remain; see docs/compatibility.md and docs/release-1.2.md. No gameplay fix is smuggled into the display-version bump.",
+  "artifacts": {
+    "directory": "release/1.3/",
+    "githubDirectory": "release/1.3/github/",
+    "tag": "v1.3",
+    "verificationStatus": "local-verified-online-state-tracked-on-github",
+    "manifest": "release/1.3/release-manifest.json",
+    "hashes": {
+      "凡人修仙传_青竹剑阵.html": "ccf524873e794be86f2f163de7ac217874ee82a04becc6bdfb85954eecc063c7",
+      "凡人修仙传_青竹剑阵_兼容PNG.html": "7eaa8079036485ca8f394164a89cc4ca39cad56f9ea0270fea3a80bd6a93a187"
+    },
+    "sourceFiles": 658
+  },
+  "archive": "local-archive/releases/2026-10-12-v1.3/",
+  "readmeScreenshots": {
+    "version": "1.3",
+    "size": "1440x900",
+    "method": "Fresh browser context, empty storage, normal UI and real-time first-node play; no test parameter or debug API. Not a full playthrough.",
+    "pageErrors": 0,
+    "externalRequests": 0
+  },
+  "ciPackagingOrder": "Generate public introduction narration before source packaging; check its browser behavior after Chromium installation."
+}

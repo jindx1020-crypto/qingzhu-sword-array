@@ -2,8 +2,8 @@
  * Copyright (C) 2026 bilibili@卡布奇诺ultra
  */
 import {chapterName} from './chapter-names.js';
-import {modText} from './descriptions.js';
-export {modText,STAT_NAMES} from './descriptions.js';
+import {modText} from './stat-text.js';
+export {modText,STAT_NAMES} from './stat-text.js';
 // Save-format version; independent from the player-facing GAME_VERSION.
 export const VERSION=1;
 export const COLORS=['#91dcc1','#edd083','#9fbbf3','#e8c466','#ebaa70','#b7b3e2'];

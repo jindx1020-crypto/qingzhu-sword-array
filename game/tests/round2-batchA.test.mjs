@@ -52,7 +52,7 @@ void test('A-3 system clearAim/pause never completes step 5; only the player rel
 void test('A-4 pause and summary buttons are CombatButtons; CombatButton keeps the styled element',()=>{
  const game=src('Game.jsx'),button=src('CombatButton.jsx');
  assert.match(game,/<CombatButton as=\{Btn\} trigger="up" variant="outline" onAction=\{\(\)=>b\.pause\(\)\} aria-label="暂停">Ⅱ<\/CombatButton>/);
- assert.match(game,/<CombatButton className="hud-summary-button" trigger="up" onAction=/);assert.match(button,/const releaseAndAct=e=>\{if\(!pressed\.current\.delete\(e\.pointerId\)\|\|trigger!=='up'/);assert.doesNotMatch(game,/<Btn variant="outline" onClick=\{\(\)=>b\.pause\(\)\} aria-label="暂停">/);
+ assert.match(src('BattleFooter.jsx'),/<CombatButton className="hud-summary-button" trigger="up" onAction=/);assert.match(button,/const releaseAndAct=e=>\{if\(!pressed\.current\.delete\(e\.pointerId\)\|\|trigger!=='up'/);assert.doesNotMatch(game,/<Btn variant="outline" onClick=\{\(\)=>b\.pause\(\)\} aria-label="暂停">/);
  assert.match(button,/as:Tag='button'/);assert.match(button,/<Tag \{\.\.\.props\} disabled=\{disabled\} onPointerDown=/);
 });
 

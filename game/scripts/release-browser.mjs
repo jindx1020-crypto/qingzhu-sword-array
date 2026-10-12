@@ -28,7 +28,7 @@ try{
   // Every package notice embedded in this HTML (scripts, stylesheets, vendored sources, runtime helpers) is readable on the license page.
   const notices=await page.evaluate(()=>JSON.parse(document.getElementById('third-party-notices').textContent).split('\n').filter(line=>/^\S+@\d\S* \([^)]+\)$/.test(line)));assert.ok(notices.length&&notices.every(line=>license.includes(line)),'License page lacks embedded notices: '+notices.filter(line=>!license.includes(line)).join(', '));
   await page.getByRole('button',{name:'关闭说明',exact:true}).click();assert.deepEqual(await snapshot(page),before);
-  await page.getByRole('button',{name:/游玩说明/}).click();await page.getByLabel('搜索说明关键词').fill('隔离原文');assert.match(await page.getByLabel('游玩说明正文').innerText(),/满额时停止本次覆盖/);await page.getByRole('button',{name:'下一个匹配段落',exact:true}).click();await page.screenshot({path:path.join(out,'help-'+width+'x'+height+'.png')});
+  await page.getByRole('button',{name:/游玩说明/}).click();await page.getByLabel('搜索说明关键词').fill('隔离原文');assert.match(await page.getByLabel('游玩说明正文').innerText(),/满额时停止本次覆盖/);await page.getByRole('button',{name:'下一个匹配位置',exact:true}).click();await page.screenshot({path:path.join(out,'help-'+width+'x'+height+'.png')});
   await page.getByRole('button',{name:'关闭说明',exact:true}).click();await page.getByRole('button',{name:/更新日志/}).click();const changes=(await page.getByLabel('更新日志正文').innerText()).trim();assert.ok(changes.startsWith(GAME_VERSION+' ')&&changes.endsWith('1.0正式发布'),changes);
   if(width===1440){
    await page.getByRole('button',{name:'关闭说明',exact:true}).click();await page.getByRole('button',{name:/藏经图鉴/}).click();

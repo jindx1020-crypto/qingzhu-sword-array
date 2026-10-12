@@ -1,289 +1,1678 @@
 {
- "version": "1.2",
- "date": "2026-10-08",
- "environment": {
-  "os": "macOS arm64",
-  "node": "24.15.0",
-  "npm": "11.12.1"
- },
- "automated": {
-  "tests": 559,
-  "passed": 559,
-  "failed": 0,
-  "skipped": 0,
-  "newRegressionTests": 12,
-  "newRegressionTestsFailOn1_1": 10,
-  "playtestBatch1RegressionTestsFailOnPrior1_2": 2
- },
- "lint": {
-  "newDiagnostics": 0,
-  "unchangedBaseline": 19
- },
- "typescript": true,
- "audit": {
-  "gate": "npm run audit:gate",
-  "passed": true,
-  "highOrCritical": 1,
-  "registeredUnfixedUpstream": [
-   "GHSA-vfj7-8cjw-p6xm"
-  ],
-  "resolvedThisRelease": [
-   "GHSA-5gmw-xhrv-c9v3",
-   "GHSA-85c8-ppgw-ccpr",
-   "GHSA-jqcg-44mw-7w3h",
-   "GHSA-wq5f-xc86-pv6w",
-   "GHSA-68fv-2mgg-jv7q",
-   "GHSA-6qxp-vccf-f47h"
-  ],
-  "bundledPackagesChanged": 0
- },
- "dependencyInventory": {
-  "lockEntries": 699,
-  "licenseTexts": 272,
-  "bundledInOffline": 15,
-  "regeneratedWith": "npm run docs:deps"
- },
- "browser": [
-  {
-   "profile": "webp",
-   "suite": "batch1",
-   "checks": 13,
-   "viewRecords": 10,
-   "pageErrors": 0,
-   "externalRequests": 0
-  },
-  {
-   "profile": "webp",
-   "suite": "batch2",
-   "checks": 4,
-   "viewRecords": 8,
-   "pageErrors": 0,
-   "externalRequests": 0
-  },
-  {
-   "profile": "webp",
-   "suite": "batch3",
-   "checks": 11,
-   "viewRecords": 0,
-   "pageErrors": 0,
-   "externalRequests": 0
-  },
-  {
-   "profile": "webp",
-   "suite": "experience",
-   "checks": 24,
-   "viewRecords": 0,
-   "pageErrors": 0,
-   "externalRequests": null
-  },
-  {
-   "profile": "webp",
-   "suite": "release",
-   "checks": 7,
-   "viewRecords": 0,
-   "pageErrors": 0,
-   "externalRequests": 0
-  },
-  {
-   "profile": "webp",
-   "suite": "release-1.2",
-   "checks": 28,
-   "viewRecords": 0,
-   "pageErrors": 0,
-   "externalRequests": 0
-  },
-  {
-   "profile": "png",
-   "suite": "batch1",
-   "checks": 13,
-   "viewRecords": 10,
-   "pageErrors": 0,
-   "externalRequests": 0
-  },
-  {
-   "profile": "png",
-   "suite": "batch2",
-   "checks": 4,
-   "viewRecords": 8,
-   "pageErrors": 0,
-   "externalRequests": 0
-  },
-  {
-   "profile": "png",
-   "suite": "batch3",
-   "checks": 11,
-   "viewRecords": 0,
-   "pageErrors": 0,
-   "externalRequests": 0
-  },
-  {
-   "profile": "png",
-   "suite": "experience",
-   "checks": 24,
-   "viewRecords": 0,
-   "pageErrors": 0,
-   "externalRequests": null
-  },
-  {
-   "profile": "png",
-   "suite": "release",
-   "checks": 7,
-   "viewRecords": 0,
-   "pageErrors": 0,
-   "externalRequests": 0
-  },
-  {
-   "profile": "png",
-   "suite": "release-1.2",
-   "checks": 28,
-   "viewRecords": 0,
-   "pageErrors": 0,
-   "externalRequests": 0
-  }
- ],
- "browserChecks": 174,
- "viewRecords": 36,
- "realInputSuite": {
-  "script": "game/scripts/qa-release-1.2-browser.mjs",
-  "checksPerProfile": 28,
-  "failsOn1_1At": "choice card body selects with real mouse 1440x900"
- },
- "playerPackage": {
-  "entries": [
-   {
-    "entry": "开始游戏.html",
-    "viewport": "1440x900"
-   },
-   {
-    "entry": "兼容版/开始游戏_PNG.html",
-    "viewport": "390x844"
-   }
-  ],
-  "offline": true,
-  "normalLaunch": true,
-  "movementAndDash": true,
-  "pause": true,
-  "saveSurvivesReload": true,
-  "errors": 0,
-  "externalRequests": 0
- },
- "introduction": {
-  "built": true,
-  "tested": true,
-  "versionLabelsMatch": "1.2"
- },
- "simulations": {
-  "seed": "release-v1.0",
-  "runs": 18,
-  "wins": 16,
-  "losses": 2,
-  "snapshotChecks": 2811,
-  "fullyIdenticalRecordsTo1_1": 18
- },
- "layout": {
-  "method": "same Playwright measurement on 1.1 and 1.2 offline HTML",
-  "journeyBodyPx": {
-   "320x568": [
-    9,
-    185
-   ],
-   "360x640": [
-    81,
-    264
-   ],
-   "375x667": [
-    160,
-    291
-   ],
-   "667x375": [
-    73,
-    146
-   ],
-   "744x430": [
-    16,
-    160
-   ],
-   "820x560": [
-    89,
-    233
-   ],
-   "568x320": [
-    18,
-    77
-   ]
-  },
-  "restBodyPx": {
-   "320x568": [
-    54,
-    178
-   ],
-   "360x640": [
-    126,
-    250
-   ],
-   "568x320": [
-    113,
-    113
-   ]
-  },
-  "launchDockVisibleWithoutScroll": "all batch1 sizes 1440x1000 to 320x280"
- },
- "cleanVerification": {
-  "pathWithSpaceAndCJK": true,
-  "npmCi": true,
-  "check": true,
-  "auditGate": true,
-  "webBuild": true,
-  "offlineBuilds": true,
-  "identicalHTML": true,
-  "identicalSourceArchive": true,
-  "identicalPlayerPackage": true,
-  "identicalChecksums": true
- },
- "boundaries": [
-  "No physical phone validation",
-  "No human win-rate claim",
-  "Reference image rights pending author confirmation",
-  "Nine source-wording groups pending verification",
-  "Rule-changing findings (fire spirit, replay insight, reserve buy/sell, live-array sweeps) deferred to a gated rules update"
- ],
- "sourceArchiveFiles": 614,
- "playtestBatch1": {
+  "version": "1.2",
   "date": "2026-10-08",
-  "source": "local-archive/playtests/2026-10-08-thirty-players (30 automated agents; not human or device testing)",
-  "implemented": [
-   "G01",
-   "G02",
-   "G31"
-  ],
-  "deferred": 28,
-  "rulesChanged": false,
-  "measurements": {
-   "G01_resultDialogScrollOverClientWidth": {
-    "320x568": [
-     "585/278",
-     "278/278"
-    ],
-    "360x640": [
-     "585/318",
-     "318/318"
-    ],
-    "568x320": [
-     "581/526",
-     "526/526"
-    ]
-   },
-   "G01_sigilTableFitsAt320": true,
-   "G02_restHintOverlapsSkills568x320": [
-    true,
-    false
-   ],
-   "G02_restHintInSummary": true,
-   "G31_lingxiLabel": [
-    "原著器物 / 协战",
-    "游戏化器物"
-   ]
+  "environment": {
+    "os": "macOS arm64",
+    "node": "24.15.0",
+    "npm": "11.12.1"
   },
-  "browserChecksAdded": 5
- }
+  "automated": {
+    "tests": 559,
+    "passed": 559,
+    "failed": 0,
+    "skipped": 0,
+    "newRegressionTests": 12,
+    "newRegressionTestsFailOn1_1": 10,
+    "playtestBatch1RegressionTestsFailOnPrior1_2": 2
+  },
+  "lint": {
+    "newDiagnostics": 0,
+    "unchangedBaseline": 19
+  },
+  "typescript": true,
+  "audit": {
+    "gate": "npm run audit:gate",
+    "passed": true,
+    "highOrCritical": 1,
+    "registeredUnfixedUpstream": [
+      "GHSA-vfj7-8cjw-p6xm"
+    ],
+    "resolvedThisRelease": [
+      "GHSA-5gmw-xhrv-c9v3",
+      "GHSA-85c8-ppgw-ccpr",
+      "GHSA-jqcg-44mw-7w3h",
+      "GHSA-wq5f-xc86-pv6w",
+      "GHSA-68fv-2mgg-jv7q",
+      "GHSA-6qxp-vccf-f47h"
+    ],
+    "bundledPackagesChanged": 0
+  },
+  "dependencyInventory": {
+    "lockEntries": 699,
+    "licenseTexts": 272,
+    "bundledInOffline": 15,
+    "regeneratedWith": "npm run docs:deps"
+  },
+  "browser": [
+    {
+      "profile": "webp",
+      "suite": "batch1",
+      "checks": 13,
+      "viewRecords": 10,
+      "pageErrors": 0,
+      "externalRequests": 0
+    },
+    {
+      "profile": "webp",
+      "suite": "batch2",
+      "checks": 4,
+      "viewRecords": 8,
+      "pageErrors": 0,
+      "externalRequests": 0
+    },
+    {
+      "profile": "webp",
+      "suite": "batch3",
+      "checks": 11,
+      "viewRecords": 0,
+      "pageErrors": 0,
+      "externalRequests": 0
+    },
+    {
+      "profile": "webp",
+      "suite": "experience",
+      "checks": 24,
+      "viewRecords": 0,
+      "pageErrors": 0,
+      "externalRequests": null
+    },
+    {
+      "profile": "webp",
+      "suite": "release",
+      "checks": 7,
+      "viewRecords": 0,
+      "pageErrors": 0,
+      "externalRequests": 0
+    },
+    {
+      "profile": "webp",
+      "suite": "release-1.2",
+      "checks": 28,
+      "viewRecords": 0,
+      "pageErrors": 0,
+      "externalRequests": 0
+    },
+    {
+      "profile": "png",
+      "suite": "batch1",
+      "checks": 13,
+      "viewRecords": 10,
+      "pageErrors": 0,
+      "externalRequests": 0
+    },
+    {
+      "profile": "png",
+      "suite": "batch2",
+      "checks": 4,
+      "viewRecords": 8,
+      "pageErrors": 0,
+      "externalRequests": 0
+    },
+    {
+      "profile": "png",
+      "suite": "batch3",
+      "checks": 11,
+      "viewRecords": 0,
+      "pageErrors": 0,
+      "externalRequests": 0
+    },
+    {
+      "profile": "png",
+      "suite": "experience",
+      "checks": 24,
+      "viewRecords": 0,
+      "pageErrors": 0,
+      "externalRequests": null
+    },
+    {
+      "profile": "png",
+      "suite": "release",
+      "checks": 7,
+      "viewRecords": 0,
+      "pageErrors": 0,
+      "externalRequests": 0
+    },
+    {
+      "profile": "png",
+      "suite": "release-1.2",
+      "checks": 28,
+      "viewRecords": 0,
+      "pageErrors": 0,
+      "externalRequests": 0
+    }
+  ],
+  "browserChecks": 174,
+  "viewRecords": 36,
+  "realInputSuite": {
+    "script": "game/scripts/qa-release-1.2-browser.mjs",
+    "checksPerProfile": 28,
+    "failsOn1_1At": "choice card body selects with real mouse 1440x900"
+  },
+  "playerPackage": {
+    "entries": [
+      {
+        "entry": "开始游戏.html",
+        "viewport": "1440x900"
+      },
+      {
+        "entry": "兼容版/开始游戏_PNG.html",
+        "viewport": "390x844"
+      }
+    ],
+    "offline": true,
+    "normalLaunch": true,
+    "movementAndDash": true,
+    "pause": true,
+    "saveSurvivesReload": true,
+    "errors": 0,
+    "externalRequests": 0
+  },
+  "introduction": {
+    "built": true,
+    "tested": true,
+    "versionLabelsMatch": "1.2"
+  },
+  "simulations": {
+    "seed": "release-v1.0",
+    "runs": 18,
+    "wins": 16,
+    "losses": 2,
+    "snapshotChecks": 2811,
+    "fullyIdenticalRecordsTo1_1": 18
+  },
+  "layout": {
+    "method": "same Playwright measurement on 1.1 and 1.2 offline HTML",
+    "journeyBodyPx": {
+      "320x568": [
+        9,
+        185
+      ],
+      "360x640": [
+        81,
+        264
+      ],
+      "375x667": [
+        160,
+        291
+      ],
+      "667x375": [
+        73,
+        146
+      ],
+      "744x430": [
+        16,
+        160
+      ],
+      "820x560": [
+        89,
+        233
+      ],
+      "568x320": [
+        18,
+        77
+      ]
+    },
+    "restBodyPx": {
+      "320x568": [
+        54,
+        178
+      ],
+      "360x640": [
+        126,
+        250
+      ],
+      "568x320": [
+        113,
+        113
+      ]
+    },
+    "launchDockVisibleWithoutScroll": "all batch1 sizes 1440x1000 to 320x280"
+  },
+  "cleanVerification": {
+    "pathWithSpaceAndCJK": true,
+    "npmCi": true,
+    "check": true,
+    "auditGate": true,
+    "webBuild": true,
+    "offlineBuilds": true,
+    "identicalHTML": true,
+    "identicalSourceArchive": true,
+    "identicalPlayerPackage": true,
+    "identicalChecksums": true
+  },
+  "boundaries": [
+    "No physical phone validation",
+    "No human win-rate claim",
+    "Reference image rights pending author confirmation",
+    "Nine source-wording groups pending verification",
+    "Rule-changing findings (fire spirit, replay insight, reserve buy/sell, live-array sweeps) deferred to a gated rules update"
+  ],
+  "sourceArchiveFiles": 614,
+  "playtestBatch1": {
+    "date": "2026-10-08",
+    "source": "local-archive/playtests/2026-10-08-thirty-players (30 automated agents; not human or device testing)",
+    "implemented": [
+      "G01",
+      "G02",
+      "G31"
+    ],
+    "deferred": 28,
+    "rulesChanged": false,
+    "measurements": {
+      "G01_resultDialogScrollOverClientWidth": {
+        "320x568": [
+          "585/278",
+          "278/278"
+        ],
+        "360x640": [
+          "585/318",
+          "318/318"
+        ],
+        "568x320": [
+          "581/526",
+          "526/526"
+        ]
+      },
+      "G01_sigilTableFitsAt320": true,
+      "G02_restHintOverlapsSkills568x320": [
+        true,
+        false
+      ],
+      "G02_restHintInSummary": true,
+      "G31_lingxiLabel": [
+        "原著器物 / 协战",
+        "游戏化器物"
+      ]
+    },
+    "browserChecksAdded": 5
+  },
+  "latestFollowUpDate": "2026-10-11",
+  "priorityFive": {
+    "date": "2026-10-11",
+    "source": "local-archive/playtests/2026-10-11-thirty-players-realtime (30 AI players, normal speed, complete runs; original evidence unchanged)",
+    "scope": [
+      "T01",
+      "T02",
+      "T03",
+      "T06/T07",
+      "T15"
+    ],
+    "rulesChanged": false,
+    "saveSchemaChanged": false,
+    "method": "Automated tests and isolated browser state fixtures with real mouse, keyboard and emulated touch input. These are fix regressions, not additional natural-play runs or physical phone testing.",
+    "automated": {
+      "tests": 573,
+      "passed": 573,
+      "failed": 0,
+      "skipped": 0,
+      "addedSincePreviousAcceptance": 14
+    },
+    "lint": {
+      "newDiagnostics": 0,
+      "unchangedBaseline": 19
+    },
+    "typescript": true,
+    "webBuild": true,
+    "statParity": {
+      "cases": 648,
+      "exactFloatingPointAndFieldOrder": true,
+      "callbackStateOrder": true,
+      "frozenInputsAndForbiddenRNG": true
+    },
+    "illusion": {
+      "encounterVersions": [
+        1,
+        6,
+        7,
+        8
+      ],
+      "firstTwoGuideOnward": true,
+      "thirdSaysComplete": true,
+      "staleIllusionCuesClearedOnly": true,
+      "protectionSnapshotAndRNGPreserved": true
+    },
+    "browser": [
+      {
+        "profile": "webp",
+        "suite": "batch1",
+        "checks": 13,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "batch2",
+        "checks": 4,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "batch3",
+        "checks": 11,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "experience",
+        "checks": 24,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "release",
+        "checks": 7,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "release-1.2",
+        "checks": 34,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "batch1",
+        "checks": 13,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "batch2",
+        "checks": 4,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "batch3",
+        "checks": 11,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "experience",
+        "checks": 24,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "release",
+        "checks": 7,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "release-1.2",
+        "checks": 34,
+        "pageErrors": 0,
+        "externalRequests": 0
+      }
+    ],
+    "browserChecks": 186,
+    "effectivePreview": {
+      "K11": [
+        "21.25",
+        "34.85"
+      ],
+      "permanentPuppets": [
+        2,
+        3
+      ],
+      "puppetShield": [
+        8,
+        12
+      ],
+      "K03Cost": [
+        21,
+        17
+      ],
+      "reserve110Budget": [
+        5,
+        6
+      ],
+      "temporaryPuppetsExcluded": true
+    },
+    "defeatReview": {
+      "objectiveProgressFromFinalState": true,
+      "fatalSeparatedFromMainRecentType": true,
+      "boundedToLastFive": true,
+      "targetsSeparated": true,
+      "targetFilter": true,
+      "legacyMissingOutcomeNotGuessed": true
+    },
+    "sourceArchiveFiles": 615,
+    "evidence": "local-archive/fixes/2026-10-11-priority-five/",
+    "layoutBrowser": {
+      "reports": [
+        {
+          "profile": "webp",
+          "checks": 19,
+          "errors": 0,
+          "failures": 0,
+          "htmlSha256": "3b273f72e753fa7ed630a4135d69d1439fbd41c6a4c0124fb08322caee5c8f4b",
+          "method": "Built offline HTML. Explicit isolated UI state fixtures; real touch/keyboard activation. Not natural gameplay or phone hardware."
+        },
+        {
+          "profile": "png",
+          "checks": 19,
+          "errors": 0,
+          "failures": 0,
+          "htmlSha256": "a0fb3f9709f4a0fe6933dc4fa623d06a527f984cbb102732604bbe5991a30a5e",
+          "method": "Built offline HTML. Explicit isolated UI state fixtures; real touch/keyboard activation. Not natural gameplay or phone hardware."
+        }
+      ],
+      "checks": 38,
+      "viewports": [
+        "320x568",
+        "568x320",
+        "844x390",
+        "932x430",
+        "1024x768",
+        "1440x900",
+        "280x300"
+      ],
+      "candidateBenefitPrefixesVisible": true,
+      "completeRulesReachableByScroll": true,
+      "singleAccessibleSelectionPerCard": true,
+      "bossPhaseAndObjectiveClearOfHint": true,
+      "hintTouchTargetPx": [
+        44,
+        44
+      ],
+      "hintCanBeDismissed": true,
+      "lifeTextGlyphsNotClipped": true
+    }
+  },
+  "priorityBatch2": {
+    "date": "2026-10-11",
+    "implemented": [
+      "T04",
+      "T05",
+      "T08",
+      "T12",
+      "T18",
+      "T24",
+      "T26",
+      "T29"
+    ],
+    "basis": "Original 30 normal-speed AI playtests; original report and suggestions unchanged.",
+    "rulesChanged": false,
+    "saveSchemaChanged": false,
+    "engineAndRuleFilesIdenticalToPriorSourceZip": 21,
+    "automated": {
+      "tests": 595,
+      "passed": 595,
+      "failed": 0,
+      "skipped": 0,
+      "addedSincePriorityFive": 22
+    },
+    "lint": {
+      "newDiagnostics": 0,
+      "unchangedBaseline": 19
+    },
+    "typescript": true,
+    "webBuild": true,
+    "method": "Isolated state fixtures, actual keyboard/mouse/touch inputs where stated, and native selectOption control changes. These are regression tests, not new natural-play runs or physical phone or screen-reader validation.",
+    "remainingThemes": 15,
+    "followUpBoundaries": {
+      "T07": "Budget previews complete; direct reserve-number shortcut remains a later usability option.",
+      "T12": "History explanation implemented; new fine-grained telemetry deferred.",
+      "T29": "Focus and card description implemented; combat keyboard focus/targeting is excluded."
+    },
+    "evidence": "local-archive/fixes/2026-10-11-priority-batch2/",
+    "sourceArchiveFiles": 622,
+    "focusedBrowser": [
+      {
+        "feature": "help",
+        "profile": "webp",
+        "checks": 15,
+        "errors": 0,
+        "failures": 0,
+        "htmlSha256": "14597bddb51e48875b41c68af8e3cb41bab882142539f68a3024db7ee9a6b2da"
+      },
+      {
+        "feature": "help",
+        "profile": "png",
+        "checks": 15,
+        "errors": 0,
+        "failures": 0,
+        "htmlSha256": "219352d87bb8c08f46c25c48af943948bbc86b52758a8122a2ec5040a1c98616"
+      },
+      {
+        "feature": "conditions",
+        "profile": "webp",
+        "checks": 27,
+        "errors": 0,
+        "failures": 0,
+        "htmlSha256": "14597bddb51e48875b41c68af8e3cb41bab882142539f68a3024db7ee9a6b2da"
+      },
+      {
+        "feature": "conditions",
+        "profile": "png",
+        "checks": 27,
+        "errors": 0,
+        "failures": 0,
+        "htmlSha256": "219352d87bb8c08f46c25c48af943948bbc86b52758a8122a2ec5040a1c98616"
+      },
+      {
+        "feature": "rest-result",
+        "profile": "webp",
+        "checks": 34,
+        "errors": 0,
+        "failures": 0,
+        "htmlSha256": "14597bddb51e48875b41c68af8e3cb41bab882142539f68a3024db7ee9a6b2da"
+      },
+      {
+        "feature": "rest-result",
+        "profile": "png",
+        "checks": 34,
+        "errors": 0,
+        "failures": 0,
+        "htmlSha256": "219352d87bb8c08f46c25c48af943948bbc86b52758a8122a2ec5040a1c98616"
+      }
+    ],
+    "focusedBrowserChecks": 152,
+    "helpWordLocationsChecked": 570,
+    "keyboardSelectDiagnostic": "The same headless native-select popup keyboard limitation reproduced in empty HTML and the game with no prevented events. Progress selection is tested using native selectOption; card and focus actions use actual keyboard events.",
+    "browser": [
+      {
+        "profile": "webp",
+        "suite": "batch1",
+        "checks": 13,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "batch2",
+        "checks": 4,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "batch3",
+        "checks": 11,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "experience",
+        "checks": 24,
+        "pageErrors": 0,
+        "externalRequests": null
+      },
+      {
+        "profile": "webp",
+        "suite": "release",
+        "checks": 7,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "release-1.2",
+        "checks": 34,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "priority-batch2",
+        "checks": 4,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "batch1",
+        "checks": 13,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "batch2",
+        "checks": 4,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "batch3",
+        "checks": 11,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "experience",
+        "checks": 24,
+        "pageErrors": 0,
+        "externalRequests": null
+      },
+      {
+        "profile": "png",
+        "suite": "release",
+        "checks": 7,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "release-1.2",
+        "checks": 34,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "priority-batch2",
+        "checks": 4,
+        "pageErrors": 0,
+        "externalRequests": 0
+      }
+    ],
+    "browserChecks": 194,
+    "browserRunLogs": [
+      "browser-full-02.log (WebP batch1 and batch2 passed before updating the collapsed-ending assertion)",
+      "browser-resume-03.log (remaining WebP suites and all PNG suites passed)"
+    ]
+  },
+  "priorityBatch3": {
+    "date": "2026-10-11",
+    "implemented": [
+      "T10",
+      "T11",
+      "T21",
+      "T22",
+      "T23"
+    ],
+    "completedFollowUp": [
+      "T07"
+    ],
+    "basis": "Original 30 normal-speed AI playtests; original report and suggestions unchanged.",
+    "rulesChanged": false,
+    "saveSchemaChanged": false,
+    "ruleAndSaveFilesIdenticalToPriorSourceZip": 19,
+    "engineOnlyAddsOptionalDisplayReasonArguments": true,
+    "touchTargetLegalityPredicateUnchanged": true,
+    "touchBehaviorParity": "Frozen baseline set/update/clear comparisons: complete snapshots, input buffers, cue durations, both random states and range-call counts. Display-only release history is held in a WeakMap, not saved.",
+    "automated": {
+      "tests": 621,
+      "passed": 621,
+      "failed": 0,
+      "skipped": 0,
+      "addedSincePriorityBatch2": 26
+    },
+    "lint": {
+      "newDiagnostics": 0,
+      "unchangedBaseline": 19
+    },
+    "typescript": true,
+    "webBuild": true,
+    "method": "Isolated explicit state fixtures and actual keyboard/mouse/touch inputs. These are regression checks, not new natural-play runs or physical-phone or screen-reader validation.",
+    "browser": [
+      {
+        "profile": "webp",
+        "suite": "batch1",
+        "checks": 13,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "batch2",
+        "checks": 4,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "batch3",
+        "checks": 11,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "experience",
+        "checks": 24,
+        "pageErrors": 0,
+        "externalRequests": null
+      },
+      {
+        "profile": "webp",
+        "suite": "release",
+        "checks": 7,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "release-1.2",
+        "checks": 34,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "priority-batch2",
+        "checks": 4,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "priority-batch3",
+        "checks": 5,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "batch1",
+        "checks": 13,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "batch2",
+        "checks": 4,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "batch3",
+        "checks": 11,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "experience",
+        "checks": 24,
+        "pageErrors": 0,
+        "externalRequests": null
+      },
+      {
+        "profile": "png",
+        "suite": "release",
+        "checks": 7,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "release-1.2",
+        "checks": 34,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "priority-batch2",
+        "checks": 4,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "priority-batch3",
+        "checks": 5,
+        "pageErrors": 0,
+        "externalRequests": 0
+      }
+    ],
+    "browserChecks": 204,
+    "browserRunLog": "browser-full-02.log",
+    "focusedBrowser": [
+      {
+        "feature": "combat-status",
+        "profile": "webp",
+        "checks": 16,
+        "errors": 0,
+        "failures": 0,
+        "htmlSha256": "26e0ce2236e1b59fa705ce485117f58a08f0f6285b22abaedb2647d51dd68f60"
+      },
+      {
+        "feature": "lock",
+        "profile": "webp",
+        "checks": 35,
+        "errors": 0,
+        "failures": 0,
+        "htmlSha256": "26e0ce2236e1b59fa705ce485117f58a08f0f6285b22abaedb2647d51dd68f60"
+      },
+      {
+        "feature": "consumables",
+        "profile": "webp",
+        "checks": 23,
+        "errors": 0,
+        "failures": 0,
+        "htmlSha256": "26e0ce2236e1b59fa705ce485117f58a08f0f6285b22abaedb2647d51dd68f60"
+      },
+      {
+        "feature": "combat-status",
+        "profile": "png",
+        "checks": 16,
+        "errors": 0,
+        "failures": 0,
+        "htmlSha256": "324158f2fc58343f2bfa86257499fad7aa506136a9ad1cc9a844fd43a6e97af5"
+      },
+      {
+        "feature": "lock",
+        "profile": "png",
+        "checks": 35,
+        "errors": 0,
+        "failures": 0,
+        "htmlSha256": "324158f2fc58343f2bfa86257499fad7aa506136a9ad1cc9a844fd43a6e97af5"
+      },
+      {
+        "feature": "consumables",
+        "profile": "png",
+        "checks": 23,
+        "errors": 0,
+        "failures": 0,
+        "htmlSha256": "324158f2fc58343f2bfa86257499fad7aa506136a9ad1cc9a844fd43a6e97af5"
+      }
+    ],
+    "focusedBrowserChecks": 148,
+    "keyboardReadOnlyRegression": "Reproduced accidental dash when Space activated a focused resource reader. Fixed input priority for reader activation; tested rebound Enter does not cast, and fresh Space after resume still dashes with focus on the field.",
+    "viewports": [
+      "320x568",
+      "568x320",
+      "844x390",
+      "1024x768"
+    ],
+    "remainingThemes": [
+      "T09",
+      "T13",
+      "T14",
+      "T16",
+      "T17",
+      "T19",
+      "T20",
+      "T25",
+      "T27",
+      "T28"
+    ],
+    "followUpBoundaries": {
+      "T07": "Actual budget and direct reserve-number explanation are now implemented.",
+      "T11": "Existing source calculation is exposed; unrecorded acquisition history is not reconstructed.",
+      "T12": "Additional fine-grained historical telemetry remains deferred.",
+      "T29": "Combat keyboard focus/targeting remains excluded."
+    },
+    "evidence": "local-archive/fixes/2026-10-11-priority-batch3/",
+    "sourceArchiveFiles": 632
+  },
+  "priorityBatch4": {
+    "date": "2026-10-11",
+    "implementedInPriorityOrder": [
+      "T16",
+      "T27",
+      "T17",
+      "T09",
+      "T28"
+    ],
+    "basis": "Original normal-speed 30 AI player report preserved. Same P3 tier: prioritize decisions and review accessibility supported by existing data.",
+    "rulesChanged": false,
+    "saveSchemaChanged": false,
+    "coreFilesIdenticalToPriorSourceZip": 25,
+    "automated": {
+      "tests": 640,
+      "passed": 640,
+      "failed": 0,
+      "skipped": 0,
+      "addedSincePriorityBatch3": 19
+    },
+    "lint": {
+      "newDiagnostics": 0,
+      "unchangedBaseline": 19
+    },
+    "typescript": true,
+    "webBuild": true,
+    "browser": [
+      {
+        "profile": "webp",
+        "suite": "batch1",
+        "checks": 13,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "batch2",
+        "checks": 4,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "batch3",
+        "checks": 11,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "experience",
+        "checks": 24,
+        "pageErrors": 0,
+        "externalRequests": null
+      },
+      {
+        "profile": "webp",
+        "suite": "release",
+        "checks": 7,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "release-1.2",
+        "checks": 34,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "priority-batch2",
+        "checks": 4,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "priority-batch3",
+        "checks": 5,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "priority-batch4",
+        "checks": 7,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "batch1",
+        "checks": 13,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "batch2",
+        "checks": 4,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "batch3",
+        "checks": 11,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "experience",
+        "checks": 24,
+        "pageErrors": 0,
+        "externalRequests": null
+      },
+      {
+        "profile": "png",
+        "suite": "release",
+        "checks": 7,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "release-1.2",
+        "checks": 34,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "priority-batch2",
+        "checks": 4,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "priority-batch3",
+        "checks": 5,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "priority-batch4",
+        "checks": 7,
+        "pageErrors": 0,
+        "externalRequests": 0
+      }
+    ],
+    "browserChecks": 218,
+    "browserRunLog": "browser-full-01.log",
+    "focusedBrowser": [
+      {
+        "feature": "reviews",
+        "profile": "webp",
+        "checks": 13,
+        "errors": 0,
+        "failures": 0,
+        "htmlSha256": "bb91420cb798e7eb5c347634fe584b922153eb31739b6b52b51b8a88d443605b"
+      },
+      {
+        "feature": "progress",
+        "profile": "webp",
+        "checks": 26,
+        "errors": 0,
+        "failures": 0,
+        "htmlSha256": "bb91420cb798e7eb5c347634fe584b922153eb31739b6b52b51b8a88d443605b"
+      },
+      {
+        "feature": "tactical-windows",
+        "profile": "webp",
+        "checks": 12,
+        "errors": 0,
+        "failures": 0,
+        "htmlSha256": "bb91420cb798e7eb5c347634fe584b922153eb31739b6b52b51b8a88d443605b"
+      },
+      {
+        "feature": "reviews",
+        "profile": "png",
+        "checks": 13,
+        "errors": 0,
+        "failures": 0,
+        "htmlSha256": "d017396625631bac4e90854d1cbc9e31007588404d8953e988dd2368ed4e1afc"
+      },
+      {
+        "feature": "progress",
+        "profile": "png",
+        "checks": 26,
+        "errors": 0,
+        "failures": 0,
+        "htmlSha256": "d017396625631bac4e90854d1cbc9e31007588404d8953e988dd2368ed4e1afc"
+      },
+      {
+        "feature": "tactical-windows",
+        "profile": "png",
+        "checks": 12,
+        "errors": 0,
+        "failures": 0,
+        "htmlSha256": "d017396625631bac4e90854d1cbc9e31007588404d8953e988dd2368ed4e1afc"
+      }
+    ],
+    "focusedBrowserChecks": 102,
+    "method": "Isolated declared state fixtures with actual mouse, keyboard and touch inputs; canvas text glyph bounds and screenshots where DOM does not apply. Real input and XP pickup paths within declared fixtures do not constitute natural play, physical phone or screen-reader validation.",
+    "pendingResultPractice": "Injected storage failure on an actual result. Cancel preserves result and disk; confirmation starts the existing full guided practice at step 0. Exact pending export matches after leaving practice; no formal storage writes.",
+    "timingBoundary": "Tactical cues read actual battle fields using local RAF without an independent countdown. Empty dodge produces neither counter nor shield; setup carryover stays carryover even after movement is released.",
+    "levelCap": "Level 160 displays retained XP without a next-level denominator or progress bar; missing candidates and queued choices remain distinct.",
+    "remainingThemesInPriorityOrder": [
+      "T19",
+      "T20",
+      "T25",
+      "T13",
+      "T14"
+    ],
+    "followUpBoundaries": {
+      "T17": "Existing per-cast data only; pair IDs and fire-line attribution not collected or inferred.",
+      "T13/T14": "Historical defense, stationary time and chapter resource flows require new event collection and explicit old-save boundaries.",
+      "T12": "Fine-grained historical damage telemetry remains deferred.",
+      "T29": "Combat keyboard targeting remains deferred."
+    },
+    "evidence": "local-archive/fixes/2026-10-11-priority-batch4/",
+    "sourceArchiveFiles": 640
+  },
+  "priorityBatch5": {
+    "date": "2026-10-12",
+    "started": "2026-10-11",
+    "implemented": [
+      "T19",
+      "T20"
+    ],
+    "basis": "Original 30 normal-speed AI player report unchanged. Prioritize settings return, current-size read-only preview and opt-in handed control grouping.",
+    "rulesChanged": false,
+    "saveFormatChanged": false,
+    "recordsSchemaChanged": false,
+    "unchangedCoreFilesAgainstPriorSourceZip": 28,
+    "touchLockFunctionsFromSupportsTouchLockUnchanged": true,
+    "newDevicePreference": {
+      "key": "suppliesFollowSkills",
+      "default": false,
+      "invalidOrMissing": "false",
+      "presets": "One functional transaction; preserve stick size, keymap and touch lock."
+    },
+    "automated": {
+      "tests": 650,
+      "passed": 650,
+      "failed": 0,
+      "skipped": 0,
+      "addedSincePriorityBatch4": 10
+    },
+    "lint": {
+      "newDiagnostics": 0,
+      "unchangedBaseline": 19
+    },
+    "typescript": true,
+    "webBuild": true,
+    "browser": [
+      {
+        "profile": "webp",
+        "suite": "batch1",
+        "checks": 13,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "batch2",
+        "checks": 4,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "batch3",
+        "checks": 11,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "experience",
+        "checks": 24,
+        "pageErrors": 0,
+        "externalRequests": null
+      },
+      {
+        "profile": "webp",
+        "suite": "release",
+        "checks": 7,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "release-1.2",
+        "checks": 34,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "priority-batch2",
+        "checks": 4,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "priority-batch3",
+        "checks": 5,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "priority-batch4",
+        "checks": 7,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "priority-batch5",
+        "checks": 7,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "batch1",
+        "checks": 13,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "batch2",
+        "checks": 4,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "batch3",
+        "checks": 11,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "experience",
+        "checks": 24,
+        "pageErrors": 0,
+        "externalRequests": null
+      },
+      {
+        "profile": "png",
+        "suite": "release",
+        "checks": 7,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "release-1.2",
+        "checks": 34,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "priority-batch2",
+        "checks": 4,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "priority-batch3",
+        "checks": 5,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "priority-batch4",
+        "checks": 7,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "priority-batch5",
+        "checks": 7,
+        "pageErrors": 0,
+        "externalRequests": 0
+      }
+    ],
+    "browserChecks": 232,
+    "browserRunLog": "browser-full-final.log",
+    "focusedBrowser": [
+      {
+        "feature": "settings",
+        "profile": "webp",
+        "checks": 43,
+        "pageErrors": 0,
+        "failures": 0,
+        "htmlSha256": "8c09858d008efc4d2c1999ecea8ec80acf483a35b219a47f834fbae369126cde"
+      },
+      {
+        "feature": "layout",
+        "profile": "webp",
+        "checks": 44,
+        "pageErrors": 0,
+        "failures": 0,
+        "htmlSha256": "8c09858d008efc4d2c1999ecea8ec80acf483a35b219a47f834fbae369126cde"
+      },
+      {
+        "feature": "settings",
+        "profile": "png",
+        "checks": 43,
+        "pageErrors": 0,
+        "failures": 0,
+        "htmlSha256": "08cf64d98e0ba1d311180f55903a7ca6236b11d2e8c7f35038a97c43a93c0695"
+      },
+      {
+        "feature": "layout",
+        "profile": "png",
+        "checks": 44,
+        "pageErrors": 0,
+        "failures": 0,
+        "htmlSha256": "08cf64d98e0ba1d311180f55903a7ca6236b11d2e8c7f35038a97c43a93c0695"
+      }
+    ],
+    "focusedBrowserChecks": 174,
+    "layoutMatrix": {
+      "viewports": [
+        "320x568",
+        "568x320",
+        "844x390",
+        "1024x768"
+      ],
+      "perProfile": {
+        "standardSideAndFollowCombinations": 32,
+        "largeStickCases": 8,
+        "noRunSamples": 4
+      },
+      "previewActualPairsIncludingRotation": 82,
+      "coordinateComparisons": 4592,
+      "maximumDifferenceCssPixels": 0,
+      "acceptanceThresholdCssPixels": 1,
+      "rotationCases": 2
+    },
+    "method": "Isolated declared state/storage fixtures and actual browser keyboard/touch/drag. Preview/actual coordinates, actual glyph bounds, screenshots and real live-control actions are checked. These are not additional natural-play runs, physical-phone or screen-reader validation. Console.error was not independently collected by the layout suite.",
+    "previewSafety": "Independent inert layout surface, shared actual controls with no-op actions, no run creation or persistence. Explicitly loading a real second-page test record closes the settings-only preview; cancel/failed-write/observation paths preserve their original storage behavior.",
+    "followUpBoundaries": {
+      "T19/R20-02": "Separate saved portrait and landscape profiles are not implemented; both orientations share one preference set.",
+      "T13/T14": "New historical effect/resource telemetry requires separate collection and legacy-save design.",
+      "T17": "No inferred pair IDs or fire-line attribution.",
+      "T29": "Combat keyboard targeting remains deferred."
+    },
+    "remainingThemesInPriorityOrder": [
+      "T25",
+      "T13",
+      "T14"
+    ],
+    "evidence": "local-archive/fixes/2026-10-11-priority-batch5/",
+    "sourceArchiveFiles": 650
+  },
+  "priorityBatch6": {
+    "date": "2026-10-12",
+    "implemented": [
+      "T25"
+    ],
+    "sourceSuggestionIds": [
+      "R01-04",
+      "R08-05",
+      "R21-05",
+      "R28-04"
+    ],
+    "basis": "Original 30 normal-speed AI player report and 150 suggestions unchanged. New work addresses observed first-win rewards, unlocks and current-run item states.",
+    "rulesChanged": false,
+    "saveFormatChanged": false,
+    "recordsSchemaChanged": false,
+    "automated": {
+      "tests": 674,
+      "passed": 674,
+      "failed": 0,
+      "skipped": 0,
+      "addedSincePriorityBatch5": 24
+    },
+    "lint": {
+      "newDiagnostics": 0,
+      "unchangedBaseline": 19
+    },
+    "typescript": true,
+    "webBuild": true,
+    "ruleAudit": {
+      "productFiles": 204,
+      "identicalProductFiles": 197,
+      "modifiedProductFiles": 4,
+      "addedProductFiles": 3,
+      "removedProductFiles": 0,
+      "baselineJavaScriptModulesCompared": 73,
+      "allBaselineJavaScriptModulesByteIdentical": true,
+      "settlementParityCases": 360,
+      "legacySavedMarkerParityCases": 128
+    },
+    "settlementDisplay": {
+      "source": "One original settleRunResult call, observed before/after in a WeakMap outside persistence.",
+      "firstVictory": "Story/seed victory from 0 to 1 wins, confirmed only after ordinary successful save with this run receipt.",
+      "priorOrMissing": "No inferred first victory or new payout. Existing recorded result is not settled again.",
+      "recovery": "Import/adoption is excluded from fresh-settlement confirmation.",
+      "balances": "Current saved balances update after manual growth actions; original captured gains stay unchanged.",
+      "navigation": "Saved result opens growth/configuration without launching/spending and can be returned to; changed next-run choices persist. Pending result uses existing retry/export first."
+    },
+    "itemDetails": {
+      "entries": 9,
+      "configurable": 5,
+      "evidence": "Only current run storyInventory/relics. Missing legacy ownership remains unknown.",
+      "futureItems": "Default folded directory warns about later items. Sealed story objects have no separate ownership receipt or equip action.",
+      "effects": "Shared base relic descriptions; existing core modifiers are separately explained.",
+      "readonly": "Full serialization, raw inventory, input, both RNG states, save object and every localStorage value matched across actual disclosure operations."
+    },
+    "fixedDuringAcceptance": [
+      "568x320 first-unlock label clipped below the result body: prioritize the label directly after the section title.",
+      "Opening the garden scrolled the research numeral above the viewport: scroll the garden section while focusing its title without scrolling.",
+      "Sticky save actions covered pending gains/balance text: keep original actions in normal flow before the outcome and add a navigation shortcut; acceptance also checks sibling occlusion."
+    ],
+    "method": "Isolated declared synthetic checkpoint/state/storage fixtures with actual browser keyboard/touch/download/retry. Not additional natural-speed runs or physical-device/screen-reader certification.",
+    "remainingThemesInPriorityOrder": [
+      "T13",
+      "T14"
+    ],
+    "followUpBoundaries": {
+      "T13/T14": "Historical defense/stationary benefit and per-chapter damage/resource telemetry remain separate work; never infer unavailable history.",
+      "T19/R20-02": "Separate saved portrait/landscape preferences remain unimplemented.",
+      "T17/T12": "No invented pair/fire-line attribution or historical damage breakdown.",
+      "T29": "Combat keyboard targeting remains deferred."
+    },
+    "htmlSha256": {
+      "凡人修仙传_青竹剑阵.html": "c73182fecbcd625c353dd10dcff1a0b75d912285bcc6d00c8a676aa7391e83d5",
+      "凡人修仙传_青竹剑阵_兼容PNG.html": "d8abf7df1cdc1a78dd98597dac64b9d0c7de9d455a68dbd08981d6db386c9b2b"
+    },
+    "evidence": "local-archive/fixes/2026-10-12-priority-batch6/",
+    "focusedBrowser": [
+      {
+        "feature": "settlement/navigation",
+        "profile": "webp",
+        "checks": 19,
+        "failures": 0,
+        "pageErrors": 0,
+        "htmlSha256": "c73182fecbcd625c353dd10dcff1a0b75d912285bcc6d00c8a676aa7391e83d5",
+        "evidence": "local-archive/fixes/2026-10-12-priority-batch6/outcome-ui/final-webp/report.json",
+        "externalRequests": 0
+      },
+      {
+        "feature": "settlement/navigation",
+        "profile": "png",
+        "checks": 19,
+        "failures": 0,
+        "pageErrors": 0,
+        "htmlSha256": "d8abf7df1cdc1a78dd98597dac64b9d0c7de9d455a68dbd08981d6db386c9b2b",
+        "evidence": "local-archive/fixes/2026-10-12-priority-batch6/outcome-ui/final-png/report.json",
+        "externalRequests": 0
+      },
+      {
+        "feature": "item details",
+        "profile": "webp",
+        "checks": 15,
+        "pageErrors": 0,
+        "failures": 0,
+        "externalRequests": null,
+        "htmlSha256": "c73182fecbcd625c353dd10dcff1a0b75d912285bcc6d00c8a676aa7391e83d5",
+        "evidence": "local-archive/fixes/2026-10-12-priority-batch6/story-items/webp/2026-10-11T17-12-18.093Z/report.json"
+      },
+      {
+        "feature": "item details",
+        "profile": "png",
+        "checks": 15,
+        "pageErrors": 0,
+        "failures": 0,
+        "externalRequests": null,
+        "htmlSha256": "d8abf7df1cdc1a78dd98597dac64b9d0c7de9d455a68dbd08981d6db386c9b2b",
+        "evidence": "local-archive/fixes/2026-10-12-priority-batch6/story-items/png/2026-10-11T17-12-18.091Z/report.json"
+      }
+    ],
+    "focusedBrowserTotal": 68,
+    "browser": [
+      {
+        "profile": "webp",
+        "suite": "batch1",
+        "checks": 13,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "batch2",
+        "checks": 4,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "batch3",
+        "checks": 11,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "experience",
+        "checks": 24,
+        "pageErrors": 0,
+        "externalRequests": null
+      },
+      {
+        "profile": "webp",
+        "suite": "release",
+        "checks": 7,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "release-1.2",
+        "checks": 34,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "priority-batch2",
+        "checks": 4,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "priority-batch3",
+        "checks": 5,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "priority-batch4",
+        "checks": 7,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "priority-batch5",
+        "checks": 7,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "webp",
+        "suite": "priority-batch6",
+        "checks": 5,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "batch1",
+        "checks": 13,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "batch2",
+        "checks": 4,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "batch3",
+        "checks": 11,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "experience",
+        "checks": 24,
+        "pageErrors": 0,
+        "externalRequests": null
+      },
+      {
+        "profile": "png",
+        "suite": "release",
+        "checks": 7,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "release-1.2",
+        "checks": 34,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "priority-batch2",
+        "checks": 4,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "priority-batch3",
+        "checks": 5,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "priority-batch4",
+        "checks": 7,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "priority-batch5",
+        "checks": 7,
+        "pageErrors": 0,
+        "externalRequests": 0
+      },
+      {
+        "profile": "png",
+        "suite": "priority-batch6",
+        "checks": 5,
+        "pageErrors": 0,
+        "externalRequests": 0
+      }
+    ],
+    "visibilityVerification": {
+      "outcomeSamples": 112,
+      "textRectangles": 442,
+      "method": "Actual text Range geometry with clipping ancestors and elementFromPoint sibling-occlusion checks; plus visual screenshot review.",
+      "reviewedOutcomeScreenshots": 20
+    },
+    "browserTotal": 242,
+    "sourceArchiveFiles": 656,
+    "totalBrowserChecksIncludingFocused": 310,
+    "deliveryEvidence": "local-archive/fixes/2026-10-12-priority-batch6/delivery-verification.json"
+  }
 }

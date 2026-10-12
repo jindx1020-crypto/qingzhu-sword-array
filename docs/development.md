@@ -1,4 +1,4 @@
-# 开发与构建 · 1.2
+# 开发与构建 · 1.3
 
 ## 环境
 
@@ -22,7 +22,7 @@ React 与 Canvas 通过 Game 组件桥接；战斗引擎维护可变状态，Rea
 | game/scripts | 构建、文档表格、验收、模拟与测试夹具 |
 | game/tests | 当前与历史规则的回归测试 |
 | docs | 当前开发、许可、验收、改编与发布说明 |
-| release/1.2、release/video | 游戏发布附件、介绍视频成品；构建生成，不提交 Git |
+| release/1.3、release/video | 游戏发布附件、介绍视频成品；构建生成，不提交 Git |
 | local-archive | 本地旧源码、测试原文、方案、参考素材和旧交付；不公开 |
 | game/qa | 当前验证输出目录，按需创建；旧输出已归档 |
 
@@ -61,7 +61,7 @@ npm run check:release
 
 - `check`：lint、全部规则测试、TypeScript；JS 未全面启用 checkJs，不将此描述为全引擎类型认证。
 - lint 基线只有 19 条原通用组件诊断，并锁定文件哈希；不允许扩大基线来掩盖新诊断。
-- `test:browser`：项目内 Playwright 的 Chromium，两个离线变体分别运行六组检查，其中 `qa-release-1.2-browser.mjs` 以真实鼠标、触屏与键盘输入覆盖整卡点击、弹窗上方提示、小屏正文、练习靶位、连点、冲突重提示等 1.2 修复；输出在 game/qa/release，可包含合成存档、截图和声音片段，不进源码包。
+- `test:browser`：项目内 Playwright 的 Chromium，两个离线变体分别运行十一组套件。`qa-release-1.2-browser.mjs` 保留历史名称并继续覆盖整卡点击、弹窗提示、小屏正文、练习靶位、连点和冲突重提示；五组 priority 回归继续覆盖后续显示、输入、设置与结算改进。运行对象为当前构建成品，结果不能由套件文件名推断版本。输出在 game/qa/release，可包含合成存档、截图和声音片段，不进源码包。
 - Linux 可用 `npx playwright install --with-deps chromium` 安装系统依赖。需指定已安装 Chromium 时设置 `PLAYWRIGHT_CHROMIUM_EXECUTABLE`；默认不使用个人浏览器资料。
 - 单组调试可执行 `node scripts/release-browser.mjs`；`QINGZHU_ASSET_PROFILE=png` 选择 PNG，`QINGZHU_HTML` 可指定待测文件。
 - 普通打开不暴露调试接口；只有 `?test=1` 暴露 `window.__FANREN__`。测试中的合成完成或改位仅用于检查界面与保存，不作通关速度证据。
@@ -72,7 +72,7 @@ npm run check:release
 
 ## 发布产物
 
-产物位置统一定义在 `scripts/delivery-paths.mjs`。游戏发布附件进入 `release/<游戏版本>/`，当前为 `release/1.2/`；根目录两个同名 HTML 保留直接游玩入口，与发布副本逐字节相同。`npm run build:intro` 将视频介绍 HTML、口播稿副本和录制说明写入 `release/video/`。
+产物位置统一定义在 `scripts/delivery-paths.mjs`。游戏发布附件进入 `release/<游戏版本>/`，当前为 `release/1.3/`；根目录两个同名 HTML 保留直接游玩入口，与发布副本逐字节相同。`npm run build:intro` 将视频介绍 HTML、口播稿副本和录制说明写入 `release/video/`。
 
 `build:release` 校验原图／编码哈希、嵌入文档、构建两份离线 HTML，恢复默认 WebP 配置，生成白名单源码 ZIP、免安装玩家 ZIP、SHA256SUMS.txt 与 release-manifest.json。玩家包包含直接运行的 HTML、PNG 兼容入口、先读我和对应源码；构建脚本不放在玩家入口目录。源码包固定 ZIP 时间戳并解压回读比对，不靠 Python 或系统 zip。开始时删除发布目录中旧的 SHA256SUMS.txt、release-manifest.json 与 github/，之后须重新执行 `prepare:github`。
 
@@ -86,4 +86,4 @@ WebP 与 PNG 的离线画面应在浏览器中核对；半透明预乘通道可�
 
 旧规则快照现在与 `scripts/fixtures/pre-balance4/` 中经哈希封存的独立旧引擎，在同一个 Node 运行时进行完整快照哈希对比。原 54 行归档与派生数值夹具保持；不靠跨 CPU／运行时的序列化哈希替代兼容性验证，不放宽数字容差或跳过用例。
 
-发布 GitHub 前运行 `npm run prepare:github`，在 release/1.2/github/ 生成逐字节相同的英文附件及对应校验清单，避免平台把中文文件名改成下划线。
+发布 GitHub 前运行 `npm run prepare:github`，在 release/1.3/github/ 生成逐字节相同的英文附件及对应校验清单，避免平台把中文文件名改成下划线。当前状态见 [1.3 验收报告](release-1.3.md)；历史报告保留当时结果。

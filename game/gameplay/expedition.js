@@ -21,6 +21,7 @@ import {beginPracticeStep,updatePractice} from './practice.js';
 import {sigilFuse} from './sigil-metrics.js';
 import {BALANCE_VERSION,reserveRestoration,phase3Balance,puppetReady,sigilPairFuse,enemyDamageScale} from './balance.js';
 import {shieldReward,restoreFeedback,recordHit} from './combat-feedback.js';
+import {shieldCoreMultiplier} from './stat-sources.js';
 import {validateCommonSnapshot,validateWorldSnapshot} from './snapshot-validation.js';
 import {validateEncounterState} from './encounter-validation.js';
 import {validateSnapshotRelations} from './snapshot-relations.js';
@@ -30,6 +31,7 @@ import {Battle} from './engine.js';
 import {CHAPTERS,PATHS,TRAITS,RELICS,CONSUMABLES,ENEMIES,EVENTS,seeded,hashSeed} from './data.js';
 import {EXPEDITIONS,CORES,CHAINS,CINEMATICS,SUPPLIES,coreEligible} from './expedition-data.js';
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,n)),distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y),copy=x=>structuredClone(x);
+const ILLUSION_CUE_KEYS=new Set(['illusion-true','illusion-false','illusion-return']);
 export const EQUIPMENT=[...RELICS,...CORES];
 const segmentDistance=(p,a,b)=>{const dx=b.x-a.x,dy=b.y-a.y,t=clamp(((p.x-a.x)*dx+(p.y-a.y)*dy)/(dx*dx+dy*dy||1),0,1);return Math.hypot(p.x-a.x-dx*t,p.y-a.y-dy*t);};
 export class Expedition extends Battle{
@@ -65,6 +67,9 @@ export class Expedition extends Battle{
  }
  beginNode(){
   if(this.node.selected===null){this.toast('请先选择下一条路线');return;}
+  // Menus pause cue lifetimes. Drop only the previous illusion's presentation on entering a node;
+  // its protection is objective state, while formation/skill confirmations keep their own lifetimes.
+  this.combatCues=this.combatCues.filter(c=>!ILLUSION_CUE_KEYS.has(c.key));for(const key of ILLUSION_CUE_KEYS)delete this.cueTimers[key];
   this.rest=null;this.waveTime=0;this.nodeStartXP=this.totalXP;this.nodeDropXP=0;this.nodeStartHits=this.hitCount;this.nodeStartThunder=this.thunders;this.spawnBudget=0;this.nextElite=32;this.nextEscort=15;this.nextHazard=12;this.midEncounter=null;this.mechanism=null;this.boss=null;this.bossEnding=0;this.objective=null;this.targetCache={};this.clearField();
   beginGrowthNode(this);beginDirectorNode(this);
   const e=this.encounter,k=e.kind;if(latePressure(this)&&!['serpent','ghost','puppet','xuangu'].includes(k)){const profile=mechanismPressure(this)?mechanismProfile(this):null;this.spawnBudget=profile?.opening??6;this.nextElite=profile?.firstElite??22;}this.player.x=k==='escape'?210:640;this.player.y=520;this.player.invuln=Math.max(this.player.invuln,1);
@@ -103,7 +108,7 @@ export class Expedition extends Battle{
   updatePursuit(this);
   const k=this.encounter.kind,q=this.objective,p=this.player;
   if(k==='treasure'){const m=this.mechanism,stepSeconds=treasureStepSeconds(this);if(distance(p,m)<m.r){m.progress+=dt;if(Math.floor(m.progress/stepSeconds)>m.step&&m.progress<m.goal){m.step++;m.x=[430,850,640][m.step];m.y=[400,430,260][m.step];this.toast('敛息 '+m.step+' / 3 已成 · 前往下一阵位');this.cue('treasure-step','阵位 '+(m.step+1)+' / 3 · 顺着指引转移','#b8e8d0',3);}}if(m.progress>=m.goal){this.completeNode();return;}if(!mechanismPressure(this))return;}
-  if(k==='illusion'){q.cool=Math.max(0,q.cool-dt);if(this.waveTime>=q.next&&q.cool===0){const at=q.gates.findIndex(g=>distance(p,g)<65);if(at>=0){if(this.options.encounterVersion>=7){q.returnProtectedUntil=this.time+.45;this.cue('illusion-return','落点保护 · 0.45秒','#a9e6ef',.45);}if(at===q.trueGate){q.done++;q.next=Math.max(q.next+10,this.waveTime+2);q.trueGate=illusionTrueGate(q);this.player.x=640;this.player.y=560;this.toast('神识辨真 · '+q.done+' / 3');this.cue('illusion-true','已辨真 '+q.done+' / 3 · 寻找下一道双环','#c7edd0',3);if(q.done===3){this.completeNode();return;}}else{q.cool=2;this.player.y=560;this.toast('虚妄之门 · 观察「真」字与双环');this.cue('illusion-false','此门为虚 · 已退回，观察真字与双环','#ecc3ac',2);}}}if(!mechanismPressure(this))return;}
+  if(k==='illusion'){q.cool=Math.max(0,q.cool-dt);if(this.waveTime>=q.next&&q.cool===0){const at=q.gates.findIndex(g=>distance(p,g)<65);if(at>=0){if(this.options.encounterVersion>=7){q.returnProtectedUntil=this.time+.45;this.cue('illusion-return','落点保护 · 0.45秒','#a9e6ef',.45);}if(at===q.trueGate){q.done++;q.next=Math.max(q.next+10,this.waveTime+2);q.trueGate=illusionTrueGate(q);this.player.x=640;this.player.y=560;this.toast('神识辨真 · '+q.done+' / 3');this.cue('illusion-true','已辨真 '+q.done+' / 3 · '+(q.done===3?'幻境已破':'寻找下一道双环'),'#c7edd0',3);if(q.done===3){this.completeNode();return;}}else{q.cool=2;this.player.y=560;this.toast('虚妄之门 · 观察「真」字与双环');this.cue('illusion-false','此门为虚 · 已退回，观察真字与双环','#ecc3ac',2);}}}if(!mechanismPressure(this))return;}
   if(k==='ice'){q.r=Math.min(380,40+this.waveTime*8.5);if(distance(p,q)<q.r)this.hitPlayer((14+this.chapter*2)*this.difficulty.damage,true,{name:'乾蓝冰焰',x:q.x,y:q.y,kind:'险地'});if(this.waveTime>=FIXED_NODE_SECONDS.ice&&distance(p,q.exit)<q.exit.r){this.completeNode();return;}if(!mechanismPressure(this))return;}
   if(k==='defend'){q.invuln=Math.max(0,q.invuln-dt);if(this.encounter.variant===2){q.x=640+Math.sin(this.waveTime*.045)*220;q.y=360+Math.cos(this.waveTime*.045)*80;}if(this.waveTime>=FIXED_NODE_SECONDS.defend){this.completeNode();return;}}
   if(k==='hunt'&&this.encounter.variant===0)for(const e of this.enemies.filter(e=>e.mission==='marked'))e.untargetable=this.enemies.some(g=>g.hp>0&&g.guarded===e.id);
@@ -262,7 +267,7 @@ export class Expedition extends Battle{
  sell(index){if(this.modeState!=='rest'||!Number.isInteger(index)||!this.relics[index])return;const id=this.relics[index],p=this.player,hp=p.hp/p.maxHp,shield=p.shield;this.relics.splice(index,1);this.gold+=Math.floor((this.paidPrices[id]||0)*.4);delete this.paidPrices[id];this.recalc();p.hp=p.maxHp*hp;p.shield=shield;this.checkpoint();}
  refreshShop(){const ok=super.refreshShop();if(ok)this.checkpoint();return ok;}
  toggleLock(i){super.toggleLock(i);this.checkpoint();}
- recalc(){super.recalc();if(!this.player)return;const factor=this.hasCore('K11')?.85:this.hasCore('K12')?.75:1;this.player.maxShield=(this.stats.shield||0)*factor;this.player.shield=Math.max(0,this.player.shield);}
+ recalc(){super.recalc();if(!this.player)return;const factor=shieldCoreMultiplier(this);this.player.maxShield=(this.stats.shield||0)*factor;this.player.shield=Math.max(0,this.player.shield);}
  orbitMultiplier(){return this.hasCore('K02')?1.4:1;}
  swordDamage(e){return super.swordDamage(e)*(this.hasCore('K01')?.9:this.hasCore('K02')?.88:1);}
  onSwordLaunch(sw){sw.returnReady=true;}

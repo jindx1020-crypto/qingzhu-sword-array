@@ -394,3 +394,259 @@ h3{font-size:17px;letter-spacing:1px;font-weight:500;margin:20px 0 14px}.muted{c
 /* 1.2 playtest G02: the compact HUD's reserve column is 80px wide; the rest hint (shown again above for the absolute reserve row)
    overflowed onto 闪避 and 神雷 at 568×320. As on other compact screens it stays in the 战况 summary instead. */
 .hud-compact .skill-controls .reserve-label>.reserve-rest-hint:last-child{display:none}
+
+/* 1.2 priority T01: the dismissible size hint participates in the header's
+   controls, so the measured header (and the shared input/render camera) reserves
+   its space. It must never float on the boss identity or objective rows. */
+.fanren.space-limited .battle-counters .small-window-advice{position:static;inset:auto;display:flex;align-items:center;justify-content:center;flex:0 0 44px;width:44px;min-width:44px;max-width:44px;height:44px;min-height:44px;padding:3px;box-sizing:border-box;white-space:normal;text-align:center;font-size:11px;line-height:16px;letter-spacing:0;pointer-events:auto;z-index:auto}
+.battle-counters .small-window-advice:focus-visible{outline:2px solid #e0cc8c;outline-offset:2px}
+@media(max-width:300px){.hud-compact .battle-header{grid-template-columns:minmax(100px,1fr) auto}}
+
+/* T03: candidates precede the unchanged explanatory blocks in the DOM. Keep
+   their real gains near the top, without another click target or CSS reordering. */
+.scene-choice .choice-grid{grid-template-columns:repeat(3,minmax(0,1fr));flex:none}
+.scene-choice .choice-card{min-width:0;overflow-wrap:anywhere}
+.scene-choice .choice-chain,.scene-choice .choice-note{flex:none;min-width:0}
+.scene-choice .choice-card .trait-effective{flex:none;margin:5px 0 7px;padding-left:6px;border-left:2px solid #b6c989;color:#e7d9aa;font-size:12px;line-height:1.45;overflow-wrap:anywhere}
+@media(max-width:600px),(max-height:800px){
+ .game-dialog.scene-choice{padding:16px!important;gap:10px!important}
+ .scene-choice>.dialog-heading{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;gap:3px 8px;padding-bottom:7px}
+ .scene-choice .dialog-heading .eyebrow{display:block;grid-column:2;grid-row:1;font-size:11px;line-height:16px;letter-spacing:0;margin:0}
+ .scene-choice .dialog-heading [data-slot=dialog-title]{grid-column:1;grid-row:1;font-size:23px;line-height:28px;letter-spacing:2px;margin:0}
+ .scene-choice .dialog-heading [data-slot=dialog-description]{display:block;grid-column:1/-1;grid-row:2;font-size:12px;line-height:1.4;margin:0}
+ .scene-choice .panel-body>div{gap:12px}
+ .scene-choice .choice-grid{gap:10px}
+ .scene-choice .choice-card{min-height:0;padding:10px 12px}
+ .scene-choice .choice-sigil{display:none}
+ .scene-choice .choice-top,.scene-choice .choice-top small{font-size:11px;line-height:16px;gap:5px}
+ .scene-choice .choice-card h3{font-size:20px;line-height:25px;margin:5px 0 7px}
+ .scene-choice .choice-card p{flex:none;font-size:13px;line-height:1.5;margin:0 0 8px}
+ .scene-choice .choice-card .trait-effective{margin:3px 0 6px;font-size:12px;line-height:1.45}
+ .scene-choice .choice-card .trait-values{font-size:11px;line-height:1.45;margin-bottom:7px}
+ .scene-choice .choice-card footer{padding-top:7px}
+ .scene-choice .panel-action-dock{gap:6px;padding-top:7px}
+ .scene-choice .panel-action-dock>.muted{display:block;flex:1 1 180px;order:0;margin:0;max-width:none;font-size:11px;line-height:1.4}
+}
+@media(max-width:600px){.scene-choice .choice-grid{grid-template-columns:minmax(0,1fr)}}
+@media(max-height:460px){
+ .game-dialog.scene-choice{height:calc(100dvh - 16px);max-height:calc(100dvh - 16px)!important;padding:10px!important;gap:6px!important}
+ .scene-choice>.dialog-heading{padding-bottom:4px}
+ .scene-choice .dialog-heading [data-slot=dialog-title]{font-size:20px;line-height:24px}
+ .scene-choice .dialog-heading [data-slot=dialog-description]{font-size:11px;line-height:1.35}
+ .scene-choice .panel-body{padding-top:1px}
+ .scene-choice .panel-body>div{gap:8px}
+ .scene-choice .choice-card{padding:8px}
+ .scene-choice .choice-card h3{font-size:18px;line-height:22px;margin:3px 0 5px}
+ .scene-choice .choice-card p{font-size:12px;line-height:1.4;margin-bottom:6px}
+ .scene-choice .choice-card .trait-effective{font-size:12px;line-height:1.4;margin:2px 0 5px}
+ .scene-choice .choice-card footer{flex-wrap:nowrap;gap:5px;padding-top:5px}
+ .scene-choice .choice-card footer>span{min-width:0;font-size:11px;line-height:1.35}
+ .scene-choice .choice-card footer .scene-action{width:auto;min-width:60px;flex:0 0 auto;padding:6px 8px}
+ .scene-choice .panel-action-dock{padding-top:5px}
+ .scene-choice .panel-action-dock>.muted{flex:1 1 0;font-size:11px}
+}
+@media(min-width:500px) and (max-height:460px){.scene-choice .choice-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}}
+
+/* Failure review and computed candidate previews use normal flow and wrap even
+   at narrow result widths; no new min-content width or hidden explanation. */
+.scene-result .defeat-review{min-width:0;max-width:100%;padding:12px;border:1px solid #79684980;border-radius:6px;background:#30291b40;overflow-wrap:anywhere}
+.scene-result .defeat-review h3{margin:0 0 7px;font-size:16px;line-height:1.4}
+.scene-result .defeat-review p{min-width:0;max-width:100%;margin:5px 0;font-size:13px;line-height:1.55;white-space:normal;overflow-wrap:anywhere}
+.scene-result .defeat-review .defeat-objective{color:#ddd6b0}
+.scene-result .defeat-review .defeat-fatal{color:#e5bca4}
+.scene-result .defeat-review .defeat-dominant{color:#bdcebb}
+.hit-target-filter{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;min-width:0;max-width:100%;margin:10px 0;font-size:12px;color:#becdb8}
+.hit-target-filter label{min-width:0;max-width:100%;overflow-wrap:anywhere}
+.hit-target-filter select{min-width:0;max-width:100%;min-height:36px;flex:0 1 180px;padding:5px 8px;border:1px solid #78916c;border-radius:3px;background:#10281f;color:#e0e4cd;font-size:12px;white-space:normal}
+
+/* T18: search scrolls only the text and the matching table cell. Keep the
+   compact navigation outside that scrollport, including on short landscape. */
+.game-dialog.help-dialog{height:min(90dvh,960px);min-height:0;overflow:hidden!important;gap:10px!important}
+.help-dialog>[data-slot=dialog-title]{flex:none;margin:0;font-size:24px;line-height:30px;padding-right:32px}
+.help-dialog>[data-slot=dialog-description]{flex:none;display:block;margin:0;font-size:12px;line-height:17px}
+.help-dialog>.help-layout{flex:1 1 0;height:auto;min-height:0;overflow:hidden;gap:8px}
+.help-dialog .help-layout>.help-reader{flex:1 1 0;min-height:0;max-height:none;overflow:auto;overscroll-behavior:contain;padding:3px 8px 8px 3px}
+.help-dialog .help-tools{grid-template-columns:auto auto minmax(0,1fr);align-items:center;gap:5px}
+.help-dialog .help-tools input{grid-column:1/4;min-width:0}
+.help-dialog .help-tools .reader-directory{grid-column:3;grid-row:2;min-width:0;width:100%}
+.help-dialog .help-tools .reader-button{grid-row:2;min-width:0;white-space:nowrap}
+.help-dialog .help-tools .reader-match-count{grid-column:1/3;grid-row:3;max-width:none;margin:0;font-size:12px;line-height:16px}
+.help-dialog .help-tools .help-quick{grid-column:3;grid-row:3;min-width:0;max-height:18dvh;overflow:auto;margin:0;padding:0 6px;border-radius:4px;font-size:12px}
+.help-dialog .help-tools .help-quick summary{min-height:28px;padding:4px 0;line-height:20px;white-space:nowrap}
+.help-dialog .help-tools .help-quick[open]{grid-column:1/-1;grid-row:4}
+.help-dialog .reader-current-match{outline:2px solid #f4e8b3;outline-offset:2px;background:#f4df86;color:#0b2118}
+.help-dialog .reader-table{max-width:100%;overscroll-behavior-x:contain}
+@media(min-width:700px){
+ .help-dialog .help-tools{grid-template-columns:minmax(0,1fr) auto auto minmax(130px,.6fr) auto auto}
+ .help-dialog .help-tools input,.help-dialog .help-tools .reader-button,.help-dialog .help-tools .reader-directory,.help-dialog .help-tools .reader-match-count,.help-dialog .help-tools .help-quick{grid-column:auto;grid-row:auto}
+ .help-dialog .help-tools .help-quick[open]{grid-column:1/-1}
+}
+@media(max-width:480px),(max-height:700px){.game-dialog.help-dialog{padding:14px!important;gap:6px!important;height:calc(100dvh - 24px)}.help-dialog>[data-slot=dialog-title]{font-size:21px;line-height:26px}.help-dialog>[data-slot=dialog-description]{font-size:11px;line-height:15px}}
+@media(max-height:460px){
+ .game-dialog.help-dialog{padding:10px!important;gap:4px!important;height:calc(100dvh - 16px);max-height:calc(100dvh - 16px)!important}
+ .help-dialog>[data-slot=dialog-title]{font-size:18px;line-height:22px}
+ .help-dialog>[data-slot=dialog-description]{font-size:10px;line-height:13px}
+ .help-dialog>.help-layout{gap:4px}
+ .help-dialog .help-tools input,.help-dialog .help-tools select,.help-dialog .help-tools .reader-button{min-height:32px;height:32px;font-size:12px}
+ .help-dialog .help-tools .reader-button{padding:3px 5px}
+ .help-dialog .help-tools .reader-match-count{font-size:10px;line-height:14px;white-space:nowrap}
+ .help-dialog .help-tools .help-quick{font-size:10px;padding:0 3px}
+ .help-dialog .help-tools .help-quick summary{min-height:30px;line-height:22px;padding:4px 0}
+ .help-dialog>.fr-btn{min-height:32px;height:32px;margin:0;padding-top:4px!important;padding-bottom:4px!important}
+}
+@media(min-width:500px) and (max-height:460px){
+ .help-dialog .help-tools{grid-template-columns:minmax(50px,1fr) auto auto minmax(92px,.65fr) auto auto;gap:4px}
+ .help-dialog .help-tools input,.help-dialog .help-tools .reader-button,.help-dialog .help-tools .reader-directory,.help-dialog .help-tools .reader-match-count,.help-dialog .help-tools .help-quick{grid-column:auto;grid-row:auto}
+ .help-dialog .help-tools .help-quick[open]{grid-column:1/-1}
+}
+/* Priority batch 2: navigation changes focus only; it never confirms a launch. */
+.focus-shortcut{position:absolute;left:-10000px;top:0;z-index:12;padding:10px 14px;background:#173d2c;border:2px solid #dfcf95;color:#f0e5bb;min-height:44px}
+.focus-shortcut:focus{left:12px;top:6px}
+.choice-description{min-width:0;flex:1;overflow-wrap:anywhere}
+.scene-choice .choice-card .trait-species{display:block;margin:4px 0 8px;color:#c8d6a6;font-size:11px;line-height:1.45}
+.combo-progress label{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:10px 0}
+.combo-progress select{min-width:0;max-width:100%;min-height:44px;padding:5px 9px;background:#102c20;border:1px solid #8da17d;color:#e2d8b2;font-size:13px}
+.combo-progress-rows p{overflow-wrap:anywhere}
+.rest-priority{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-bottom:12px}
+.rest-priority .rest-checklist{padding:10px;gap:8px;min-width:0}
+.rest-current-resources{min-width:0;padding:10px;border:1px solid #87a48660;background:#18342870;color:#c8d6bd;font-size:13px;line-height:1.5;overflow-wrap:anywhere}
+.rest-current-resources p{margin:6px 0}.rest-current-resources small{font-size:11px}.rest-current-resources.low-health,.rest-current-resources .empty-bags{color:#f0c19e}
+.rest-details{margin:12px 0;border:1px solid #6f897344;padding:8px 10px}.rest-details>summary{min-height:36px;cursor:pointer;color:#c6d0b0;line-height:1.5}
+.rest-departure-resources{display:flex;flex-wrap:wrap;gap:3px 12px;font-size:12px;line-height:1.4;margin:0 0 6px;color:#d6d5ac;min-width:0;overflow-wrap:anywhere}
+.rest-departure-resources span{min-width:0}.rest-departure-resources strong{font-weight:500}
+.result-record{min-width:0;max-width:100%}.result-record .result-identity,.result-record .record-seed,.result-record .result-lock,.history-identity,.record-seed{overflow-wrap:anywhere;white-space:pre-wrap}
+.result-record .record-save-ok small,.result-record .record-save-pending small{display:block;overflow-wrap:anywhere;font-size:12px}
+.result-copy-actions{display:flex;flex-wrap:wrap;gap:7px 12px;margin:8px 0}
+.readonly-copy{min-width:0;max-width:100%;font-size:12px}.readonly-copy .fr-btn{min-height:44px;padding:7px 12px;font-size:12px}
+.readonly-copy output{display:block;font-size:12px;line-height:1.5;color:#c8d8bd}
+.readonly-copy-fallback{min-width:0;max-width:100%;margin:6px 0}.readonly-copy-fallback textarea{box-sizing:border-box;width:100%;max-width:100%;min-width:0;min-height:64px;background:#092219;color:#e1dec0;border:1px solid #9baf87;padding:7px;font:12px/1.5 monospace;white-space:pre-wrap;overflow-wrap:anywhere}
+.result-record-details>summary{min-height:36px;padding:6px 0;cursor:pointer;color:#d8cead;font-size:13px;line-height:1.5}
+.current-conditions,.core-current-state{min-width:0;overflow-wrap:anywhere}.core-current-state{color:#dbd1a7!important}
+.combat-feedback .sigil-timing>b,.combat-feedback .sigil-timing>small{display:block;font-size:inherit;font-weight:400;line-height:1.4}
+.damage-report{min-width:0;max-width:100%}.damage-report .damage-bars>div>span{width:120px;min-width:90px;max-width:44%;overflow-wrap:anywhere}.damage-report .damage-bars>div>small{flex:0 0 68px;max-width:30%;overflow-wrap:anywhere}
+.damage-source-notes{margin:10px 0;font-size:12px;line-height:1.6;color:#bdccb6}.damage-source-notes>summary{min-height:36px;cursor:pointer}.damage-source-notes p{overflow-wrap:anywhere}
+.combat-feedback .thunder-target-preview{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:600px){.rest-priority{grid-template-columns:minmax(0,1fr)}.result-record{padding:10px;margin:8px 0}.result-record p{font-size:12px;line-height:1.5;margin:5px 0}.result-record h3{font-size:16px;margin-bottom:6px}.result-copy-actions{gap:6px}.readonly-copy .fr-btn{padding:5px 9px}}
+@media(max-height:600px),(max-width:420px){.rest-departure-resources{font-size:11px;line-height:14px;margin-bottom:4px;gap:2px 8px}.rest-priority .rest-checklist{padding:8px;gap:6px;font-size:12px}.rest-current-resources{padding:8px;font-size:12px}.rest-priority .rest-checklist button{font-size:12px;padding:5px 8px}}
+
+/* Priority batch 3: resource readouts are separate reading actions, never combat actions. */
+.resource-trigger{font:inherit;color:inherit;background:none;border:1px solid transparent;cursor:pointer;min-height:44px;text-align:left}
+.resource-trigger:focus-visible,.consumable-info:focus-visible,.hud-summary-tabs button:focus-visible{outline:2px solid #dfd09d;outline-offset:2px}
+.battle-header .vitals.resource-trigger{display:block;flex:1;padding:0;min-width:0;border:0}
+.ally-counts.resource-trigger{width:100%;padding:3px 0}
+.reserve-details-trigger{display:flex;flex-direction:column;justify-content:center;max-width:100%;padding:3px 4px;border-color:#84936370;background:#112c22;line-height:1.4;overflow-wrap:anywhere}
+.consumables .consumable-info{flex:0 0 44px;width:44px;min-width:44px;min-height:44px;align-self:stretch;padding:3px;border:1px solid #84936388;background:#102d22;color:#dce6c6;font-size:11px;line-height:16px}
+.aim-instruction{display:block;max-width:72px;padding:3px;color:#c6d3b6;font-size:11px;line-height:16px;text-align:center;overflow-wrap:anywhere}
+.hud-summary-tabs{display:flex;flex-wrap:wrap;gap:5px;flex-shrink:0}.hud-summary-tabs button{min-height:44px;flex:1;min-width:44px;padding:4px 8px;border:1px solid #7b947466;background:#0c241b;color:#c9d6b5;font-size:12px}
+.hud-summary-tabs button[aria-pressed=true]{border-color:#d6cc91;background:#2b4934;color:#f0e4b4}
+.hud-summary-dialog>.panel-body-wrap{min-height:0;flex:1}.hud-summary-dialog .panel-action-dock{flex-shrink:0}
+/* Priority batch 4: reading stays scrollable while the primary pause/result actions remain visible. */
+.game-dialog.scene-pause,.game-dialog.scene-result{display:flex!important;flex-direction:column;overflow:hidden;max-height:calc(100dvh - 24px)!important;gap:10px!important}
+.scene-pause>.dialog-heading,.scene-result>.dialog-heading,.review-navigation,.review-action-dock{flex-shrink:0}
+.scene-pause>.panel-body-wrap,.scene-result>.panel-body-wrap{flex:1;min-height:0;overflow:hidden}
+.scene-pause .panel-body,.scene-result .panel-body{scroll-padding-top:8px}
+.review-navigation{display:flex;gap:6px;overflow-x:auto;overscroll-behavior-x:contain;min-width:0;padding:2px 0 5px}
+.review-navigation>button{flex-shrink:0;min-height:44px;padding:6px 10px;border:1px solid #7a987666;background:#112d23;color:#dce8c7;font-size:13px;white-space:nowrap;border-radius:4px}
+.review-action-dock{display:flex;gap:8px;border-top:1px solid #83977766;padding-top:9px;margin:0!important}
+.review-action-dock>.fr-btn{flex:1;min-width:0;min-height:44px;margin:0!important;white-space:normal}
+.review-disclosure{margin:12px 0;min-width:0}
+.review-disclosure>summary{min-height:44px;cursor:pointer;padding:10px 6px;color:#dce6c4;border-bottom:1px solid #7a987644}
+.review-disclosure .sigil-report,.review-disclosure .damage-report{margin-top:8px}
+.review-navigation>button:focus-visible,.review-disclosure:focus-visible,.scene-pause [tabindex='-1']:focus-visible,.scene-result [tabindex='-1']:focus-visible{outline:2px solid #e0ce97;outline-offset:2px}
+@media(max-height:420px){.game-dialog.scene-pause,.game-dialog.scene-result{padding:10px!important;gap:5px!important;max-height:calc(100dvh - 12px)!important}.scene-pause>.dialog-heading,.scene-result>.dialog-heading{padding-bottom:0}.scene-pause .dialog-heading>.eyebrow,.scene-result .dialog-heading>.eyebrow{display:none}.scene-pause [data-slot=dialog-title],.scene-result [data-slot=dialog-title]{font-size:20px;line-height:25px}.scene-pause [data-slot=dialog-description],.scene-result [data-slot=dialog-description]{font-size:11px;margin:0}.review-navigation{padding-bottom:2px}.review-action-dock{padding-top:5px}.review-action-dock>.fr-btn{font-size:12px!important;padding:5px!important}}
+.resource-details,.consumable-details,.combat-status-details,.aim-status-summary{min-width:0;overflow-wrap:anywhere;font-size:13px;line-height:1.65}
+.resource-details h3,.consumable-details h3,.combat-status-details h3,.aim-status-summary h3{font-size:16px;margin:10px 0 6px}
+.resource-details p,.consumable-details p,.combat-status-details p,.aim-status-summary p{margin:7px 0}
+.resource-details .stat-ledger table{min-width:0;font-size:12px}.resource-details .stat-ledger th:first-child{min-width:0}.resource-details .stat-ledger td,.resource-details .stat-ledger th{padding:6px;overflow-wrap:anywhere}
+.consumable-detail{padding:12px;border:1px solid #819a6f70;background:#17382950;margin:10px 0;min-width:0}.consumable-availability{color:#e6d297}.consumable-effect{color:#c5d9b1}.consumable-note{font-size:12px;color:#c1cab6}
+.supply-actual{color:#e6d6a4!important}.supply-disabled-reason{color:#efbe95!important}.supply-capacity,.supply-quota{overflow-wrap:anywhere}
+.combat-status .combat-status-overview{display:flex;flex-wrap:wrap;gap:3px 12px;align-items:baseline}.combat-status .combat-summon-count{font-size:11px;color:#d8dfb7}
+.combat-status .combat-target-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 10px;min-width:0}
+.combat-status .combat-target-line{min-width:0;font-size:11px;line-height:15px}.combat-status .combat-target-name{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;color:#e4d6ac;white-space:normal;overflow-wrap:anywhere;font-weight:500}
+.combat-status .combat-target-metrics{display:block;font-size:11px;line-height:15px;white-space:normal;overflow:visible;color:#bbd2b7}
+.combat-status .defend-assignment{display:block;font-size:11px;line-height:15px;white-space:normal}.combat-status .combat-target-more{display:block;font-size:10px;line-height:14px}
+.status-target-row{min-width:0;padding:8px 10px;margin:7px 0;border-left:2px solid #92ab78;background:#152d2380;overflow-wrap:anywhere}.status-target-row strong,.status-target-row small{display:block}
+.fanren .mobile-status.combat-status{top:var(--battle-header-base,86px);bottom:auto;max-height:none;min-width:0;height:auto;padding:3px 6px;white-space:normal;overflow:hidden}
+.hud-compact .mobile-status.combat-status{display:block;left:8px;right:8px;width:auto;max-width:none}
+.hud-compact .mobile-status.combat-status>span,.hud-compact .mobile-status.combat-status>div{display:block}
+.hud-compact .mobile-status.combat-status .combat-target-list{display:grid}
+.fanren .boss-bar{top:calc(var(--battle-header-base,86px) + var(--battle-status-height,20px) + 3px)}
+.fanren .objective-note{top:calc(var(--battle-header-base,86px) + var(--battle-status-height,20px) + 5px)}
+.hud-compact .reserve-details-trigger{min-height:44px;font-size:11px;line-height:14px;padding:2px;align-self:stretch}
+.hud-compact .reserve-details-trigger .compact-allies{display:block!important;line-height:13px;font-size:10px;white-space:normal}
+.hud-compact .reserve-label{min-width:70px;flex-shrink:1}.hud-compact .consumables{min-width:0}.hud-compact .consumables .consumable-slot{width:auto;min-width:44px;flex:1 1 0}
+@media(max-width:600px){.hud-summary-dialog{height:calc(100dvh - 24px);max-height:calc(100dvh - 24px)!important;padding:14px!important;gap:8px!important}.hud-summary-tabs{gap:4px}.hud-summary-tabs button{padding:3px 5px}.resource-details,.consumable-details,.combat-status-details,.aim-status-summary{font-size:12px}.resource-details .stat-ledger td,.resource-details .stat-ledger th{padding:5px}}
+@media(max-height:420px){.hud-summary-dialog{height:calc(100dvh - 16px);max-height:calc(100dvh - 16px)!important;padding:10px!important;gap:6px!important}.hud-summary-dialog [data-slot=dialog-title]{font-size:20px;line-height:25px}.hud-summary-dialog [data-slot=dialog-description]{font-size:11px;margin:0}.hud-summary-dialog .panel-action-dock{padding-top:5px}.hud-compact .consumables{max-width:190px}.hud-compact .battle-footer{gap:6px}.hud-compact .skill-controls{gap:5px}.hud-compact .reserve-label{margin-right:0}.hud-compact .mobile-status.combat-status{padding:2px 5px}.combat-status .combat-status-overview{gap:2px 9px}}
+@media(max-width:300px){.aim-instruction{display:none}.hud-compact .consumables .consumable-info{flex-basis:44px}}
+.hud-compact .mobile-status.combat-status>.combat-status-overview{display:flex}
+.combat-status .combat-status-overview>strong{display:inline;min-width:0;font-size:11px;line-height:15px;white-space:normal}
+.combat-feedback .gnaw-full-current{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;line-height:15px}
+.combat-feedback .defend-crisis{font-size:12px;line-height:16px}
+
+/* Short tactical timers share their real operation area; reserve stable space during each window. */
+.tactical-window-slot{display:flex;align-items:center;justify-content:center;min-height:20px;width:100%;flex-shrink:0}
+.tactical-window-cue{display:flex;flex-direction:column;gap:2px;max-width:100%;color:#dfd8ae;pointer-events:none;font-size:12px;line-height:15px;letter-spacing:0}
+.tactical-window-cue.is-active{color:#cceba9}
+.tactical-window-label{white-space:nowrap}
+.tactical-window-meter{display:block;height:3px;min-height:3px;width:100%;background:#a6b88c33;border-radius:2px;overflow:hidden}
+.tactical-window-meter>i{display:block;height:100%;background:#c9dc98}
+.skill-controls .dash-button[data-tactical-window],.hud-compact .skill-controls .dash-button[data-tactical-window]{width:82px;min-width:82px;height:76px;min-height:76px}
+.skill-controls .thunder-button[data-tactical-window],.hud-compact .skill-controls .thunder-button[data-tactical-window]{height:76px;min-height:76px}
+.sigil-effective-summary{display:flex;flex-wrap:wrap;gap:6px 14px;padding:8px;border:1px solid #82926c66;background:#26372455}
+.sigil-recent{min-width:0;margin:10px 0}.sigil-recent>summary{min-height:44px;padding:10px 4px;cursor:pointer}
+.sigil-recent ol{margin:8px 0;padding-left:22px}.sigil-recent-row{padding:8px 0;border-bottom:1px solid #7b917944;font-size:13px;line-height:1.6;overflow-wrap:anywhere}
+.sigil-recent-row p{margin:4px 0}.sigil-review-boundary,.sigil-practice-link small,.split-comparison-empty{display:block;font-size:12px;line-height:1.7;color:#bdcdb6}
+.sigil-practice-link{display:flex;flex-direction:column;gap:6px;align-items:flex-start;margin-top:10px}
+
+.boss-health-number{font-variant-numeric:tabular-nums;white-space:nowrap;color:#e6d4a3}.ending-submit-note{flex-shrink:0;margin:0;font-size:12px;line-height:1.5;color:#bad1ad}.xp-label>span{min-width:0}.xp-label>span:first-child{overflow-wrap:anywhere}
+
+.sigil-effective-summary>p{flex:1 1 150px;margin:0;display:flex;flex-direction:column;gap:3px}.sigil-effective-summary>p>span{font-size:12px}
+.game-dialog .review-action-dock>.fr-btn{flex:1 1 0;min-width:0}.skill-controls .tactical-window-label{font-size:11px!important;line-height:14px!important}.skill-controls .tactical-window-cue{line-height:14px}
+
+.game-dialog .review-action-dock>.fr-btn{font-size:14px!important;letter-spacing:0;padding-left:6px!important;padding-right:6px!important;align-self:stretch}
+.scene-pause>.dialog-heading,.scene-result>.dialog-heading{padding-bottom:8px}.scene-pause .dialog-heading [data-slot=dialog-title],.scene-result .dialog-heading [data-slot=dialog-title]{margin-bottom:5px}.scene-pause .dialog-heading .eyebrow,.scene-result .dialog-heading .eyebrow{margin-bottom:5px}
+.scene-pause .sigil-report,.scene-result .sigil-report{padding-top:0}.scene-pause .sigil-report h3,.scene-result .sigil-report h3{margin-top:4px}
+@media(max-width:600px) and (min-height:421px){.game-dialog.scene-pause,.game-dialog.scene-result{padding:16px!important}}
+@media(max-height:420px){.scene-pause>.dialog-heading,.scene-result>.dialog-heading{padding-bottom:0}.game-dialog .review-action-dock>.fr-btn{font-size:12px!important}}
+/* Priority batch 5: settings scroll separately from its return controls. */
+.page-settings .library-panel{display:flex;flex-direction:column;overflow:hidden;padding-bottom:12px}
+.page-settings .panel-top{flex-shrink:0;margin-bottom:8px;padding-bottom:8px}.page-settings .settings-top-return{display:none}
+.settings-frame{display:flex;flex:1;flex-direction:column;min-height:0;gap:8px}.settings-frame>.panel-body-wrap{min-height:0;flex:1}
+.settings-sections{min-width:0}.settings-sections .touch-settings{margin-top:0}.settings-sections .settings-grid{gap:18px}
+.settings-navigation{display:flex;gap:6px;overflow-x:auto;flex-shrink:0;padding:2px 0 5px;min-height:49px}
+.settings-navigation>button{min-height:44px;flex-shrink:0;padding:6px 10px;background:#132e25;border:1px solid #7f9b7966;color:#dce8c7;font-size:13px;border-radius:4px}
+.settings-action-dock{display:flex;flex-shrink:0;gap:8px;border-top:1px solid #7a947566;padding-top:8px}.settings-action-dock>.fr-btn{flex:1;min-width:0;min-height:44px;margin:0;white-space:normal;font-size:14px!important;letter-spacing:0;padding-left:6px!important;padding-right:6px!important}
+.settings-sections [tabindex='-1']:focus-visible,.settings-navigation button:focus-visible{outline:2px solid #ddce9c;outline-offset:2px}
+.touch-layout-presets{margin:10px 0 18px;padding-bottom:12px;border-bottom:1px solid #8bad8544}.touch-layout-presets small{font-size:12px;line-height:1.6;color:#b7caae}
+@media(max-width:600px){.page-settings .library-panel{padding:12px 10px;top:78px;bottom:8px}.page-settings .panel-top h2{font-size:22px}.page-settings .panel-top .eyebrow{display:none}.settings-sections .settings-grid{display:block}.settings-action-dock>.fr-btn{font-size:12px!important}}
+@media(max-height:420px){.page-settings .library-panel{top:65px;bottom:6px;padding:8px 10px}.page-settings .panel-top{margin:0;padding:0}.page-settings .panel-top h2{font-size:20px;line-height:25px;margin:0}.page-settings .panel-top .eyebrow{display:none}.settings-frame{gap:4px}.settings-navigation{padding-bottom:2px;min-height:46px}.settings-action-dock{padding-top:4px}.settings-action-dock>.fr-btn{font-size:12px!important}.settings-sections .touch-settings{padding:8px}}
+/* The original placement remains the default. Opt-in links the auxiliary controls to the skill group. */
+.touch-supplies-follow .battle-footer .skill-controls .reserve-label{position:static;order:2;margin:0 0 0 4px;width:auto;max-width:180px;align-items:flex-start;text-align:left;justify-content:center}
+.touch-supplies-follow .battle-footer .skill-controls{display:flex;flex-wrap:nowrap;align-items:center;padding-bottom:0}
+.touch-supplies-follow.touch-skills-left .battle-footer{flex-direction:row}
+.touch-supplies-follow.touch-skills-left .battle-footer .skill-controls{order:0;justify-content:flex-start}.touch-supplies-follow.touch-skills-left .battle-footer .consumables{order:1;margin:0 auto 0 0}.touch-supplies-follow.touch-skills-left .battle-footer .progress-section{order:2;margin-left:auto}
+.touch-supplies-follow.touch-skills-right .battle-footer .progress-section{order:0;margin-right:auto}.touch-supplies-follow.touch-skills-right .battle-footer .consumables{order:1;margin:0}.touch-supplies-follow.touch-skills-right .battle-footer .skill-controls{order:2;justify-content:flex-end}
+.hud-compact.touch-supplies-follow .battle-footer .skill-controls .reserve-label{max-width:94px;min-width:70px;margin-left:0;flex-shrink:1}
+@media(orientation:portrait){.hud-compact.touch-supplies-follow .battle-footer{display:grid;grid-template-columns:minmax(0,1fr) 96px}.hud-compact.touch-supplies-follow .battle-footer .progress-section{grid-column:2;grid-row:1;margin:0;justify-self:end}.hud-compact.touch-supplies-follow .battle-footer .consumables{grid-column:1;grid-row:1;margin:0;justify-self:start;justify-content:flex-start;width:100%;max-width:260px}.hud-compact.touch-supplies-follow .battle-footer .skill-controls{grid-column:1/-1;grid-row:2;margin:0}.hud-compact.touch-supplies-follow.touch-skills-right .battle-footer{grid-template-columns:96px minmax(0,1fr)}.hud-compact.touch-supplies-follow.touch-skills-right .battle-footer .progress-section{grid-column:1;justify-self:start}.hud-compact.touch-supplies-follow.touch-skills-right .battle-footer .consumables{grid-column:2;justify-self:end;justify-content:flex-end}}
+/* Full viewport preview: the same footer/joystick DOM uses the same media queries, with no live actions. */
+.layout-preview-dialog{--tw-translate-x:0px!important;--tw-translate-y:0px!important;position:fixed!important;inset:0!important;translate:none!important;transform:none!important;width:100vw!important;max-width:none!important;height:100dvh!important;max-height:none!important;padding:0!important;border:0!important;border-radius:0!important;overflow:hidden!important;background:#081d17!important;gap:0!important}
+.layout-preview-surface{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;background:radial-gradient(ellipse at center,#214437,#091b16 70%);pointer-events:none!important}
+.layout-preview-captured{display:contents}.layout-preview-surface *{pointer-events:none!important}.layout-preview-surface .thumb-clear{display:grid;place-items:center;position:absolute;left:var(--thumb-left,118px);top:var(--thumb-top,50%);width:44px;height:44px;z-index:4;border:1px dashed #a8c593;border-radius:4px;background:#183d2c;color:#dcebd2;font-size:12px}
+.layout-preview-tools{position:absolute;top:47%;left:50%;transform:translate(-50%,-50%);width:min(300px,calc(100% - 140px));min-width:170px;z-index:8;background:#0d271ff0;border:1px solid #84987599;border-radius:5px;padding:10px;text-align:center;box-sizing:border-box;color:#dce8c7}
+.layout-preview-tools [data-slot=dialog-title]{font-size:16px;line-height:1.4;margin:0 0 4px}.layout-preview-tools [data-slot=dialog-description],.layout-preview-tools p{font-size:11px;line-height:1.5;margin:5px 0}.layout-preview-tools>.fr-btn{min-height:44px;width:100%;margin-top:3px}
+@media(max-height:420px){.layout-preview-tools{top:48%;width:280px;padding:7px}.layout-preview-tools>p:not([data-slot=dialog-description]){display:none}.layout-preview-tools [data-slot=dialog-title]{font-size:14px}.layout-preview-tools [data-slot=dialog-description]{margin:3px 0}}
+/* The real game inherits the body's 1.5 line height; a dialog's text-sm must not change preview geometry. */
+.layout-preview-surface{line-height:1.5}
+/* Priority batch 6: settlement evidence and read-only item state use the finished run. */
+.result-outcome{margin:12px 0;padding:12px;border:1px solid #839e7166;background:#1d352b66;border-radius:5px;min-width:0}
+.result-outcome h3{margin:0 0 6px}.result-outcome p{margin:6px 0;line-height:1.7;overflow-wrap:anywhere}.outcome-gains b,.outcome-balances b{font-variant-numeric:tabular-nums;color:#ecdfa8}
+.result-outcome .first-victory-unlock{padding:8px;border-left:3px solid #d4c577;background:#52644244;color:#e8eab3}.outcome-pending{color:#e9c799}.outcome-unrecorded,.outcome-existing-unlock{font-size:12px;color:#c4d1b7}
+.outcome-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.outcome-actions>.fr-btn{flex:1 1 150px;min-width:0;min-height:44px;white-space:normal;height:auto;letter-spacing:0;font-size:13px!important;padding:8px!important}.outcome-actions>.fr-btn:disabled{opacity:.55}
+.outcome-explanation>summary,.story-item-details>summary{min-height:44px;padding:10px 0;cursor:pointer;line-height:1.7;overflow-wrap:anywhere}.outcome-explanation{margin-top:8px}.outcome-explanation p{font-size:12px;color:#bfceb4}
+.story-item-summary{min-width:0}.story-item-summary p{line-height:1.7;overflow-wrap:anywhere}.story-item-list{display:grid;gap:8px;min-width:0}.story-item-entry{border:1px solid #82977766;border-radius:5px;background:#203a2b66;min-width:0}
+.story-item-entry>summary{min-height:44px;padding:10px;line-height:1.7;cursor:pointer;overflow-wrap:anywhere}.story-item-entry>summary>span{font-weight:600}.story-item-entry>summary>small{display:block;margin-left:18px;font-size:12px;color:#bfceb4;white-space:normal}.story-item-content{padding:0 12px 10px;font-size:13px;line-height:1.7}.story-item-content p{margin:8px 0}.story-item-state{display:grid;grid-template-columns:80px minmax(0,1fr);gap:6px;margin:10px 0}.story-item-state dt{color:#b8c8aa}.story-item-state dd{margin:0;overflow-wrap:anywhere}.story-item-boundary,.story-item-notice,.story-item-effect-note{font-size:12px;color:#bacbad}.story-item-canon{color:#e1cc98}
+.result-outcome :focus-visible,.story-item-details :focus-visible{outline:2px solid #dacf9d;outline-offset:2px}.lodge-nav{flex-wrap:wrap}.lodge-nav>[data-result-return]{color:#eddda8}
+@media(max-width:400px){.result-outcome{padding:8px}.outcome-actions>.fr-btn{flex-basis:100%}.story-item-state{grid-template-columns:minmax(0,1fr);gap:2px}.story-item-state dd{margin:0 0 6px}.story-item-content{padding-left:10px;padding-right:10px}}
+
+/* Pending-save controls remain reachable by the review shortcut without covering reward text. */
+.scene-result .pending-result-actions{position:static;margin:10px 0}

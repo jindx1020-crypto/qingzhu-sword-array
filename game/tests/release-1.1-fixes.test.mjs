@@ -63,11 +63,12 @@ void test('pending saves: recovery attempts never become the base of later resul
  assert.match(game,/const recovery=!!\(options\.recoveryCandidate\|\|options\.resolveRecovery\),rejected=!!frozen&&!writableRecord\(frozen\);\n\s*if\(frozen&&!recovery&&!rejected\)pendingSaveRef\.current=/);
  assert.match(game,/const pending=typeof fn==='function'&&!options\.discardPending\?pendingSaveRef\.current:null;/);
  assert.match(game,/fn\(pending\?structuredClone\(pending\.next\):saveRef\.current\)/);
- assert.match(game,/persist\(s=>settleRunResult\(s,\{\.\.\.ev\.summary,seen:\[\.\.\.b\.seen\]\}\),\{onSuccess:/);
+ assert.match(game,/persist\(s=>\{const summary=\{\.\.\.ev\.summary,seen:\[\.\.\.b\.seen\]\},next=settleRunResult\(s,summary\);rememberAttempt\(b,s,next,summary\);return next;\},\{onSuccess:/,'settlement still uses the functional pending base and returns its exact result after read-only observation');
+ assert.equal((game.match(/settleRunResult\(/g)||[]).length,1,'the display observer must not perform a second settlement');
  assert.doesNotMatch(game,/settleRunResult\(pendingSaveRef\.current\?\.next\|\|saveRef\.current/);
  assert.match(game,/discardPending:true,resolveRecovery:/,'a confirmed new run explicitly drops the abandoned pending record');
  assert.match(game,/if\(!confirmed&&\(pendingSaveRef\.current\|\|checkpointDirty\(battleRef\.current,saveRef\.current\)\)\)\{showRisk\(\{title:'放弃未保存的进度并继续？'/);
- assert.match(game,/function openSettings\(\)\{if\(pageRef\.current!=='settings'\)settingsOrigin\.current=/);
+ assert.match(game,/if\(pageRef\.current!=='settings'\)settingsOrigin\.current=/);
 });
 
 void test('a failed adoption leaves disk and backup untouched for the next ordinary write',()=>{

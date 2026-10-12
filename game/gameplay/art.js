@@ -12,6 +12,7 @@ import {sigilFuse} from './sigil-metrics.js';
 import {WORLD} from './engine.js';
 import {layoutFor} from './encounters.js';
 import {seeded} from './data.js';
+import {placeObjectiveLabel} from './progress-display.js';
 export {ASSETS};
 const TAU=Math.PI*2;
 function load(src){return new Promise((resolve,reject)=>{const i=new Image();i.onload=()=>resolve(i);i.onerror=()=>reject(Error('素材未能加载'));i.src=src;});}
@@ -53,7 +54,14 @@ export class Renderer{
  drawBossDefeat(){const f=this.bossDeath;if(!f)return;const t=(performance.now()-f.started)/900;if(t>=1){this.bossDeath=null;return;}const ctx=this.ctx,{x,y,scale}=this.camera;ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);ctx.globalAlpha=1-t;ctx.strokeStyle=f.color;ctx.fillStyle=f.color;ctx.lineWidth=3;ctx.beginPath();ctx.arc(f.x,f.y-24,20+t*100,0,TAU);ctx.stroke();sprite(ctx,this.art.foes[f.sprite],f.x,f.y+10-t*22,110*(1-t*.18),(1-t)*.65);for(let i=0;i<18;i++){const a=i*2.39996,d=24+t*(55+i%4*15),size=Math.max(1,5*(1-t));ctx.fillRect(f.x+Math.cos(a)*d-size/2,f.y-35+Math.sin(a)*d-size/2-t*20,size,size);}ctx.font='bold 16px sans-serif';ctx.textAlign='center';ctx.fillText(f.name+' · 消散',f.x,f.y-120-t*15);ctx.restore();}
  drawObjective(b,_time){const q=b.objective,ctx=this.ctx;if(!q)return;ctx.save();ctx.textAlign='center';ctx.font='bold 17px sans-serif';ctx.lineWidth=3;
   if(q.kind==='defend'){sprite(ctx,this.art.props[0],q.x,q.y+20,110);drawHealthBar(ctx,q.x-55,q.y-112,110,8,q.hp,q.maxHp,'#a2e7c3');ctx.fillStyle='#a2e7c3';ctx.fillText('护持阵盘',q.x,q.y-130);}
-  if(q.kind==='illusion')q.gates.forEach((g,i)=>{const real=i===q.trueGate,open=b.waveTime>=q.next;sprite(ctx,this.art.props[open?2:1],g.x,g.y+40,125,real?1:.6);ctx.strokeStyle=real?'#dfd3a2':'#91a5b0';ctx.beginPath();ctx.arc(g.x,g.y,72,0,TAU);ctx.stroke();if(real){ctx.beginPath();ctx.arc(g.x,g.y,79,0,TAU);ctx.stroke();}ctx.fillStyle=real?'#ffe4aa':'#b5c1c5';ctx.fillText(real?(open?'真 · 可通行':'真 · '+Math.max(0,Math.ceil(q.next-b.waveTime))+'秒后通行'):'幻 · 勿入',g.x,g.y-103);});
+  if(q.kind==='illusion'){
+   const camera=this.camera,scale=camera.scale,font=Math.max(17,12/scale),occupied=[...(this.hudAvoid||[])];ctx.font='bold '+font+'px sans-serif';
+   q.gates.forEach((g,i)=>{const real=i===q.trueGate,open=b.waveTime>=q.next;sprite(ctx,this.art.props[open?2:1],g.x,g.y+40,125,real?1:.6);ctx.strokeStyle=real?'#dfd3a2':'#91a5b0';ctx.lineWidth=3;ctx.beginPath();ctx.arc(g.x,g.y,72,0,TAU);ctx.stroke();if(real){ctx.beginPath();ctx.arc(g.x,g.y,79,0,TAU);ctx.stroke();}
+    const text=real?(open?'真 · 可通行':'真 · '+Math.max(0,Math.ceil(q.next-b.waveTime))+'秒后通行'):'幻 · 勿入',label=placeObjectiveLabel(camera,{x:g.x,y:g.y-103},{width:ctx.measureText(text).width*scale+10,height:font*scale+8},occupied),x=(label.x-camera.x)/scale,y=(label.y-camera.y)/scale;
+    if(label.moved){ctx.strokeStyle=real?'#dfd3a288':'#91a5b077';ctx.lineWidth=1/scale;ctx.beginPath();ctx.moveTo(g.x,g.y-79);ctx.lineTo(x,y-font*.5);ctx.stroke();}
+    ctx.fillStyle='#081c17e8';ctx.fillRect((label.left-camera.x)/scale,(label.top-camera.y)/scale,label.width/scale,label.height/scale);ctx.fillStyle=real?'#ffe4aa':'#b5c1c5';ctx.fillText(text,x,y-4/scale,Math.max(1,(label.width-10)/scale));occupied.push(label);
+   });
+  }
   if(q.kind==='ice'){ctx.fillStyle='#a2c8ed44';ctx.strokeStyle='#dcecff';ctx.beginPath();ctx.arc(q.x,q.y,q.r,0,TAU);ctx.fill();ctx.stroke();ctx.fillStyle='#dbedff';ctx.fillText('乾蓝冰焰 · 后撤',q.x,q.y-15);}
   if(q.exit){const open=q.kind==='ice'?b.waveTime>=40:q.done>=q.total;sprite(ctx,this.art.props[open?2:1],q.exit.x,q.exit.y+35,125);ctx.strokeStyle=open?'#a4edc7':'#9dada7';ctx.beginPath();ctx.arc(q.exit.x,q.exit.y,q.exit.r,0,TAU);ctx.stroke();ctx.fillStyle='#e9e1b8';ctx.fillText(open?'退路已开 · 靠近离场':'退路待开',q.exit.x,q.exit.y-106);}
  ctx.restore();}
